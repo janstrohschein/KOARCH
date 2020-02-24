@@ -1,0 +1,9 @@
+FROM python:3
+
+COPY ./configurations/requirements_2pc.txt /
+RUN pip install -r requirements_2pc.txt
+
+COPY . /src
+WORKDIR /src
+
+CMD ["python", "2pc_get_tweet_emotions.py"]

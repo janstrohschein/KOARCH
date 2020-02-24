@@ -1,0 +1,3 @@
+avro-python3
+kafka-python
+psycopg2-binary

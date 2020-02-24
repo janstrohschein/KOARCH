@@ -1,0 +1,15 @@
+{"type": "record",
+ "name": "Tweet_Emotions",
+ "fields": [{"name": "author_id_str", "type": ["string"]},
+    {"name": "status_id_str", "type": ["string"]},
+    {"name": "status_created_at_str", "type": ["string"]},
+    {"name": "text", "type": ["string"]},
+    {"name": "retweet_count", "type": ["null", "long"]},
+    {"name": "anger", "type": ["float"]},
+    {"name": "disgust", "type": ["float"]},
+    {"name": "fear", "type": ["float"]},
+    {"name": "joy", "type": ["float"]},
+    {"name": "sadness", "type": ["float"]},
+    {"name": "surprise", "type": ["float"]}
+    ]
+    }

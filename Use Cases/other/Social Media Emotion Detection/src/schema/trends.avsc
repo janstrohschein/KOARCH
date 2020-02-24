@@ -1,0 +1,10 @@
+{"type": "record",
+ "name": "Trend",
+ "fields": [{"name": "location_name", "type": ["null","string"]},
+    {"name": "trend_name", "type": ["null", "string"]},
+    {"name": "promoted_content", "type": ["null", "string"]},
+    {"name": "query", "type": ["null", "string"]},
+    {"name": "tweet_volume", "type": ["null", "long"]},
+    {"name": "url", "type": ["null", "string"]}
+    ]
+    }

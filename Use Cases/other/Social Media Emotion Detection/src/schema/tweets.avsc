@@ -1,0 +1,10 @@
+{"type": "record",
+ "name": "Tweet",
+ "fields": [
+	{"name": "author_id_str", "type": ["string"]},
+    {"name": "status_id_str", "type": ["string"]},
+    {"name": "status_created_at_str", "type": ["string"]},
+    {"name": "text", "type": ["string"]},
+    {"name": "retweet_count", "type": ["null", "long", "int"]}
+    ]
+    }

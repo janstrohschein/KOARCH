@@ -1,0 +1,154 @@
+version: '2'
+    
+services:
+
+  0p_get_twitter_users:
+    container_name: 0p_get_twitter_users
+    build:
+      context: ./src
+      dockerfile: Dockerfile_0p
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      OUT_TOPIC: twitter_users
+      OUT_SCHEMA_FILE: ./schema/users.avsc
+      CONFIG_PATH: ./configurations/twitter.ini
+
+  1pc_get_user_tweets:
+    container_name: 1pc_get_user_tweets
+    build:
+      context: ./src
+      dockerfile: Dockerfile_1pc
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: twitter_users
+      IN_GROUP: get_twitter_users
+      IN_SCHEMA_FILE: ./schema/users.avsc
+      OUT_TOPIC: user_tweets
+      OUT_SCHEMA_FILE: ./schema/tweets.avsc
+      CONFIG_PATH: ./configurations/twitter.ini      
+
+  1c_postgres_db:
+    container_name: 1c_postgres_db
+    image: postgres:alpine
+    hostname: 1c_postgres_db
+    ports:
+    - "54321:5432"
+    volumes:
+      - 1c_postgres_volume:/var/lib/postgresql/data
+  
+  1c_persist_users_to_postgres:
+    container_name: 1c_persist_users_to_postgres
+    build:
+      context: ./src
+      dockerfile: Dockerfile_1c_postgres
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: twitter_users
+      IN_GROUP: persist_twitter_users
+      IN_SCHEMA_FILE: ./schema/users.avsc
+      CONFIG_PATH: ./configurations/1c_postgres.ini
+    links:
+      - 1c_postgres_db
+    depends_on:
+      - 1c_postgres_db
+
+  2pc_get_tweet_emotions_1:
+    container_name: 2pc_get_tweet_emotions_1
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2pc
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: user_tweets
+      IN_GROUP: get_emotions
+      IN_SCHEMA_FILE: ./schema/tweets.avsc
+      OUT_TOPIC: tweet_emotions
+      OUT_SCHEMA_FILE: ./schema/tweet_emotions.avsc
+      
+  2pc_get_tweet_emotions_2:
+    container_name: 2pc_get_tweet_emotions_2
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2pc
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: user_tweets
+      IN_GROUP: get_emotions
+      IN_SCHEMA_FILE: ./schema/tweets.avsc
+      OUT_TOPIC: tweet_emotions
+      OUT_SCHEMA_FILE: ./schema/tweet_emotions.avsc
+      
+  2pc_get_tweet_emotions_3:
+    container_name: 2pc_get_tweet_emotions_3
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2pc
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: user_tweets
+      IN_GROUP: get_emotions
+      IN_SCHEMA_FILE: ./schema/tweets.avsc
+      OUT_TOPIC: tweet_emotions
+      OUT_SCHEMA_FILE: ./schema/tweet_emotions.avsc
+
+  2pc_get_tweet_emotions_4:
+    container_name: 2pc_get_tweet_emotions_4
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2pc
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: user_tweets
+      IN_GROUP: get_emotions
+      IN_SCHEMA_FILE: ./schema/tweets.avsc
+      OUT_TOPIC: tweet_emotions
+      OUT_SCHEMA_FILE: ./schema/tweet_emotions.avsc
+  
+  2pc_get_tweet_emotions_5:
+    container_name: 2pc_get_tweet_emotions_5
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2pc
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: user_tweets
+      IN_GROUP: get_emotions
+      IN_SCHEMA_FILE: ./schema/tweets.avsc
+      OUT_TOPIC: tweet_emotions
+      OUT_SCHEMA_FILE: ./schema/tweet_emotions.avsc
+
+  3c_postgres_db:
+    container_name: 3c_postgres_db
+    image: postgres:alpine
+    hostname: 3c_postgres_db
+    ports:
+    - "54323:5432"
+    volumes:
+      - 3c_postgres_volume:/var/lib/postgresql/data
+        
+  3c_persist_to_postgres:
+    container_name: 3c_persist_to_postgres
+    build:
+      context: ./src
+      dockerfile: Dockerfile_3c_postgres
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: tweet_emotions
+      IN_GROUP: persist_postgres
+      IN_SCHEMA_FILE: ./schema/tweet_emotions.avsc
+      CONFIG_PATH: ./configurations/3c_postgres.ini
+    links:
+      - 3c_postgres_db
+    depends_on:
+      - 3c_postgres_db
+    
+networks:
+  default:
+    external:
+      name: emotion-detection
+
+volumes:
+  1c_postgres_volume:
+    external: true
+  3c_postgres_volume:
+    external: true

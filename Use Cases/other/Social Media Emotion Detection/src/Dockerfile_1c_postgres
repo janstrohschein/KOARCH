@@ -1,0 +1,9 @@
+FROM python:3.8-slim-buster
+
+COPY ./configurations/requirements_postgres.txt /
+RUN pip install -r requirements_postgres.txt
+
+COPY . /src
+WORKDIR /src
+
+CMD ["python", "1c_persist_to_postgres_db.py"]

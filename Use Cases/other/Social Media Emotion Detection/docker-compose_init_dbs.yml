@@ -1,0 +1,32 @@
+version: '2'
+    
+services:
+
+  1c_postgres_db:
+    image: postgres:alpine
+    hostname: 1c_postgres_db
+    ports:
+    - "54321:5432"
+    volumes:
+      - 1c_postgres_volume:/var/lib/postgresql/data
+      - ./src/configurations/1c_init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  3c_postgres_db:
+    image: postgres:alpine
+    hostname: 3c_postgres_db
+    ports:
+    - "54323:5432"
+    volumes:
+      - 3c_postgres_volume:/var/lib/postgresql/data
+      - ./src/configurations/3c_init.sql:/docker-entrypoint-initdb.d/init.sql
+    
+networks:
+  default:
+    external:
+      name: emotion-detection
+      
+volumes:
+  1c_postgres_volume:
+    external: true
+  3c_postgres_volume:
+    external: true

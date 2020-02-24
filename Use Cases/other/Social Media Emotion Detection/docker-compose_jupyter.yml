@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  jupyter:
+    container_name: Jupyter
+    build:
+      context: ./src
+      dockerfile: Dockerfile_Jupyter
+    volumes:
+      - ./src/notebooks:/home/jovyan/
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    command: "start.sh jupyter notebook --NotebookApp.token=''"
+    
+networks:
+  default:
+    external:
+      name: emotion-detection

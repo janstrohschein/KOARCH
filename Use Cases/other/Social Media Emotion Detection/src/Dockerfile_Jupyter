@@ -1,0 +1,3 @@
+FROM jupyter/datascience-notebook:1386e2046833
+
+RUN pip install psycopg2-binary
