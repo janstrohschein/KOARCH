@@ -1,10 +1,12 @@
 # Introduction
 
-This use case implements a first prototype of our big data platform and uses an automated approach to study the emotions of a larger group of social media users on Twitter over time. It is possible to extract emotions from the text of their status updates as shown by Tasoulis et al. and Colneric and Demsar ([Tasoulis et al., 2018](https://arxiv.org/abs/1804.00482), [Colneric & Demsar, 2018](https://ieeexplore.ieee.org/document/8295234)). This analysis is based on the work of Colneric and Demsar ([github](https://github.com/nikicc/twitter-emotion-recognition))and investigates if the emotions of users or groups of users become more negative over time as suggested by other studies.
+This use case implements a first prototype of our big data platform and uses an automated approach to study the emotions of a larger group of social media users on Twitter over time. It is possible to extract emotions from the text of their status updates as shown by Tasoulis et al. and Colneric and Demsar ([Tasoulis et al., 2018](https://arxiv.org/abs/1804.00482), [Colneric & Demsar, 2018](https://ieeexplore.ieee.org/document/8295234)). This analysis is based on the work of Colneric and Demsar ([github](https://github.com/nikicc/twitter-emotion-recognition)) and investigates if the emotions of users or groups of users become more negative over time as suggested by other studies.
 
 
 
+Architecture:
 
+<img src="./docs/architecture.jpg" width="800px" align="left"/>
 
 
 
@@ -55,10 +57,10 @@ The implementation consists of several Docker containers. Please follow the inst
     
     - repeat for second instance on Port 54323
     
-    ```
-    psql -h localhost -p 54323 -U postgres
-    \dt
-    ```
+      ```
+      psql -h localhost -p 54323 -U postgres
+      \dt
+      ```
     
   - Stop the DB containers
   
