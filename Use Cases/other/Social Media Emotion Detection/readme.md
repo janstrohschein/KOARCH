@@ -4,9 +4,19 @@ This use case implements a first prototype of our big data platform and uses an 
 
 
 
-Architecture:
 
-<img src="./docs/architecture.jpg" width="800px">
+
+# Big Data Platform
+
+<img src="./docs/big_data_platform.jpg" width="800px">
+
+
+
+# Workflow
+
+
+
+<img src="./docs/workflow.jpg" width="800px">
 
 
 
