@@ -8,13 +8,19 @@ This use case implements a first prototype of our big data platform and uses an 
 
 # Big Data Platform
 
+The platform uses Docker and Kafka to implement the applications as microservices. Data schemata specify the interfaces between applications and ensure data quality. 
+
 <img src="./docs/big_data_platform.jpg" width="800px">
 
 
 
 # Workflow
 
-
+1. Connect to twitter and retrieve users in the U.S.A., who published a status update at a trending topic, as well as their followers. The users are persisted in "User DB". 
+2. Collect the tweets from all users. The twitter API allows to download roughly the last 3.200 tweets. 
+3. Implements Colneric and Demsars pre-trained RNN in several instances to classify the text of each tweet in parallel and retrieve values for each emotion. 
+4. Receives the classifications from all instances and persists them to "User Emotions DB". 
+5. Jupyter Hub enables the interactive analysis in the browser.
 
 <img src="./docs/workflow.jpg" width="800px">
 
@@ -53,7 +59,7 @@ The implementation consists of several Docker containers. Please follow the inst
       psql -h localhost -p 54321 -U postgres
       ```
     
-    - show table definition
+    - show table definition for "Twitter Users"
     
       ```
       \dt
@@ -65,11 +71,12 @@ The implementation consists of several Docker containers. Please follow the inst
       \q
       ```
     
-    - repeat for second instance on Port 54323
+    - repeat for second instance on Port 54323 to check the "Twitter Updates" table
     
       ```
       psql -h localhost -p 54323 -U postgres
       \dt
+      \q
       ```
     
   - Stop the DB containers
