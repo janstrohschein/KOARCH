@@ -30,20 +30,22 @@ The platform uses Docker and Kafka to implement the applications as microservice
 
 The implementation consists of several Docker containers. Please follow the instructions on [Docker Docs](https://docs.docker.com/install/) to install Docker for your platform. Afterwards open a console and complete the following steps:
 
-- Create Network
+- Create a Twitter developer account at [Twitter Dev Website](https://developer.twitter.com/en/apply-for-access) and enter the credentials in "./src/configurations/twitter.ini"
+
+- Create Docker Network
   
   ```
   create network emotion-detection
   ```
   
-- Create Volumes
+- Create Docker Volumes
   
   ```
   create volume 1c_postgres_volume
   create volume 3c_postgres_volume
   ```
   
-- Initialize DBs
+- Initialize Postgres DBs
   
   - Execute the Docker Compose script to initialize the DBs
     
