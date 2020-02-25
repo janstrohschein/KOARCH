@@ -95,12 +95,39 @@ The implementation consists of several Docker containers. Please follow the inst
 
 # Collect tweets and classifications
 
-- Use Docker Compose to start the containers
-  docker-compose up --build
-- connect to first PostgresDB
-  - select count(*) from twitter_users;
-  - select * from twitter_users;
-    - "q" closes the result screen
+- Use Docker Compose to start the pipeline
+  
+  ```
+  docker-compose up --build -d
+  ```
+  
+- check for incoming data points in PostgresDB "User DB"
+  
+  - connect to DB
+  
+    ```
+    psql -h localhost -p 54321 -U postgres
+    ```
+  
+  - show the number of users in the DB
+  
+    ```
+    select count(*) from twitter_users;
+    ```
+  
+  - show the users and their statistics, press "q" to close the result screen
+  
+    ```
+    select * from twitter_users;
+    ```
+  
+  - close psql
+  
+    ```
+    \q
+    ```
+  
+    
 
 # Analysis
 
