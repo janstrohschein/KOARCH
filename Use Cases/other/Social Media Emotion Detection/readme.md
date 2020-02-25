@@ -28,9 +28,7 @@ The platform uses Docker and Kafka to implement the applications as microservice
 
 # Preparation
 
-The implementation consists of several Docker containers. Please follow the instructions on [Docker Docs](https://docs.docker.com/install/) to install Docker for your platform. Afterwards open a console and complete the following steps:
-
-- Create a Twitter developer account at [Twitter Dev Website](https://developer.twitter.com/en/apply-for-access) and enter the credentials in "./src/configurations/twitter.ini"
+The implementation consists of several Docker containers. Please follow the instructions on [Docker Docs](https://docs.docker.com/install/) to install Docker for your platform. It is also required to create a Twitter developer account at [Twitter Dev Website](https://developer.twitter.com/en/apply-for-access) and enter the credentials in "./src/configurations/twitter.ini". Afterwards open a console and complete the following steps:
 
 - Create Docker Network
   
