@@ -8,7 +8,7 @@ This use case implements a first prototype of our big data platform and uses an 
 
 # Big Data Platform
 
-The platform uses Docker and Kafka to implement the applications as microservices. Data schemata specify the interfaces between applications and ensure data quality. 
+The platform uses Docker and Kafka to implement the applications as microservices with communication capabilities. Data schemata specify the interfaces between applications and ensure data quality. 
 
 <img src="./docs/big_data_platform.jpg" width="800px">
 
