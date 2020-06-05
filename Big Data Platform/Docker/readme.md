@@ -25,8 +25,8 @@ Now you can start the Kafka broker with the following command:\
 This starts the Kafka container and an additional Zookeeper container, which helps Kafka to handle state.
 Docker also  opens port 9092 for communication between localhost and the container and 9093 for communication between containers.
 
-Open two additional terminals and execute the commands below to send and receive messages:
-`docker-compose -f docker-compose_1p_count_up up`
+Open two additional terminals and execute the commands below to send and receive messages:\
+`docker-compose -f docker-compose_1p_count_up up`\
 `docker-compose -f docker-compose_2c_print_out up`
 
 You should see the first program counting up and sending those numbers to the broker.
@@ -34,7 +34,8 @@ The second program receives the numbers from the broker and prints them.
 The publishing program then exits with code 0, because it successfully sent all its messages.
 The receiving program waits for further messages until the time-out is reached.
 You can stop the second program and the Kafka Container with `Ctrl-C`.
-After the containers stopped you can execute `docker-compose -f docker-compose_1p_count_up down` if you want to remove the containers. Repeat with the other filenames as necessary.
+After the containers stopped you can execute the following command to remove the containers:\
+`docker-compose -f docker-compose_1p_count_up down`\
 
 A lot of things happened in the background to make this work:
 + Docker-compose builds the Containers from the Dockerfiles in `src`.
