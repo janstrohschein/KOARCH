@@ -16,7 +16,7 @@ You can find the building blocks in `./src/classes`.
 ## Kafka
 Kafka consists of brokers, producers and consumers. A producer publishes a message to a certain topic and sends it to the broker. A consumer subscribes to a topic and receives incoming messages.
 
-Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:\
+Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
 `docker network create caai`
 
 Now you can start the Kafka broker with the following command:\
@@ -34,8 +34,8 @@ The second program receives the numbers from the broker and prints them.
 The publishing program then exits with code 0, because it successfully sent all its messages.
 The receiving program waits for further messages until the time-out is reached.
 You can stop the second program and the Kafka Container with `Ctrl-C`.
-After the containers stopped you can execute the following command to remove the containers:\
-`docker-compose -f docker-compose_1p_count_up down`\
+After the containers stopped you can execute the following command to remove the containers:
+`docker-compose -f docker-compose_1p_count_up down`
 
 A lot of things happened in the background to make this work:
 + Docker-compose builds the Containers from the Dockerfiles in `src`.
