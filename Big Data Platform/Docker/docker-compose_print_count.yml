@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  2c_print_count:
+    container_name: 2c_print_count
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2c_print_count
+    environment:
+      KAFKA_BROKER_URL: kafka:9093
+      IN_TOPIC: count
+      IN_GROUP: print_count
+      IN_SCHEMA_FILE: ./schema/count.avsc
+
+networks:
+  default:
+    external:
+      name: caai

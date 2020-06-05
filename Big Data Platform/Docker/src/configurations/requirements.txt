@@ -1,0 +1,2 @@
+avro-python3
+kafka-python
