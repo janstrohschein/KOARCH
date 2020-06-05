@@ -16,6 +16,7 @@ You can find the building blocks in `./src/classes`.
 ## Kafka
 Kafka consists of brokers, producers and consumers. A producer publishes a message to a certain topic and sends it to the broker. A consumer subscribes to a topic and receives incoming messages.
 
+### Example
 Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
 `docker network create caai`
 
