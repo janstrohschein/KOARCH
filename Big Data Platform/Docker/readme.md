@@ -31,6 +31,10 @@ Open two additional terminals and execute the commands below to send and receive
 
 You should see the first program counting up and sending those numbers to the broker.
 The second program receives the numbers from the broker and prints them.
+The publishing program then exits with code 0, because it successfully sent all its messages.
+The receiving program waits for further messages until the time-out is reached.
+You can stop the second program and the Kafka Container with `Ctrl-C`.
+After the containers stopped you can execute `docker-compose -f docker-compose_1p_count_up down` if you want to remove the containers. Repeat with the other filenames as necessary.
 
 A lot of things happened in the background to make this work:
 + Docker-compose builds the Containers from the Dockerfiles in `src`.
