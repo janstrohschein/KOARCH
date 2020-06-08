@@ -27,8 +27,8 @@ This starts the Kafka container and an additional Zookeeper container, which hel
 Docker also  opens port 9092 for communication between localhost and the container and 9093 for communication between containers.
 
 Open two additional terminals and execute the commands below to send and receive messages:\
-`docker-compose -f docker-compose_1p_count_up up`\
-`docker-compose -f docker-compose_2c_print_out up`
+`docker-compose -f docker-compose_1p_count_up.yml up`\
+`docker-compose -f docker-compose_2c_print_out.yml up`
 
 You should see the first program counting up and sending those numbers to the broker.
 The second program receives the numbers from the broker and prints them.
