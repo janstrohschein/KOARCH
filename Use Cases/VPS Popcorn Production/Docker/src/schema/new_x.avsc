@@ -1,0 +1,8 @@
+{"type": "record",
+ "name": "New_X",
+ "fields": [
+    {"name": "phase", "type": ["string"]},
+    {"name": "id_x", "type": ["int"]},
+    {"name": "new_x", "type": ["float"]}
+    ]
+    }
