@@ -4,9 +4,10 @@ Modules do not communicate directly with each other, but use messaging to publis
 
 # Docker Installation
 Please install Docker and docker-compose to run the containers.
-You find instructions for the Docker installation on their [website](https://docs.docker.com/get-docker/). To test the Docker installation you can open a terminal and execute `docker run hello-world`.
+You find instructions for the Docker installation on their [website](https://docs.docker.com/get-docker/). 
+To test the Docker installation you can open a terminal and execute `docker run hello-world`.
 
-On some OS the Docker installation does not include docker-compose. You can find information for the installation [here](https://docs.docker.com/compose/install/)  if you get a message that docker-compose is missing.
+On some OS the Docker installation does not include docker-compose. You can find information for the installation [here](https://docs.docker.com/compose/install/)  in case you get a message that docker-compose is missing.
 
 # Building blocks
 All modules rely on the messaging ability for indirect communication with other modules.
