@@ -6,14 +6,14 @@ import numpy as np
 
 from classes.KafkaPC import KafkaPC
 
-
-
-env_vars = {'kafka_broker_url': os.getenv('KAFKA_BROKER_URL'),
-            'in_topic': os.getenv('IN_TOPIC'),
-            'in_group': os.getenv('IN_GROUP'),
-            'in_schema_file': os.getenv('IN_SCHEMA_FILE'),
-            'out_topic': os.getenv('OUT_TOPIC'),
-            'out_schema_file': os.getenv('OUT_SCHEMA_FILE')}
+env_vars = {
+    "kafka_broker_url": os.getenv("KAFKA_BROKER_URL"),
+    "in_topic": os.getenv("IN_TOPIC"),
+    "in_group": os.getenv("IN_GROUP"),
+    "in_schema_file": os.getenv("IN_SCHEMA_FILE"),
+    "out_topic": os.getenv("OUT_TOPIC"),
+    "out_schema_file": os.getenv("OUT_SCHEMA_FILE"),
+}
 """
 env_vars = {'in_topic': 'AB_model_data',
             'in_group': 'model_appl',
@@ -23,7 +23,7 @@ env_vars = {'in_topic': 'AB_model_data',
             }
 """
 
-## configuration constants
+# configuration constants
 N_INITIAL_DESIGN = 5
 N_OPTIMIZATION_BUDGET = 200
 N_POP_SIZE = 20
@@ -63,16 +63,19 @@ for msg in new_pc.consumer:
     """
 
     new_model = new_pc.decode_avro_msg(msg)
-
-
-    model = pickle.loads(new_model['model'])
-    result = differential_evolution(evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE)
+    model = pickle.loads(new_model["model"])
+    result = differential_evolution(
+        evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE
+    )
 
     surrogate_x = result.x[0]
     surrogate_y = result.fun
 
-    #print('Best Result: x=%.3f, y=%.3f' % (surrogate_x, surrogate_y))
-    print(f'{new_model["model_name"]}, n={new_model["n_data_points"]}, x={surrogate_x}, y={surrogate_y}')
+    # print('Best Result: x=%.3f, y=%.3f' % (surrogate_x, surrogate_y))
+    print(
+        f'{new_model["model_name"]}, n={new_model["n_data_points"]},\
+        x={surrogate_x}, y={surrogate_y}'
+    )
 
     """
     "name": "Model_Application",
@@ -91,19 +94,20 @@ for msg in new_pc.consumer:
         {"name": "RAM", "type": ["float"]}
         ]
     """
-    model_appl_data = {'phase': new_model['phase'],
-                       'model_name': new_model['model_name'],
-                       'n_data_points': new_model['n_data_points'],
-                       'id_start_x': new_model['id_start_x'],
-                       'model_size': new_model['model_size'],
-                       'best_x': surrogate_x,
-                       'best_pred_y': surrogate_y,
-                       'rmse': new_model['rmse'],
-                       'mae': new_model['mae'],
-                       'rsquared': new_model['rsquared'],
-                       'CPU_ms': new_model['CPU_ms'],
-                       'RAM': new_model['RAM']
-                       }
+    model_appl_data = {
+        "phase": new_model["phase"],
+        "model_name": new_model["model_name"],
+        "n_data_points": new_model["n_data_points"],
+        "id_start_x": new_model["id_start_x"],
+        "model_size": new_model["model_size"],
+        "best_x": surrogate_x,
+        "best_pred_y": surrogate_y,
+        "rmse": new_model["rmse"],
+        "mae": new_model["mae"],
+        "rsquared": new_model["rsquared"],
+        "CPU_ms": new_model["CPU_ms"],
+        "RAM": new_model["RAM"],
+    }
 
     new_pc.send_msg(model_appl_data)
-    print('Sent data')
+    print("Sent data")

@@ -1,5 +1,4 @@
 import os
-from time import sleep
 from datetime import datetime
 
 import pandas as pd
@@ -33,8 +32,9 @@ env_vars = {'in_topic': 'AB_model_application',
             }
 """
 
-df_columns = ['phase', 'model_name', 'n_data_points', 'id_start_x', 'model_size', 'best_x', 'best_pred_y',
-              'y', 'y_delta', 'rmse', 'mae', 'rsquared', 'CPU_ms', 'RAM', 'timestamp']
+df_columns = ['phase', 'model_name', 'n_data_points', 'id_start_x',
+              'model_size', 'best_x', 'best_pred_y', 'y', 'y_delta', 'rmse',
+              'mae', 'rsquared', 'CPU_ms', 'RAM', 'timestamp']
 
 df = pd.DataFrame(columns=df_columns)
 
@@ -101,20 +101,19 @@ for msg in new_pc.consumer:
     new_model_appl = new_pc.decode_avro_msg(msg)
     best_pred_y = new_model_appl['best_pred_y']
     y = new_objective.get_objective(new_model_appl['best_x'])
-    y_delta = abs(y - best_pred_y) # absoluter Wert?
+    y_delta = abs(y - best_pred_y)  # absoluter Wert?
 
     new_model_appl['y'] = y
     new_model_appl['y_delta'] = y_delta
     new_model_appl['timestamp'] = datetime.now()
 
-
     df = df.append(new_model_appl, ignore_index=True)
 
     min_best_pred_y = df.loc[df['best_pred_y'].idxmin()]
     new_x = min_best_pred_y.best_x
-    print(df[['model_name', 'n_data_points', 'id_start_x', 'best_x', 'best_pred_y', 'rmse', 'rsquared', 'CPU_ms', 'RAM']]
+    print(df[['model_name', 'n_data_points', 'id_start_x', 'best_x',
+              'best_pred_y', 'rmse', 'rsquared', 'CPU_ms', 'RAM']]
           .sort_values(by=['best_pred_y']))
-
 
     """
     "name": "New X",
@@ -132,6 +131,5 @@ for msg in new_pc.consumer:
         continue
 
     current_data_point += 1
-
 
     new_pc.send_msg(new_x)

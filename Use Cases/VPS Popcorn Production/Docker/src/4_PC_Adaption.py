@@ -35,9 +35,6 @@ for msg in new_pc.consumer:
 
     new_x = new_pc.decode_avro_msg(msg)
 
-
-
-
     """
     "name": "New X",
     "fields": [
