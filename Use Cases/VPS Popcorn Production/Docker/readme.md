@@ -11,7 +11,7 @@ The optimum is a trade-off between three minimization functions: the energy cons
 These functions are conflicting to some degree. 
 The result of the optimization is a parameter value x for the dosing unit that indicated the runtime of the conveyer and thus influence the amount of corn.
 As the given optimization problem can be regarded as relatively simple, we will apply a single objective optimization algorithm and compute a weighted sum of the objectives.
-This results in the following optimization problem:
+This results in the following optimization problem:\
 <img src="./docs/optimization_formula.svg" width="400px">
 
 The scalar weights of the corresponding objectives, w<sub>i</sub>,  are chosen based on user's preferences. 
