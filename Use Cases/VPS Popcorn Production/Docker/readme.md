@@ -39,19 +39,22 @@ Now you can launch the Kafka broker with the following command:\
 Open another terminal to start the experiment:\
 `docker-compose up`
 
-You can see the creation of several containers, one for each module of our CAAI pipeline.
-The start-up sequence starts in the third module, where the Cognition creates the initial design.
+## Start-up
++ You can see the creation of several containers, one for each module of our CAAI pipeline.
++ The start-up sequence starts in the third module, where the Cognition creates the initial design.
 The initial design consists of 5 points, equally distributed over the search space for x.
 The Cognition publishes those as starting points to the Analytics Bus, where the Adaption (4) listens.
-The Adaption sends those new parameters to the CPPS Simulation (0).\
-Now the normal iteration for continuous operation start.
-The Simulation built a model of the production process with data from experiments on the real CPPS during start-up.
-This model is used to evaluate new points for x and derive the corresponding y-value. 
++ The Adaption sends those new parameters to the CPPS Simulation (0) and continuous operation starts.
+
+## Continuous operation
++ The Simulation builds a model of the production process with data from experiments on the real CPPS during start-up.
+This model is used to evaluate the incoming points for x and derive the corresponding y-value. 
 The simulation sends the x and y to the Data Bus.
-As we use message-based communication, we can subscribe any number of Model Learning modules (1) to the related topic and each will receive the data to train their model.
++ As we use message-based communication, we can subscribe any number of Model Learning modules (1) to the related topic and each will receive the data to train their model.
 Both Model Learning modules, implementing Kriging and Random Forest algorithms, use leave-one-out cross-validation to calculate RMSE, MAE and R<sup>2</sup> and send those metrics as well as the trained model to the Analytics Bus.
-The Model Application + Optimization module (2) receives both models and uses differential evolution to search for an improved solution.
-The best predicted y and the corresponding x for each algorithm gets published, so the Cognition (3) is able to evaluate the suggested new values.
++ The Model Application + Optimization module (2) receives both models and uses differential evolution to search for an improved solution.
+The best predicted y and the corresponding x for each algorithm is published to the Analytics Bus. 
++ The Cognition (3) is able to evaluate the suggested new values. 
 Once the Cognition decided a new value to try in production, it is send to the Adaption, which forwards it to the CPPS and the first iteration is complete. 
 
 The described workflow is also shown in the figure below:
