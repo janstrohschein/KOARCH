@@ -35,6 +35,9 @@ for msg in new_pc.consumer:
 
     new_x = new_pc.decode_avro_msg(msg)
 
+
+
+
     """
     "name": "New X",
     "fields": [
@@ -43,5 +46,5 @@ for msg in new_pc.consumer:
         {"name": "new_x", "type": ["float"]}
         ]
     """
-
     new_pc.send_msg(new_x)
+    print('The value x='+str(new_x['new_x'])+' is applied to the CPPS')

@@ -36,7 +36,7 @@ services:
       dockerfile: Dockerfile_1_PC_Model_Learning
     environment:
       MODEL_ALGORITHM: Kriging
-      MODEL_PARAMETERS: '{"kernel": "1.0 * RationalQuadratic(length_scale=1.0, alpha=0.5)", "n_restarts_optimizer": "3"}'
+      MODEL_PARAMETERS: '{"kernel": "1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)", "optimizer": "None", "max_iter": 10000}'
       KAFKA_BROKER_URL: kafka:9093
       IN_TOPIC: DB_raw_data
       IN_GROUP: Kriging

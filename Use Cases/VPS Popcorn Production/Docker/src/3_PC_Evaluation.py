@@ -1,4 +1,5 @@
 import os
+from time import sleep
 from datetime import datetime
 
 import pandas as pd
@@ -32,9 +33,8 @@ env_vars = {'in_topic': 'AB_model_application',
             }
 """
 
-df_columns = ['phase', 'model_name', 'n_data_points', 'id_start_x',
-              'model_size', 'best_x', 'best_pred_y', 'y', 'y_delta', 'rmse',
-              'mae', 'rsquared', 'CPU_ms', 'RAM', 'timestamp']
+df_columns = ['phase', 'model_name', 'n_data_points', 'id_start_x', 'model_size', 'best_x', 'best_pred_y',
+              'y', 'y_delta', 'rmse', 'mae', 'rsquared', 'CPU_ms', 'RAM', 'timestamp']
 
 df = pd.DataFrame(columns=df_columns)
 
@@ -56,7 +56,7 @@ X_MAX = 10100.
 # equally spaced X between X_MIN, X_MAX
 X = np.linspace(X_MIN, X_MAX, num=N_INITIAL_DESIGN)
 
-print('Sending initial design')
+print('Creating initial design of the system by applying '+ str(N_INITIAL_DESIGN)+ ' equal distributed values x over the whole working area of the CPPS.')
 
 for x in X:
     """
@@ -78,7 +78,8 @@ for x in X:
 
 
 """evaluation"""
-print('Done sending initial design, now receiving results')
+#print('Done sending initial design, now receiving results')
+print('Initialization phase is completed. Now, the algorithms are applied.')
 for msg in new_pc.consumer:
     """
     "name": "Model_Application",
@@ -101,19 +102,19 @@ for msg in new_pc.consumer:
     new_model_appl = new_pc.decode_avro_msg(msg)
     best_pred_y = new_model_appl['best_pred_y']
     y = new_objective.get_objective(new_model_appl['best_x'])
-    y_delta = abs(y - best_pred_y)  # absoluter Wert?
+    y_delta = abs(y - best_pred_y) # absoluter Wert?
 
     new_model_appl['y'] = y
     new_model_appl['y_delta'] = y_delta
     new_model_appl['timestamp'] = datetime.now()
 
+
     df = df.append(new_model_appl, ignore_index=True)
 
     min_best_pred_y = df.loc[df['best_pred_y'].idxmin()]
     new_x = min_best_pred_y.best_x
-    print(df[['model_name', 'n_data_points', 'id_start_x', 'best_x',
-              'best_pred_y', 'rmse', 'rsquared', 'CPU_ms', 'RAM']]
-          .sort_values(by=['best_pred_y']))
+  #  print(df[['model_name', 'n_data_points', 'id_start_x', 'best_x', 'best_pred_y', 'rmse', 'rsquared', 'CPU_ms', 'RAM']] .sort_values(by=['best_pred_y']))
+    print(df[['model_name', 'best_x', 'best_pred_y', 'rmse', 'rsquared', 'CPU_ms', 'RAM']].iloc[-1:])
 
     """
     "name": "New X",
@@ -131,5 +132,7 @@ for msg in new_pc.consumer:
         continue
 
     current_data_point += 1
+   
+    print('The x value of the algorithm '+str(min_best_pred_y['model_name'])+' is applied to the CPPS, since the lowest y is expected (y='+str(min_best_pred_y['best_pred_y'])+').')
 
     new_pc.send_msg(new_x)

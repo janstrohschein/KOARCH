@@ -9,7 +9,8 @@ from sklearn.metrics import mean_absolute_error as mae
 from sklearn.metrics import r2_score as r2
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.gaussian_process.kernels import RationalQuadratic
+# from sklearn.gaussian_process.kernels import RationalQuadratic
+from sklearn.gaussian_process import kernels
 
 
 class ObjectiveFunction:
@@ -18,6 +19,7 @@ class ObjectiveFunction:
         self.model = None
         self.X = None
         self.y = None
+
 
     def load_data(self):
 
@@ -37,7 +39,7 @@ class ObjectiveFunction:
 
     def fit_model(self):
 
-        kernel = 1.0 * RationalQuadratic(length_scale=1.0, alpha=0.1)
+        kernel = 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=0.1)
 
         self.model = GaussianProcessRegressor(kernel=kernel)
         self.model.fit(self.X, self.y)
@@ -55,7 +57,7 @@ class ModelLearner:
         self.model = None
         self.reshape_x = False
         self.reshape_y = False
-        parameter_eval = {key: eval(val) for key, val in parameters.items()}
+        parameter_eval = {key: eval(value) for key, value in parameters.items()}
 
         if learning_algorithm == 'Kriging':
             self.model = GaussianProcessRegressor(**parameter_eval)
@@ -70,7 +72,7 @@ class ModelLearner:
 
 class DataWindow:
 
-    def __init__(self, window_size=None):
+    def __init__(self, window_size = None):
 
         self.window_size = window_size
         self.Data_Point = namedtuple('Data_Point', ('id_x', 'x', 'y'))
@@ -79,6 +81,7 @@ class DataWindow:
     def append_and_check(self, data_point):
 
         self.data.append(data_point)
+
 
         if self.window_size is not None and len(self.data) > self.window_size:
             del self.data[0]
@@ -99,10 +102,8 @@ class DataWindow:
 
         return self.data[0].id_x
 
-
 def get_cv_scores(model, X, y):
-    """ Leave-one-out cross-validation,
-    calculates and returns RMSE, MAE and R2 """
+    """ Leave-one-out cross-validation, calculates and returns RMSE, MAE and R2 """
 
     y_pred = cross_val_predict(model, X, y, cv=LeaveOneOut(), n_jobs=-1)
 
@@ -110,16 +111,14 @@ def get_cv_scores(model, X, y):
     mae_score = mae(y, y_pred)
     r2_score = r2(y, y_pred)
 
-    print(f'Mean RMSE: {rmse_score}')
-    print(f'Mean MAE: {mae_score}')
-    print(f'Mean R2: {r2_score}')
+    print(f'Update CPPS model with new data point. RMSE of the model: {rmse_score}')
+ #   print(f'Mean MAE: {mae_score}')
+ #   print(f'Mean R2: {r2_score}')
 
     return rmse_score, mae_score, r2_score
 
-
 def get_parameter_dict_from_yml(parameter_string):
-    parameter_name = [x for x in re.finditer(r'\"([a-zA-Z_-]+)\"',
-                                             parameter_string)]
+    parameter_name = [x for x in re.finditer(r'\"([a-zA-Z_-]+)\"', parameter_string)]
     parameter = [x for x in re.finditer(r': \"(.*?)\"', parameter_string)]
 
     parameter_name = [item.group(1) for item in parameter_name]
