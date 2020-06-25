@@ -1,0 +1,39 @@
+Optimization:
+  minimize:
+    minimum:
+      algorithms:
+        kriging:
+          parameter: parameters
+          metadata: # fill
+          input: preprocessed features
+        CMAES:
+          parameter: parameters
+          input: raw data
+        ERROR:
+          parameter: parameters
+          metadata: # fill
+          input: unkown data
+      preprocessed features:
+        1st_feature_pp_function:
+          parameter: parameters
+          input: raw_data
+        2nd_feature_pp_function:
+          parameter: parameters
+          input: preprocessed data
+      differently preprocessed features:
+        3rd_preprocessing_function:
+          parameter: parameters
+          input: raw_data
+      preprocessed data:
+        some_data_pp_function:
+          parameter: parameters
+          input: raw data
+  maximize:
+    minimum:
+      # fill
+Anomaly Detection:
+  # fill
+Condition Monitoring:
+  # fill
+Predictive Maintenance:
+  # fill

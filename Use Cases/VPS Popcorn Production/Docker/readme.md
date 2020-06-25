@@ -8,7 +8,7 @@ Thus, a data-driven optimization is a promising method to increase efficiency, w
 The amount of corn that is filled into the reactor has to be optimized, to get the required amount of popcorn.
 The overage of popcorn produced in one batch, or not fully filled boxes cannot be used, so it is waste.
 The optimum is a trade-off between three minimization functions: the energy consumption (f<sub>1</sub>), the processing time (f<sub>2</sub>), and the amount of corn needed for a small box (f<sub>3</sub>).
-These functions are conflicting to some degree. 
+These functions are conflicting to some degree.
 The result of the optimization is a parameter value x for the dosing unit that indicated the runtime of the conveyer and thus influence the amount of corn.
 As the given optimization problem can be regarded as relatively simple, we will apply a single objective optimization algorithm and compute a weighted sum of the objectives.
 This results in the following optimization problem:\

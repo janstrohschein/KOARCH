@@ -1,0 +1,63 @@
+General:
+  KAFKA_BROKER_URL: kafka:9093
+  # KAFKA_BROKER_URL: localhost:9092
+
+0_pc_cpps:
+  IN_TOPIC:
+    adaption: ./schema/new_x.avsc
+  IN_GROUP: CPPS
+  OUT_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  API_URL: http://0_API_CPPS_Controller:8000
+  PRODUCTION_CYCLE: 10
+
+1_pc_monitoring:
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  IN_GROUP: 'monitoring'
+  OUT_TOPIC:
+    AB_monitoring: ./schema/monitoring.avsc
+
+1_pc_model_learning_rf:
+  MODEL_ALGORITHM: RF
+  MODEL_PARAMETERS:
+    n_estimators: 3
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  IN_GROUP: RF
+  OUT_TOPIC:
+    AB_model_data: ./schema/model.avsc
+
+1_pc_model_learning_kriging:
+  MODEL_ALGORITHM: Kriging
+  MODEL_PARAMETERS:
+    kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
+    optimizer: None
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  IN_GROUP: Kriging
+  OUT_TOPIC:
+    AB_model_data: ./schema/model.avsc
+
+2_pc_model_appl_opt:
+  IN_TOPIC:
+    AB_model_data: ./schema/model.avsc
+  IN_GROUP: model_appl
+  OUT_TOPIC:
+    AB_model_application: ./schema/model_appl.avsc
+
+3_pc_evaluation:
+  IN_TOPIC:
+    AB_model_application: ./schema/model_appl.avsc
+    AB_monitoring: ./schema/monitoring.avsc
+  IN_GROUP: evaluation
+  OUT_TOPIC:
+    AB_model_evaluation: ./schema/new_x.avsc
+
+4_pc_adaption:
+  IN_TOPIC:
+    AB_model_evaluation: ./schema/new_x.avsc
+  IN_GROUP: adaption
+  OUT_TOPIC:
+    adaption: ./schema/new_x.avsc
+  API_URL: http://0_API_CPPS_Controller:8000

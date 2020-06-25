@@ -6,29 +6,33 @@ import pickle
 # import warnings
 
 from classes.KafkaPC import KafkaPC
-from classes.util import (ModelLearner, DataWindow, get_cv_scores,
-                          get_parameter_dict_from_yml)
+from classes.util import ModelLearner, DataWindow, get_cv_scores
 
 # warnings.filterwarnings("ignore")
 
+
+env_vars = {'config_path': os.getenv('config_path'),
+            'config_section': os.getenv('config_section')}
+
+"""
 env_vars = {'kafka_broker_url': os.getenv('KAFKA_BROKER_URL'),
             'in_topic': os.getenv('IN_TOPIC'),
             'in_group': os.getenv('IN_GROUP'),
             'in_schema_file': os.getenv('IN_SCHEMA_FILE'),
             'out_topic': os.getenv('OUT_TOPIC'),
             'out_schema_file': os.getenv('OUT_SCHEMA_FILE')}
-"""
-env_vars = {'in_topic': 'DB_raw_data',
+
+env_vars = {'in_topic': {'DB_raw_data': './schema/data.avsc'},
             'in_group': 'kriging',
-            'in_schema_file': './schema/data.avsc',
+            # 'in_schema_file': './schema/data.avsc',
             'out_topic': 'AB_model_data',
             'out_schema_file': './schema/model.avsc'}
 """
 
-MODEL_ALGORITHM = os.getenv('MODEL_ALGORITHM')
-MODEL_PARAMETERS = get_parameter_dict_from_yml(os.getenv('MODEL_PARAMETERS'))
-
 new_pc = KafkaPC(**env_vars)
+
+MODEL_ALGORITHM = new_pc.config['MODEL_ALGORITHM']
+MODEL_PARAMETERS = new_pc.config['MODEL_PARAMETERS']
 
 new_window = DataWindow()
 MIN_DATA_POINTS = 5
@@ -48,7 +52,10 @@ for msg in new_pc.consumer:
     new_data_point = new_window.Data_Point(new_data['id_x'], new_data['x'], new_data['y'])
     new_window.append_and_check(new_data_point)
 
-    if len(new_window.data) >= MIN_DATA_POINTS:
+    if len(new_window.data) < MIN_DATA_POINTS:
+        print(f"Not enough training data for {MODEL_ALGORITHM} "
+              f"({len(new_window.data)}/{MIN_DATA_POINTS})")
+    else:
         # performance tracking
         tracemalloc.start()
         start = time.perf_counter()
@@ -60,20 +67,20 @@ for msg in new_pc.consumer:
         id_start_x = new_window.get_id_start_x()
         ML.model.fit(X, y)
 
-        #print(f'n = {len(X)}')
+        # print(f'n = {len(X)}')
         rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
 
         real_time = round(time.perf_counter() - start, 4)
         process_time = round(time.process_time() - start_process, 4)
 
-        #print(f'Found result in {real_time}s')
-        #print(f'CPU time is {process_time}s')
+        # print(f'Found result in {real_time}s')
+        # print(f'CPU time is {process_time}s')
 
         current, peak = tracemalloc.get_traced_memory()
         current_mb = current / 10 ** 6
         peak_mb = peak / 10 ** 6
 
-        #print(f"Current memory usage is {current_mb}MB; Peak was {peak_mb}MB")
+        # print(f"Current memory usage is {current_mb}MB; Peak was {peak_mb}MB")
         tracemalloc.stop()
 
         model_pickle = pickle.dumps(ML.model)

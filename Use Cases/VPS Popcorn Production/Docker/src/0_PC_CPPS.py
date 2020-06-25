@@ -1,18 +1,19 @@
+import requests
+import json
+import time
+
 import os
 from classes.KafkaPC import KafkaPC
 from classes.util import ObjectiveFunction
 
 
-env_vars = {'kafka_broker_url': os.getenv('KAFKA_BROKER_URL'),
-            'in_topic': os.getenv('IN_TOPIC'),
-            'in_group': os.getenv('IN_GROUP'),
-            'in_schema_file': os.getenv('IN_SCHEMA_FILE'),
-            'out_topic': os.getenv('OUT_TOPIC'),
-            'out_schema_file': os.getenv('OUT_SCHEMA_FILE')}
+env_vars = {'config_path': os.getenv('config_path'),
+            'config_section': os.getenv('config_section')}
+
 """
-env_vars = {'in_topic': 'adaption',
-            'in_group': 'CPPS',
-            'in_schema_file': './schema/new_x.avsc',
+env_vars = {#'in_topic': 'adaption',
+            #'in_group': 'CPPS',
+            #'in_schema_file': './schema/new_x.avsc',
             'out_topic': 'DB_raw_data',
             'out_schema_file': './schema/data.avsc'}
 """
@@ -23,24 +24,34 @@ new_objective.fit_model()
 
 new_pc = KafkaPC(**env_vars)
 
+N_INITIAL_DESIGN = 5
+MAX_DATA_POINTS = 50
+phase = 'init'
+current_data_point = 0
 
-for msg in new_pc.consumer:
-    """
-    "name": "New_X",
-    "fields": [
-        {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
-        {"name": "id_x", "type": ["int"]},
-        {"name": "new_x", "type": ["float"]}
-    ]
-    """
-    new_data = new_pc.decode_avro_msg(msg)
-    new_x = new_data['new_x']
+time.sleep(10)
+
+while current_data_point < MAX_DATA_POINTS:
+
+    if current_data_point == N_INITIAL_DESIGN - 1:
+        phase = 'observation'
+
+    # API_URL = "http://127.0.0.1:8000"
+    API_URL = new_pc.config['API_URL']
+    ENDPOINT = "/production_parameter/x"
+    URL = API_URL + ENDPOINT
+
+    print("The CPPS loads the current value for x from the CPPS Controller")
+    api_request = requests.get(url=URL)
+    new_x = json.loads(api_request.content)
     new_y = new_objective.get_objective(new_x)
 
-    new_data_point = {'phase': new_data['phase'],
-                      'id_x': new_data['id_x'],
+    new_data_point = {'phase': phase,
+                      'id_x': current_data_point,
                       'x': new_x,
                       'y': new_y}
 
     new_pc.send_msg(new_data_point)
-    print('The CPPS provided the value y='+str(new_data_point['y']))
+    print(f"The CPPS produced with x={round(new_x, 3)} and got y={round(new_y, 3)}")
+    current_data_point += 1
+    time.sleep(10)

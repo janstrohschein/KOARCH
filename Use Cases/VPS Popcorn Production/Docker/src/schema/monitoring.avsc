@@ -1,0 +1,9 @@
+{"type": "record",
+ "name": "Monitoring",
+ "fields": [
+    {"name": "phase", "type": ["string"]},
+    {"name": "id_x", "type": ["int"]},
+    {"name": "x", "type": ["float"]},
+    {"name": "y", "type": ["float"]}
+    ]
+    }

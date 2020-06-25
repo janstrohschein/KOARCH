@@ -1,5 +1,5 @@
 from collections import namedtuple
-import re
+# import re
 import pandas as pd
 import numpy as np
 
@@ -19,7 +19,6 @@ class ObjectiveFunction:
         self.model = None
         self.X = None
         self.y = None
-
 
     def load_data(self):
 
@@ -57,7 +56,8 @@ class ModelLearner:
         self.model = None
         self.reshape_x = False
         self.reshape_y = False
-        parameter_eval = {key: eval(value) for key, value in parameters.items()}
+        parameter_eval = {key: value if type(value) is not str else eval(value)
+                          for key, value in parameters.items()}
 
         if learning_algorithm == 'Kriging':
             self.model = GaussianProcessRegressor(**parameter_eval)
@@ -72,7 +72,7 @@ class ModelLearner:
 
 class DataWindow:
 
-    def __init__(self, window_size = None):
+    def __init__(self, window_size=None):
 
         self.window_size = window_size
         self.Data_Point = namedtuple('Data_Point', ('id_x', 'x', 'y'))
@@ -81,7 +81,6 @@ class DataWindow:
     def append_and_check(self, data_point):
 
         self.data.append(data_point)
-
 
         if self.window_size is not None and len(self.data) > self.window_size:
             del self.data[0]
@@ -102,6 +101,7 @@ class DataWindow:
 
         return self.data[0].id_x
 
+
 def get_cv_scores(model, X, y):
     """ Leave-one-out cross-validation, calculates and returns RMSE, MAE and R2 """
 
@@ -111,12 +111,14 @@ def get_cv_scores(model, X, y):
     mae_score = mae(y, y_pred)
     r2_score = r2(y, y_pred)
 
-    print(f'Update CPPS model with new data point. RMSE of the model: {rmse_score}')
- #   print(f'Mean MAE: {mae_score}')
- #   print(f'Mean R2: {r2_score}')
+    print(f'Update CPPS model with new data point. RMSE of the model: {round(rmse_score, 3)}')
+    #   print(f'Mean MAE: {mae_score}')
+    #   print(f'Mean R2: {r2_score}')
 
     return rmse_score, mae_score, r2_score
 
+
+""" delete if no longer needed
 def get_parameter_dict_from_yml(parameter_string):
     parameter_name = [x for x in re.finditer(r'\"([a-zA-Z_-]+)\"', parameter_string)]
     parameter = [x for x in re.finditer(r': \"(.*?)\"', parameter_string)]
@@ -130,3 +132,4 @@ def get_parameter_dict_from_yml(parameter_string):
         d[parameter_name[i]] = parameter[i]
 
     return d
+"""

@@ -7,14 +7,16 @@ import numpy as np
 from classes.KafkaPC import KafkaPC
 
 
-
+env_vars = {'config_path': os.getenv('config_path'),
+            'config_section': os.getenv('config_section')}
+"""
 env_vars = {'kafka_broker_url': os.getenv('KAFKA_BROKER_URL'),
             'in_topic': os.getenv('IN_TOPIC'),
             'in_group': os.getenv('IN_GROUP'),
             'in_schema_file': os.getenv('IN_SCHEMA_FILE'),
             'out_topic': os.getenv('OUT_TOPIC'),
             'out_schema_file': os.getenv('OUT_SCHEMA_FILE')}
-"""
+
 env_vars = {'in_topic': 'AB_model_data',
             'in_group': 'model_appl',
             'in_schema_file': './schema/model.avsc',
@@ -64,16 +66,16 @@ for msg in new_pc.consumer:
 
     new_model = new_pc.decode_avro_msg(msg)
 
-
     model = pickle.loads(new_model['model'])
     result = differential_evolution(evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE)
 
     surrogate_x = result.x[0]
     surrogate_y = result.fun
 
-    #print('Best Result: x=%.3f, y=%.3f' % (surrogate_x, surrogate_y))
-    #print(f'{new_model["model_name"]}, n={new_model["n_data_points"]}, x={surrogate_x}, y={surrogate_y}')
-    print(f'The optimization algorithm {new_model["model_name"]} suggests the values x={surrogate_x}, y={surrogate_y}')
+    # print('Best Result: x=%.3f, y=%.3f' % (surrogate_x, surrogate_y))
+    # print(f'{new_model["model_name"]}, n={new_model["n_data_points"]}, x={surrogate_x}, y={surrogate_y}')
+    print(f"The optimization algorithm {new_model['model_name']} suggests the "
+          f"values x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
 
     """
     "name": "Model_Application",
@@ -107,4 +109,4 @@ for msg in new_pc.consumer:
                        }
 
     new_pc.send_msg(model_appl_data)
- #   print('Sent data')
+    # print('Sent data')
