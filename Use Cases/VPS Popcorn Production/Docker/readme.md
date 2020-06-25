@@ -37,25 +37,27 @@ Now you can launch the Kafka broker with the following command:\
 
 # Run the experiment
 Open another terminal to start the experiment:\
-`docker-compose up`
+`docker-compose -f docker-compose_no_config.yml up`
 
 ## Start-up
 + You can see the creation of several containers, one for each module of our CAAI pipeline.
 + The start-up sequence starts in the third module, where the Cognition creates the initial design.
 The initial design consists of 5 points, equally distributed over the search space for x.
 The Cognition publishes those as starting points to the Analytics Bus, where the Adaption (4) listens.
-+ The Adaption sends those new parameters to the CPPS Simulation (0) and continuous operation starts.
++ The Adaption sends those new parameters to the CPPS Controller (0), where they are retrieved from the CPPS (0) before continuous operation starts.
 
 ## Continuous operation
-+ The Simulation builds a model of the production process with data from experiments on the real CPPS during start-up.
++ The CPPS Module (0) builds a model of the production process with data from experiments on the real CPPS during start-up.
 This model is used to evaluate the incoming points for x and derive the corresponding y-value. 
-The simulation sends the x and y to the Data Bus.
-+ As we use message-based communication, we can subscribe any number of Model Learning modules (1) to the related topic and each will receive the data to train their model.
-Both Model Learning modules, implementing Kriging and Random Forest algorithms, use leave-one-out cross-validation to calculate RMSE, MAE and R<sup>2</sup> and send those metrics as well as the trained model to the Analytics Bus.
-+ The Model Application + Optimization module (2) receives both models and uses differential evolution to search for an improved solution.
+The CPPS (0) sends both points to the Data Bus.
++ As we use message-based communication, we can subscribe any number of modules to a topic and each will receive the data.
+In this use case the Monitoring (1) and two Model Learning (1) modules listen to new data from the CPPS (0).
+The Monitoring (1) module transfers the CPPS data from the Data Bus to the Analytics Bus, so the Cognition (3) can evaluate the process data.
+The Model Learning (1) modules, implementing Kriging and Random Forest algorithms, use leave-one-out cross-validation to calculate RMSE, MAE and R<sup>2</sup> and send those metrics as well as the trained model to the Analytics Bus.
++ The Model Application + Optimization (2) module receives both models and uses differential evolution to search for an improved solution.
 The best predicted y and the corresponding x for each algorithm is published to the Analytics Bus. 
 + The Cognition (3) is able to evaluate the suggested new values. 
-Once the Cognition decided a new value to try in production, it is send to the Adaption, which forwards it to the CPPS and the first iteration is complete. 
+Once the Cognition decided a new value to try in production, it is send to the Adaption (4), which instructs the CPPS controller and concludes the iteration. 
 
 The described workflow is also shown in the figure below:
 
@@ -63,14 +65,15 @@ The described workflow is also shown in the figure below:
 
 Please press `Ctrl + C` in each terminal, to stop the experiment as well as the Kafka broker.
 Execute both commands to remove the containers:\
-`docker-compose down`\
+`docker-compose -f docker-compose_no_config down`\
 `docker-compose -f docker-compose_kafka.yml down`
 
 # Technical details
 A lot of things happened in the background to make this work:
 + Docker-compose builds the Containers from the Dockerfiles in `src`.
-+ The Dockerfiles specify the base image, install the requirements found in `./src/configurations/requirements.txt`, copy the sources into the container and set the program to execute when the container starts.
-+ The Docker-compose files also specify the environment for the container and set the URL for the Kafka broker, the incoming / outgoing topics for our modules and also the serialization schema.
++ The Dockerfiles specify the base image, install the requirements found in `./src/configurations/`, copy the sources into the container and set the program to execute when the container starts.
++ The Docker-compose files also specify the path to the configuration file and the relevant sections for each container. 
+This sets the environment for the container, e.g. the URL for the Kafka broker, the incoming / outgoing topics for our modules and also the serialization schema.
 + Avro serializes the messages according to schemas defined in `./src/schema/`.
 Messages that do not comply to the specified schema raise an error and can´t be send.
 
