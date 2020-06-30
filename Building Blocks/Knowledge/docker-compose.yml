@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  api_knowledge:
+    container_name: API_Knowledge
+    hostname: API_Knowledge 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose: 
+    - "8000"
+    ports:
+    - "8001:8000"  
+
+networks:
+  default:
+    external:
+      name: caai
