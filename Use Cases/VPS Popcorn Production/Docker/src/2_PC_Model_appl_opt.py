@@ -25,7 +25,7 @@ env_vars = {'in_topic': 'AB_model_data',
             }
 """
 
-## configuration constants
+# configuration constants
 N_INITIAL_DESIGN = 5
 N_OPTIMIZATION_BUDGET = 200
 N_POP_SIZE = 20
@@ -76,6 +76,8 @@ for msg in new_pc.consumer:
     # print(f'{new_model["model_name"]}, n={new_model["n_data_points"]}, x={surrogate_x}, y={surrogate_y}')
     print(f"The optimization algorithm {new_model['model_name']} suggests the "
           f"values x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
+
+    new_pc.commit_offset(msg)
 
     """
     "name": "Model_Application",

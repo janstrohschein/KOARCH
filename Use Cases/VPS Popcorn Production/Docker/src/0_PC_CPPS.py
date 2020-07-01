@@ -25,11 +25,11 @@ new_objective.fit_model()
 new_pc = KafkaPC(**env_vars)
 
 N_INITIAL_DESIGN = 5
-MAX_DATA_POINTS = 50
+MAX_DATA_POINTS = 50 + N_INITIAL_DESIGN
 phase = 'init'
 current_data_point = 0
 
-time.sleep(10)
+time.sleep(5)
 
 while current_data_point < MAX_DATA_POINTS:
 
@@ -54,4 +54,4 @@ while current_data_point < MAX_DATA_POINTS:
     new_pc.send_msg(new_data_point)
     print(f"The CPPS produced with x={round(new_x, 3)} and got y={round(new_y, 3)}")
     current_data_point += 1
-    time.sleep(10)
+    time.sleep(5)

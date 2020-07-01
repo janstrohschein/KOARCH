@@ -48,6 +48,7 @@ for msg in new_pc.consumer:
     """
 
     new_message = new_pc.decode_avro_msg(msg)
+    new_pc.commit_offset(msg)
 
     # new_pc.send_msg(new_message)
     # print('The value x='+str(new_message['new_x'])+' is applied to the CPPS')

@@ -111,7 +111,7 @@ def get_cv_scores(model, X, y):
     mae_score = mae(y, y_pred)
     r2_score = r2(y, y_pred)
 
-    print(f'Update CPPS model with new data point. RMSE of the model: {round(rmse_score, 3)}')
+    # print(f'Update CPPS model with new data point. RMSE of the model: {round(rmse_score, 3)}')
     #   print(f'Mean MAE: {mae_score}')
     #   print(f'Mean R2: {r2_score}')
 

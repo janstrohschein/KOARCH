@@ -3,6 +3,7 @@ import io
 import yaml
 
 from kafka import KafkaProducer, KafkaConsumer
+from kafka.structs import OffsetAndMetadata, TopicPartition
 from avro.io import BinaryEncoder, DatumWriter
 import avro.schema
 
@@ -16,9 +17,15 @@ class KafkaPC():
             config_section = config_section.replace(' ', '').split(',')
             self.read_config(config_path, config_section)
 
-        if self.config['IN_TOPIC'] and self.config['IN_GROUP']:
+        if self.config.get('IN_TOPIC') and self.config.get('IN_GROUP'):
             self.consumer = KafkaConsumer(group_id=self.config['IN_GROUP'],
-                                          bootstrap_servers=[self.config['KAFKA_BROKER_URL']])
+                                          bootstrap_servers=[self.config['KAFKA_BROKER_URL']],
+                                          # auto_offset_reset='earliest',
+                                          request_timeout_ms=500000,
+                                          session_timeout_ms=100000,
+                                          # consumer_timeout_ms=self.config['KAFKA_CONSUMER_TIMEOUT_MS']
+                                          )
+            # print(f"Topic: {self.config.get('IN_TOPIC')}, Group: {self.config.get('IN_GROUP')}")
             self.in_topic = list(self.config['IN_TOPIC'].keys())
             self.consumer.subscribe(self.in_topic)
 
@@ -26,7 +33,7 @@ class KafkaPC():
             for topic, schema in self.config['IN_TOPIC'].items():
                 self.in_schema[topic] = self.read_avro_schema(schema)
 
-        if self.config['OUT_TOPIC']:
+        if self.config.get('OUT_TOPIC'):
             self.out_topic = list(self.config['OUT_TOPIC'].keys())
             self.out_schema = {}
             for topic, schema in self.config['OUT_TOPIC'].items():
@@ -100,3 +107,8 @@ class KafkaPC():
                 self.producer.send(out_topic, raw_bytes, partition=key)
             except Exception as e:
                 print(f'Error sending data to Kafka: {repr(e)}')
+
+    def commit_offset(self, msg):
+        tp = TopicPartition(msg.topic, msg.partition)
+        offsets = {tp: OffsetAndMetadata(msg.offset, None)}
+        self.consumer.commit(offsets=offsets)

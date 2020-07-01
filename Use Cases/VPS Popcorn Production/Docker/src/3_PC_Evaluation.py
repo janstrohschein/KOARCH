@@ -1,4 +1,5 @@
 import os
+from time import sleep
 from datetime import datetime
 
 import pandas as pd
@@ -101,7 +102,7 @@ class CognitionPC(KafkaPC):
             new_x = {'phase': 'init',
                      'id_x': new_cog.current_data_point,
                      'new_x': new_cog.X[new_cog.current_data_point]}
-            new_cog.current_data_point += 1
+            # new_cog.current_data_point += 1
 
             new_cog.send_msg(new_x)
             print(f'Sent next point from initial design x={new_x["new_x"]}')
@@ -135,7 +136,9 @@ class CognitionPC(KafkaPC):
                       f"{min_best_pred_y['model_name']} is applied to the CPPS "
                       f"since the lowest y is expected "
                       f"(y={round(min_best_pred_y['best_pred_y'], 3)}).")
-            self.current_data_point += 1
+
+        self.current_data_point += 1
+        self.commit_offset(msg)
 
 
 env_vars = {'config_path': os.getenv('config_path'),
@@ -172,6 +175,7 @@ new_x = {'phase': 'init',
          'new_x': new_cog.X[new_cog.current_data_point]}
 new_cog.current_data_point += 1
 
+sleep(3)
 new_cog.send_msg(new_x)
 
 print(f"Creating initial design of the system by applying {N_INITIAL_DESIGN} "
@@ -179,4 +183,5 @@ print(f"Creating initial design of the system by applying {N_INITIAL_DESIGN} "
       f"\nSent x={new_x['new_x']}")
 
 for msg in new_cog.consumer:
+    # print("Cognition received message")
     new_cog.func_dict[msg.topic](msg)

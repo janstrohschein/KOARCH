@@ -1,5 +1,5 @@
 avro-python3==1.9.2.1
-kafka-python==1.4.6
+kafka-python==2.0.0 # 1.4.6
 pandas==1.0.1
 numpy==1.18.1
 scipy==1.2.2

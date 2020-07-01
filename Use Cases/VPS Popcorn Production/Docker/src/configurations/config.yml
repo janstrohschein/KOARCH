@@ -1,11 +1,9 @@
 General:
   KAFKA_BROKER_URL: kafka:9093
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
   # KAFKA_BROKER_URL: localhost:9092
 
 0_pc_cpps:
-  IN_TOPIC:
-    adaption: ./schema/new_x.avsc
-  IN_GROUP: CPPS
   OUT_TOPIC:
     DB_raw_data: ./schema/data.avsc
   API_URL: http://0_API_CPPS_Controller:8000
@@ -58,6 +56,4 @@ General:
   IN_TOPIC:
     AB_model_evaluation: ./schema/new_x.avsc
   IN_GROUP: adaption
-  OUT_TOPIC:
-    adaption: ./schema/new_x.avsc
   API_URL: http://0_API_CPPS_Controller:8000

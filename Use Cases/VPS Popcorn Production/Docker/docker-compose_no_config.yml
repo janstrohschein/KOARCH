@@ -20,6 +20,8 @@ services:
     environment: 
       config_path: ./configurations/config.yml
       config_section: General, 0_pc_cpps
+    depends_on: 
+      - 3_pc_evaluation
 
   1_pc_monitoring:
     container_name: 1_PC_Monitoring
@@ -44,10 +46,11 @@ services:
     build:
       context: ./src
       dockerfile: Dockerfile_1_PC_Model_Learning
+    restart: always
     environment: 
       config_path: ./configurations/config.yml
       config_section: General, 1_pc_model_learning_kriging
-
+    
   2_pc_model_appl_opt:
     container_name: 2_PC_Model_appl_opt
     build:
@@ -65,6 +68,8 @@ services:
     environment: 
       config_path: ./configurations/config.yml
       config_section: General, 3_pc_evaluation
+    depends_on: 
+      - 4_pc_adaption
       
   4_pc_adaption:
     container_name: 4_PC_Adaption

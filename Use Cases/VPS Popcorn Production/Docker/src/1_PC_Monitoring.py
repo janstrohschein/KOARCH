@@ -35,6 +35,7 @@ for msg in new_pc.consumer:
         ]
     """
     new_data = new_pc.decode_avro_msg(msg)
+    new_pc.commit_offset(msg)
 
     """
     "name": "Data",
