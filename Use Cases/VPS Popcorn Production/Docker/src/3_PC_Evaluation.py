@@ -138,7 +138,7 @@ class CognitionPC(KafkaPC):
                       f"(y={round(min_best_pred_y['best_pred_y'], 3)}).")
 
         self.current_data_point += 1
-        self.commit_offset(msg)
+        # self.commit_offset(msg)
 
 
 env_vars = {'config_path': os.getenv('config_path'),

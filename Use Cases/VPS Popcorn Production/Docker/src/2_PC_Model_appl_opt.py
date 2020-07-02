@@ -77,7 +77,7 @@ for msg in new_pc.consumer:
     print(f"The optimization algorithm {new_model['model_name']} suggests the "
           f"values x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
 
-    new_pc.commit_offset(msg)
+    # new_pc.commit_offset(msg)
 
     """
     "name": "Model_Application",

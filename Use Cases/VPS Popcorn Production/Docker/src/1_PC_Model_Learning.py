@@ -86,7 +86,7 @@ for msg in new_pc.consumer:
         tracemalloc.stop()
 
         model_pickle = pickle.dumps(ML.model)
-        new_pc.commit_offset(msg)
+        # new_pc.commit_offset(msg)
 
         """
         "name": "Model",

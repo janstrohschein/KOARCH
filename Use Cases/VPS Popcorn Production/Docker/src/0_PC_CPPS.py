@@ -25,7 +25,7 @@ new_objective.fit_model()
 new_pc = KafkaPC(**env_vars)
 
 N_INITIAL_DESIGN = 5
-MAX_DATA_POINTS = 50 + N_INITIAL_DESIGN
+MAX_DATA_POINTS = 49 + N_INITIAL_DESIGN
 phase = 'init'
 current_data_point = 0
 
