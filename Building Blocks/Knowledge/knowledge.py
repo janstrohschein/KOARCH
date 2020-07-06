@@ -26,8 +26,11 @@ async def get_knowledge():
 @knowledgebase.get("/knowledge/{usecase}/")
 async def get_usecase(usecase: str):
     """ Filters the knowledge for a specific usecase. """
-    response = knowledge.get(usecase, "Key does not exist")
-    return response
+
+    usecase_knowledge = knowledge.get(usecase, "Key does not exist")
+    status_code = 400 if usecase_knowledge == "Key does not exist" else 200
+
+    return JSONResponse(usecase_knowledge, status_code=status_code)
 
 
 @knowledgebase.put("/import_knowledge/")
