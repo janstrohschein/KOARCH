@@ -66,7 +66,9 @@ async def get_knowledge():
 
 @knowledgebase.get("/knowledge/usecase/")
 async def get_usecase(usecase: str):
-    """ Filters the knowledge for a specific usecase. """
+    """ Filters the knowledge for a specific usecase.\n
+    Example Usecase: Optimization 
+    """
 
     usecase_knowledge = knowledge.get(usecase, "Key does not exist")
     status_code = 400 if usecase_knowledge == "Key does not exist" else 200
@@ -76,26 +78,21 @@ async def get_usecase(usecase: str):
 
 @knowledgebase.get("/knowledge/feasible_pipelines/")
 async def get_feasible_pipelines(use_case=None, goal=None, feature=None):
-
+    """ Filters the knowledgebase and returns feasible pipelines.\n
+    Example Input:\n
+    use_case = Optimization\n
+    goal = minimize\n
+    feature = minimum\n
     """
-    user_input = {'use_case': 'Optimization',
-                  'goal': 'minimize',
-                  'feature': 'minimum',
-                  'sensor': 'l_rPower'  # target_variable at last spot?, how to handle multiple criteria?
-                  }
-    """
-    # knowledge = load_knowledge('knowledge.json')
 
     if use_case is None or goal is None or feature is None:
         return JSONResponse("Need use_case, goal and feature", status_code=400)
 
-    # search_base = f'{user_input["use_case"]}.{user_input["goal"]}.{user_input["feature"]}'
     search_base = f"{use_case}.{goal}.{feature}"
 
     pipeline_start = 'algorithms'  # brauchen wir einen dynamischen Start? wie können wir diesen kennzeichnen?
 
     pipelines = get_pipelines(knowledge, search_base, pipeline_start)
-
     return JSONResponse(pipelines, status_code=200)
 
 
