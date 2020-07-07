@@ -1,4 +1,6 @@
 import yaml
+# import json
+import pydash
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
@@ -11,9 +13,48 @@ def import_knowledge(knowledge_path="knowledge.yaml"):
     return knowledge
 
 
-knowledgebase = FastAPI()
+def get_from_knowledge(knowledge, search_base, search):
 
+    result = None
+    search_string = search_base + '.' + search
+
+    try:
+        result = pydash.get(knowledge, search_string)
+    except Exception as e:
+        print(f'Error while searching: {search_string}, Error: {e}')
+
+    return result
+
+
+def get_pipelines(knowledge, search_base, search, parent=None, pipelines=[]):
+
+    result = get_from_knowledge(knowledge, search_base, search)
+
+    if result is None:
+        return pipelines
+
+    for key, values in result.items():
+        pipeline = (key, values)
+
+        if parent is not None:
+            pipeline = (pipeline, *parent)
+        else:
+            pipeline = (pipeline,)
+
+        if values['input'] == 'raw_data':
+            pipelines.append(pipeline)
+        else:
+
+            pipelines = get_pipelines(knowledge, search_base, values['input'], pipeline, pipelines)
+
+    return pipelines
+
+
+knowledgebase = FastAPI()
 knowledge = import_knowledge()
+
+# local path for testing
+# knowledge = import_knowledge("Building Blocks/Knowledge/data/knowledge.yaml")
 
 
 @knowledgebase.get("/knowledge/")
@@ -23,7 +64,7 @@ async def get_knowledge():
     return response
 
 
-@knowledgebase.get("/knowledge/{usecase}/")
+@knowledgebase.get("/knowledge/usecase/")
 async def get_usecase(usecase: str):
     """ Filters the knowledge for a specific usecase. """
 
@@ -31,6 +72,31 @@ async def get_usecase(usecase: str):
     status_code = 400 if usecase_knowledge == "Key does not exist" else 200
 
     return JSONResponse(usecase_knowledge, status_code=status_code)
+
+
+@knowledgebase.get("/knowledge/feasible_pipelines/")
+async def get_feasible_pipelines(use_case=None, goal=None, feature=None):
+
+    """
+    user_input = {'use_case': 'Optimization',
+                  'goal': 'minimize',
+                  'feature': 'minimum',
+                  'sensor': 'l_rPower'  # target_variable at last spot?, how to handle multiple criteria?
+                  }
+    """
+    # knowledge = load_knowledge('knowledge.json')
+
+    if use_case is None or goal is None or feature is None:
+        return JSONResponse("Need use_case, goal and feature", status_code=400)
+
+    # search_base = f'{user_input["use_case"]}.{user_input["goal"]}.{user_input["feature"]}'
+    search_base = f"{use_case}.{goal}.{feature}"
+
+    pipeline_start = 'algorithms'  # brauchen wir einen dynamischen Start? wie können wir diesen kennzeichnen?
+
+    pipelines = get_pipelines(knowledge, search_base, pipeline_start)
+
+    return JSONResponse(pipelines, status_code=200)
 
 
 @knowledgebase.put("/import_knowledge/")

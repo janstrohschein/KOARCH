@@ -4,14 +4,14 @@ Optimization:
       algorithms:
         Kriging:
           parameter: parameters
-          metadata: # fill
+          metadata: "" # fill
           input: preprocessed features
         CMAES:
           parameter: parameters
-          input: raw data
+          input: raw_data
         ERROR:
           parameter: parameters
-          metadata: # fill
+          metadata: "" # fill
           input: unkown data
       preprocessed features:
         1st_feature_pp_function:
@@ -27,7 +27,7 @@ Optimization:
       preprocessed data:
         some_data_pp_function:
           parameter: parameters
-          input: raw data
+          input: raw_data
   maximize:
     minimum:
     # fill
