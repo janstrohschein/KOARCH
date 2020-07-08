@@ -54,7 +54,7 @@ knowledgebase = FastAPI()
 knowledge = import_knowledge()
 
 # local path for testing
-# knowledge = import_knowledge("Building Blocks/Knowledge/data/knowledge.yaml")
+# knowledge = import_knowledge("Big Data Platform/Docker/Knowledge/data/knowledge.yaml")
 
 
 @knowledgebase.get("/knowledge/")
@@ -85,6 +85,7 @@ async def get_feasible_pipelines(use_case=None, goal=None, feature=None):
     feature = minimum\n
     """
 
+
     if use_case is None or goal is None or feature is None:
         return JSONResponse("Need use_case, goal and feature", status_code=400)
 
@@ -92,7 +93,7 @@ async def get_feasible_pipelines(use_case=None, goal=None, feature=None):
 
     pipeline_start = 'algorithms'  # brauchen wir einen dynamischen Start? wie können wir diesen kennzeichnen?
 
-    pipelines = get_pipelines(knowledge, search_base, pipeline_start)
+    pipelines = get_pipelines(knowledge, search_base, pipeline_start, pipelines=[])
     return JSONResponse(pipelines, status_code=200)
 
 
