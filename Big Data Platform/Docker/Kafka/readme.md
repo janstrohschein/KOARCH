@@ -12,7 +12,7 @@ The figure below depicts the workflow consisting of the following steps:
 6)	As soon as new messages arrive at the topic the Consumer will collect them and decode the message to restore the values. Therefore the schema that was used to encode the data has to be available to the consumer. 
 7)	Now the Consumer can process the data and create an intermediate result for further consumption or a final output.
 
-<img src="./docs/kafka_workflow.jpg" width="600px">
+<img src="./docs/kafka_workflow.jpg" width="609px",align="center">
 
 
 
