@@ -67,7 +67,7 @@ async def get_knowledge():
 @knowledgebase.get("/knowledge/usecase/")
 async def get_usecase(usecase: str):
     """ Filters the knowledge for a specific usecase.\n
-    Example Usecase: Optimization 
+    Example Usecase: Optimization
     """
 
     usecase_knowledge = knowledge.get(usecase, "Key does not exist")

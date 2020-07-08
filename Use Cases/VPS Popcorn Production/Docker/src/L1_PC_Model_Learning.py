@@ -6,7 +6,7 @@ import pickle
 # import warnings
 
 from classes.KafkaPC import KafkaPC
-from classes.util import ModelLearner, DataWindow, get_cv_scores
+from classes.ml_util import ModelLearner, DataWindow, get_cv_scores
 
 # warnings.filterwarnings("ignore")
 

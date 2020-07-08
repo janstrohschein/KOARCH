@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 from classes.KafkaPC import KafkaPC
-from classes.util import ObjectiveFunction
+from classes.ml_util import ObjectiveFunction
 
 pd.set_option('display.max_columns', None)
 pd.options.display.float_format = '{:.3f}'.format

@@ -14,34 +14,4 @@ All modules rely on the messaging ability for indirect communication with other 
 Thus the Kafka building block is the base class and more specialized blocks like a connector to PostgresDB can inherit the additional Kafka functionality.
 You can find the building blocks in `./src/classes`.
 
-## Kafka
-Kafka consists of brokers, producers and consumers. A producer publishes a message to a certain topic and sends it to the broker. A consumer subscribes to a topic and receives incoming messages.
 
-### Example
-Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
-`docker network create caai`
-
-Now you can start the Kafka broker with the following command:\
-`docker-compose -f docker-compose_kafka.yml up`
-
-This starts the Kafka container and an additional Zookeeper container, which helps Kafka to handle state.
-Docker also  opens port 9092 for communication between localhost and the container and 9093 for communication between containers.
-
-Open two additional terminals and execute the commands below to send and receive messages:\
-`docker-compose -f docker-compose_1p_count_up.yml up`\
-`docker-compose -f docker-compose_2c_print_out.yml up`
-
-You should see the first program counting up and sending those numbers to the broker.
-The second program receives the numbers from the broker and prints them.
-The publishing program then exits with code 0, because it successfully sent all its messages.
-The receiving program waits for further messages until the time-out is reached.
-You can stop the second program and the Kafka Container with `Ctrl-C`.
-After the containers stopped you can execute the following command to remove the containers:
-`docker-compose -f docker-compose_1p_count_up.yml down`
-
-A lot of things happened in the background to make this work:
-+ Docker-compose builds the Containers from the Dockerfiles in `src`.
-+ The Dockerfiles specify the base image, install the requirements found in `./src/configurations/requirements.txt`, copy the sources into the container and set the program to execute when the container starts.
-+ The Docker-compose files also specify the environment for the container and set the URL for the Kafka broker, the incoming / outgoing topics for our modules and also the serialization schema.
-+ Avro serializes the messages according to `./src/schema/count.avsc`.
-Messages that do not comply to this schema raise an error and can´t be send.

@@ -20,9 +20,9 @@ class ObjectiveFunction:
         self.X = None
         self.y = None
 
-    def load_data(self):
+    def load_data(self, path="data/vpsFeatures.csv"):
 
-        file_path = "data/vpsFeatures.csv"
+        file_path = path
         extract_columns = ['conveyorRuntimeMean', 'yAgg']
         extract_columns_types = {'conveyorRuntimeMean': float, 'yAgg': float}
 

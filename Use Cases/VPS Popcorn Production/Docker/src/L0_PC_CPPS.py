@@ -3,8 +3,9 @@ import json
 import time
 
 import os
+
 from classes.KafkaPC import KafkaPC
-from classes.util import ObjectiveFunction
+from classes.ml_util import ObjectiveFunction
 
 
 env_vars = {'config_path': os.getenv('config_path'),
