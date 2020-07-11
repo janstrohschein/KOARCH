@@ -10,8 +10,6 @@ To test the Docker installation you can open a terminal and execute `docker run 
 On some OS the Docker installation does not include docker-compose. You can find information for the installation [here](https://docs.docker.com/compose/install/)  in case you get a message that docker-compose is missing.
 
 # Building blocks
+The subfolders contain the different building blocks of the Big Data Platform. 
 All modules rely on the messaging ability for indirect communication with other modules.
-Thus the Kafka building block is the base class and more specialized blocks like a connector to PostgresDB can inherit the additional Kafka functionality.
-You can find the building blocks in `./src/classes`.
-
-
+Thus the Kafka building block is the base class for most other modules and more specialized blocks like a connector to PostgresDB can inherit the additional Kafka functionality.

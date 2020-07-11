@@ -85,7 +85,6 @@ async def get_feasible_pipelines(use_case=None, goal=None, feature=None):
     feature = minimum\n
     """
 
-
     if use_case is None or goal is None or feature is None:
         return JSONResponse("Need use_case, goal and feature", status_code=400)
 
