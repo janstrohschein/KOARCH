@@ -8,17 +8,31 @@ import numpy as np
 from classes.KafkaPC import KafkaPC
 from classes.ml_util import ObjectiveFunction
 
-pd.set_option('display.max_columns', None)
-pd.options.display.float_format = '{:.3f}'.format
+pd.set_option("display.max_columns", None)
+pd.options.display.float_format = "{:.3f}".format
 
 
 class CognitionPC(KafkaPC):
     def __init__(self, config_path, config_section, n_initial_design, x_min, x_max):
         super().__init__(config_path, config_section)
 
-        df_columns = ['phase', 'model_name', 'n_data_points', 'id_start_x',
-                      'model_size', 'best_x', 'best_pred_y', 'y', 'y_delta',
-                      'rmse', 'mae', 'rsquared', 'CPU_ms', 'RAM', 'timestamp']
+        df_columns = [
+            "phase",
+            "model_name",
+            "n_data_points",
+            "id_start_x",
+            "model_size",
+            "best_x",
+            "best_pred_y",
+            "y",
+            "y_delta",
+            "rmse",
+            "mae",
+            "rsquared",
+            "CPU_ms",
+            "RAM",
+            "timestamp",
+        ]
 
         self.df = pd.DataFrame(columns=df_columns)
 
@@ -34,12 +48,21 @@ class CognitionPC(KafkaPC):
         self.generate_initial_design(n_initial_design, x_min, x_max)
 
         # maps topics and functions, which process the incoming data
-        self.func_dict = {"AB_model_application": self.process_model_application,
-                          "AB_monitoring": self.process_monitoring}
+        self.func_dict = {
+            "AB_model_application": self.process_model_application,
+            "AB_monitoring": self.process_monitoring,
+        }
 
     def generate_initial_design(self, n_initial_design, x_min, x_max):
         # number n_initial_design equally spaced X between X_MIN, X_MAX
         self.X = np.linspace(x_min, x_max, num=n_initial_design)
+
+    def get_best_x(self, strategy=""):
+
+        min_best_pred_y = self.df.loc[self.df["best_pred_y"].idxmin()]
+        best_x = min_best_pred_y.best_x
+
+        return best_x
 
     def process_model_application(self, msg):
         """
@@ -60,18 +83,29 @@ class CognitionPC(KafkaPC):
         ]
         """
         new_model_appl = self.decode_avro_msg(msg)
-        best_pred_y = new_model_appl['best_pred_y']
-        y = self.new_objective.get_objective(new_model_appl['best_x'])
+        best_pred_y = new_model_appl["best_pred_y"]
+        y = self.new_objective.get_objective(new_model_appl["best_x"])
         y_delta = abs(y - best_pred_y)  # absoluter Wert?
 
-        new_model_appl['y'] = y
-        new_model_appl['y_delta'] = y_delta
-        new_model_appl['timestamp'] = datetime.now()
+        new_model_appl["y"] = y
+        new_model_appl["y_delta"] = y_delta
+        new_model_appl["timestamp"] = datetime.now()
 
         self.df = self.df.append(new_model_appl, ignore_index=True)
 
-        print(self.df[["model_name", "best_x", "best_pred_y", "rmse",
-                       "rsquared", "CPU_ms", "RAM"]].iloc[-1:])
+        print(
+            self.df[
+                [
+                    "model_name",
+                    "best_x",
+                    "best_pred_y",
+                    "rmse",
+                    "rsquared",
+                    "CPU_ms",
+                    "RAM",
+                ]
+            ].iloc[-1:]
+        )
         """
         "name": "New X",
         "fields": [
@@ -97,11 +131,42 @@ class CognitionPC(KafkaPC):
             ]
         """
 
+        """
+        reales y muss dem Algorithmus der vorherigen Iteration zugeordnet werden
+
+
+        wenn Modell Wert sendet
+        pred_model_quality = get_pred_model_quality(surrogate_y, new_model['rmse'])
+        - normalisieren über alle Module
+        - beide 1/2
+
+
+        wenn Monitoring reales Ergebnis sendet
+        real_model_quality = get_real_model_quality(surrogate_y, real_y, rmse)
+        - delta_y = | surrogate_y - real_y |
+        - normalisieren
+        - beide 1/2
+
+        resources = CPU, RAM
+        - normalisieren
+        - beide 1/2
+
+
+
+        wenn neues X ausgewählt wird
+        quality = real_model_quality if real_model_quality is not None else pred_model_quality
+        model = min(quality * user_spec + resources * user_spec)
+
+
+        """
+
         if self.current_data_point < self.n_initial_design:
 
-            new_x = {'phase': 'init',
-                     'id_x': new_cog.current_data_point,
-                     'new_x': new_cog.X[new_cog.current_data_point]}
+            new_x = {
+                "phase": "init",
+                "id_x": new_cog.current_data_point,
+                "new_x": new_cog.X[new_cog.current_data_point],
+            }
             # new_cog.current_data_point += 1
 
             new_cog.send_msg(new_x)
@@ -111,14 +176,22 @@ class CognitionPC(KafkaPC):
 
             # best / last dataframe value
             if self.df.empty is True:
-                new_x = {"phase": "observation", "id_x": self.current_data_point,
-                         "new_x": new_monitoring['x']}
+                new_x = {
+                    "phase": "observation",
+                    "id_x": self.current_data_point,
+                    "new_x": new_monitoring["x"],
+                }
                 self.send_msg(new_x)
-                print(f"The value x={new_monitoring['x']} is sent to the "
-                      f"CPPS, since no optimization results arrived yet.")
+                print(
+                    f"The value x={new_monitoring['x']} is sent to the "
+                    f"CPPS, since no optimization results arrived yet."
+                )
             else:
+
                 min_best_pred_y = self.df.loc[self.df["best_pred_y"].idxmin()]
                 new_x = min_best_pred_y.best_x
+
+                # selected_x = get_best_x()
 
                 """
                     "name": "New X",
@@ -128,21 +201,28 @@ class CognitionPC(KafkaPC):
                         {"name": "new_x", "type": ["float"]}
                         ]
                     """
-                new_x = {"phase": "observation", "id_x": self.current_data_point,
-                         "new_x": new_x}
+                new_x = {
+                    "phase": "observation",
+                    "id_x": self.current_data_point,
+                    "new_x": new_x,
+                }
 
                 self.send_msg(new_x)
-                print(f"The x value of the algorithm "
-                      f"{min_best_pred_y['model_name']} is applied to the CPPS "
-                      f"since the lowest y is expected "
-                      f"(y={round(min_best_pred_y['best_pred_y'], 3)}).")
+                print(
+                    f"The x value of the algorithm "
+                    f"{min_best_pred_y['model_name']} is applied to the CPPS "
+                    f"since the lowest y is expected "
+                    f"(y={round(min_best_pred_y['best_pred_y'], 3)})."
+                )
 
         self.current_data_point += 1
         # self.commit_offset(msg)
 
 
-env_vars = {'config_path': os.getenv('config_path'),
-            'config_section': os.getenv('config_section')}
+env_vars = {
+    "config_path": os.getenv("config_path"),
+    "config_section": os.getenv("config_section"),
+}
 
 """
 env_vars = {'in_topic': {'AB_model_application': './schema/model_appl.avsc',
@@ -156,10 +236,12 @@ env_vars = {'in_topic': {'AB_model_application': './schema/model_appl.avsc',
 
 """generate initial design"""
 N_INITIAL_DESIGN = 5
-X_MIN = 4000.
-X_MAX = 10100.
+X_MIN = 4000.0
+X_MAX = 10100.0
 
-new_cog = CognitionPC(**env_vars, n_initial_design=N_INITIAL_DESIGN, x_min=X_MIN, x_max=X_MAX)
+new_cog = CognitionPC(
+    **env_vars, n_initial_design=N_INITIAL_DESIGN, x_min=X_MIN, x_max=X_MAX
+)
 
 """
 "name": "New X",
@@ -170,18 +252,21 @@ new_cog = CognitionPC(**env_vars, n_initial_design=N_INITIAL_DESIGN, x_min=X_MIN
  ]
 """
 
-new_x = {'phase': 'init',
-         'id_x': new_cog.current_data_point,
-         'new_x': new_cog.X[new_cog.current_data_point]}
+new_x = {
+    "phase": "init",
+    "id_x": new_cog.current_data_point,
+    "new_x": new_cog.X[new_cog.current_data_point],
+}
 new_cog.current_data_point += 1
 
 sleep(3)
 new_cog.send_msg(new_x)
 
-print(f"Creating initial design of the system by applying {N_INITIAL_DESIGN} "
-      f"equally distributed values x over the whole working area of the CPPS."
-      f"\nSent x={new_x['new_x']}")
+print(
+    f"Creating initial design of the system by applying {N_INITIAL_DESIGN} "
+    f"equally distributed values x over the whole working area of the CPPS."
+    f"\nSent x={new_x['new_x']}"
+)
 
 for msg in new_cog.consumer:
-    # print("Cognition received message")
     new_cog.func_dict[msg.topic](msg)

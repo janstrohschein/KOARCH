@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 COPY . /src
 WORKDIR /src
 
-CMD ["python", "-u", "0_PC_CPPS.py"]
+CMD ["python", "-u", "L0_PC_CPPS.py"]

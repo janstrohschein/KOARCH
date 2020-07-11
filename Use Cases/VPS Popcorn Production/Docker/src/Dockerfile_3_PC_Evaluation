@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 COPY . /src
 WORKDIR /src
 
-CMD ["python", "-u", "3_PC_Evaluation.py"]
+CMD ["python", "-u", "L3_PC_Evaluation.py"]

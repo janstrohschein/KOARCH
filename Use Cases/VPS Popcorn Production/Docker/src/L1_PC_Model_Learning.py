@@ -3,12 +3,15 @@ import tracemalloc
 import time
 from sys import getsizeof
 import pickle
-# import warnings
 
 from classes.KafkaPC import KafkaPC
 from classes.ml_util import ModelLearner, DataWindow, get_cv_scores
+import sys
+import warnings
 
-# warnings.filterwarnings("ignore")
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
+    os.environ["PYTHONWARNINGS"] = "ignore"
 
 
 env_vars = {'config_path': os.getenv('config_path'),

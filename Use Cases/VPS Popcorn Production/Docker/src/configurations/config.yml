@@ -30,7 +30,7 @@ General:
   MODEL_ALGORITHM: Kriging
   MODEL_PARAMETERS:
     kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
-    optimizer: None
+    n_restarts_optimizer: 5
   IN_TOPIC:
     DB_raw_data: ./schema/data.avsc
   IN_GROUP: Kriging

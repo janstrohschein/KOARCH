@@ -1,5 +1,4 @@
 from collections import namedtuple
-# import re
 import pandas as pd
 import numpy as np
 
@@ -9,7 +8,6 @@ from sklearn.metrics import mean_absolute_error as mae
 from sklearn.metrics import r2_score as r2
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
-# from sklearn.gaussian_process.kernels import RationalQuadratic
 from sklearn.gaussian_process import kernels
 
 
@@ -107,13 +105,10 @@ def get_cv_scores(model, X, y):
 
     y_pred = cross_val_predict(model, X, y, cv=LeaveOneOut(), n_jobs=-1)
 
-    rmse_score = np.sqrt(mse(y, y_pred))
+    rmse_score = mse(y, y_pred, squared=False)
+
     mae_score = mae(y, y_pred)
     r2_score = r2(y, y_pred)
-
-    # print(f'Update CPPS model with new data point. RMSE of the model: {round(rmse_score, 3)}')
-    #   print(f'Mean MAE: {mae_score}')
-    #   print(f'Mean R2: {r2_score}')
 
     return rmse_score, mae_score, r2_score
 

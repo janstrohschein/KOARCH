@@ -4,7 +4,7 @@ from math import ceil
 import pickle
 import numpy as np
 
-from classes.KafkaPC import KafkaPC
+from classes.KafkaPC import KafkaPC    
 
 
 env_vars = {'config_path': os.getenv('config_path'),

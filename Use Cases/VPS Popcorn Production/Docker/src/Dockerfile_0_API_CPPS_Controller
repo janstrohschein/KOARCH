@@ -3,7 +3,7 @@ FROM python:3.7-slim-buster
 COPY ./configurations/requirements_0_API.txt /
 RUN pip install -r requirements_0_API.txt
 
-COPY ./0_API_CPPS_Controller.py /src/
+COPY ./L0_API_CPPS_Controller.py /src/
 WORKDIR /src
 
-CMD ["uvicorn", "0_API_CPPS_Controller:CPPS_Controller", "--host", "0.0.0.0", "--log-level", "warning"]
+CMD ["uvicorn", "L0_API_CPPS_Controller:CPPS_Controller", "--host", "0.0.0.0", "--log-level", "warning"]

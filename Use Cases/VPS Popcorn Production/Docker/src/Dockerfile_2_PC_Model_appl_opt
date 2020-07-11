@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 COPY . /src
 WORKDIR /src
 
-CMD ["python", "-u", "2_PC_Model_appl_opt.py"]
+CMD ["python", "-u", "L2_PC_Model_appl_opt.py"]
