@@ -37,7 +37,7 @@ Now you can launch the Kafka broker with the following command:\
 
 # Run the experiment
 Open another terminal to start the experiment:\
-`docker-compose -f docker-compose_no_config.yml up`
+`docker-compose up`
 
 ## Start-up
 + You can see the creation of several containers, one for each module of our CAAI pipeline.
@@ -65,7 +65,7 @@ The described workflow is also shown in the figure below:
 
 Please press `Ctrl + C` in each terminal, to stop the experiment as well as the Kafka broker.
 Execute both commands to remove the containers:\
-`docker-compose -f docker-compose_no_config down`\
+`docker-compose down`\
 `docker-compose -f docker-compose_kafka.yml down`
 
 # Technical details

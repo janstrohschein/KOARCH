@@ -89,7 +89,6 @@ for msg in new_pc.consumer:
         tracemalloc.stop()
 
         model_pickle = pickle.dumps(ML.model)
-        # new_pc.commit_offset(msg)
 
         """
         "name": "Model",
@@ -110,6 +109,7 @@ for msg in new_pc.consumer:
 
         model_data = {'phase': new_data['phase'],
                       'model_name': MODEL_ALGORITHM,
+                      'id_x': new_data['id_x'],
                       'n_data_points': len(X),
                       'id_start_x': id_start_x,
                       'model': model_pickle,

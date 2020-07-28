@@ -25,14 +25,14 @@ new_objective.fit_model()
 
 new_pc = KafkaPC(**env_vars)
 
-N_INITIAL_DESIGN = 5
-MAX_DATA_POINTS = 49 + N_INITIAL_DESIGN
+N_INITIAL_DESIGN = new_pc.config['N_INITIAL_DESIGN']
+MAX_PRODUCTION_CYCLES = new_pc.config['MAX_PRODUCTION_CYCLES']
 phase = 'init'
 current_data_point = 0
 
 time.sleep(5)
 
-while current_data_point < MAX_DATA_POINTS:
+while current_data_point < MAX_PRODUCTION_CYCLES:
 
     if current_data_point == N_INITIAL_DESIGN - 1:
         phase = 'observation'

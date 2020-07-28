@@ -3,6 +3,12 @@ General:
   KAFKA_CONSUMER_TIMEOUT_MS: 120000
   # KAFKA_BROKER_URL: localhost:9092
 
+Initial_Design:
+  N_INITIAL_DESIGN: 5
+  MAX_PRODUCTION_CYCLES: 50
+  X_MIN: 4000.0
+  X_MAX: 10100.0 
+
 0_pc_cpps:
   OUT_TOPIC:
     DB_raw_data: ./schema/data.avsc
@@ -51,6 +57,9 @@ General:
   IN_GROUP: evaluation
   OUT_TOPIC:
     AB_model_evaluation: ./schema/new_x.avsc
+  USER_WEIGHTS:
+    QUALITY: 0.95
+    RESOURCES: 0.05
 
 4_pc_adaption:
   IN_TOPIC:

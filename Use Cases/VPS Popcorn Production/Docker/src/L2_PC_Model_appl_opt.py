@@ -4,7 +4,7 @@ from math import ceil
 import pickle
 import numpy as np
 
-from classes.KafkaPC import KafkaPC    
+from classes.KafkaPC import KafkaPC
 
 
 env_vars = {'config_path': os.getenv('config_path'),
@@ -84,6 +84,7 @@ for msg in new_pc.consumer:
     "fields": [
         {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
         {"name": "model_name", "type": ["string"]},
+        {"name": "id_x", "type": ["int"]},
         {"name": "n_data_points", "type": ["int"]},
         {"name": "id_start_x", "type": ["int"]},
         {"name": "model_size", "type": ["int"]},
@@ -98,6 +99,7 @@ for msg in new_pc.consumer:
     """
     model_appl_data = {'phase': new_model['phase'],
                        'model_name': new_model['model_name'],
+                       'id_x': new_model['id_x'],
                        'n_data_points': new_model['n_data_points'],
                        'id_start_x': new_model['id_start_x'],
                        'model_size': new_model['model_size'],

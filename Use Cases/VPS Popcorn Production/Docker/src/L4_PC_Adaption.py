@@ -41,17 +41,11 @@ for msg in new_pc.consumer:
     """
     "name": "New X",
     "fields": [
-        {"name": "phase", "type": ["string"]},
-        {"name": "id_x", "type": ["int"]},
         {"name": "new_x", "type": ["float"]}
         ]
     """
 
     new_message = new_pc.decode_avro_msg(msg)
-    # new_pc.commit_offset(msg)
-
-    # new_pc.send_msg(new_message)
-    # print('The value x='+str(new_message['new_x'])+' is applied to the CPPS')
 
     # defining a params dict for the parameters to be sent to the API
     params = {"value": new_message['new_x']}

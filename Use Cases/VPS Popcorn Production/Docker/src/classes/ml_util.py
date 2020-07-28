@@ -12,7 +12,6 @@ from sklearn.gaussian_process import kernels
 
 
 class ObjectiveFunction:
-
     def __init__(self):
         self.model = None
         self.X = None
@@ -20,17 +19,21 @@ class ObjectiveFunction:
 
     def load_data(self, path="data/vpsFeatures.csv"):
 
-        file_path = path
-        extract_columns = ['conveyorRuntimeMean', 'yAgg']
-        extract_columns_types = {'conveyorRuntimeMean': float, 'yAgg': float}
+        extract_columns = ["conveyorRuntimeMean", "yAgg"]
+        extract_columns_types = {"conveyorRuntimeMean": float, "yAgg": float}
 
-        vps_df = pd.read_csv(file_path, sep=";", usecols=extract_columns,
-                             dtype=extract_columns_types, decimal=',')
+        vps_df = pd.read_csv(
+            path,
+            sep=";",
+            usecols=extract_columns,
+            dtype=extract_columns_types,
+            decimal=",",
+        )
 
         vps_df = vps_df.drop_duplicates()
 
-        self.X = np.array(vps_df['conveyorRuntimeMean']).reshape(-1, 1)
-        self.y = np.array(vps_df['yAgg'])
+        self.X = np.array(vps_df["conveyorRuntimeMean"]).reshape(-1, 1)
+        self.y = np.array(vps_df["yAgg"])
 
         return True
 
@@ -54,26 +57,27 @@ class ModelLearner:
         self.model = None
         self.reshape_x = False
         self.reshape_y = False
-        parameter_eval = {key: value if type(value) is not str else eval(value)
-                          for key, value in parameters.items()}
+        parameter_eval = {
+            key: value if type(value) is not str else eval(value)
+            for key, value in parameters.items()
+        }
 
-        if learning_algorithm == 'Kriging':
+        if learning_algorithm == "Kriging":
             self.model = GaussianProcessRegressor(**parameter_eval)
             self.reshape_x = True
             self.reshape_y = True
 
-        elif learning_algorithm == 'RF':
+        elif learning_algorithm == "RF":
             self.model = RandomForestRegressor(**parameter_eval)
             self.reshape_x = True
             self.reshape_y = False
 
 
 class DataWindow:
-
     def __init__(self, window_size=None):
 
         self.window_size = window_size
-        self.Data_Point = namedtuple('Data_Point', ('id_x', 'x', 'y'))
+        self.Data_Point = namedtuple("Data_Point", ("id_x", "x", "y"))
         self.data = []
 
     def append_and_check(self, data_point):

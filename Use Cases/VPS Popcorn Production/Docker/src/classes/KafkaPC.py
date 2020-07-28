@@ -20,12 +20,7 @@ class KafkaPC():
         if self.config.get('IN_TOPIC') and self.config.get('IN_GROUP'):
             self.consumer = KafkaConsumer(group_id=self.config['IN_GROUP'],
                                           bootstrap_servers=[self.config['KAFKA_BROKER_URL']],
-                                          # auto_offset_reset='earliest',
-                                          # request_timeout_ms=500000,
-                                          # session_timeout_ms=300000,
-                                          # consumer_timeout_ms=self.config['KAFKA_CONSUMER_TIMEOUT_MS']
                                           )
-            # print(f"Topic: {self.config.get('IN_TOPIC')}, Group: {self.config.get('IN_GROUP')}")
             self.in_topic = list(self.config['IN_TOPIC'].keys())
             self.consumer.subscribe(self.in_topic)
 

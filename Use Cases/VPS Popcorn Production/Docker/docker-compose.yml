@@ -1,105 +1,87 @@
 version: '2'
 
 services:
+  0_api_cpps_controller:
+    container_name: 0_API_CPPS_Controller
+    hostname: 0_API_CPPS_Controller
+    build:
+      context: ./src
+      dockerfile: Dockerfile_0_API_CPPS_Controller
+    expose: 
+    - "8000"
+    ports:
+    - "8001:8000"  
+
   0_pc_cpps:
     container_name: 0_PC_CPPS
     build:
       context: ./src
       dockerfile: Dockerfile_0_PC_CPPS
-    environment:
-      KAFKA_BROKER_URL: kafka:9093
-      IN_TOPIC: adaption
-      IN_GROUP: CPPS
-      IN_SCHEMA_FILE: ./schema/new_x.avsc
-      OUT_TOPIC: DB_raw_data
-      OUT_SCHEMA_FILE: ./schema/data.avsc
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, Initial_Design, 0_pc_cpps
+    depends_on: 
+      - 3_pc_evaluation
+
+  1_pc_monitoring:
+    container_name: 1_PC_Monitoring
+    build:
+      context: ./src
+      dockerfile: Dockerfile_1_PC_Monitoring
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 1_pc_monitoring
 
   1_pc_model_learning_rf:
     container_name: 1_PC_Model_Learning_RF
     build:
       context: ./src
       dockerfile: Dockerfile_1_PC_Model_Learning
-    environment:
-      MODEL_ALGORITHM: RF
-      MODEL_PARAMETERS: 
-        n_estimators: 3
-      KAFKA_BROKER_URL: kafka:9093
-      IN_TOPIC: DB_raw_data
-      IN_GROUP: RF
-      IN_SCHEMA_FILE: ./schema/data.avsc
-      OUT_TOPIC: AB_model_data
-      OUT_SCHEMA_FILE: ./schema/model.avsc
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 1_pc_model_learning_rf
 
   1_pc_model_learning_kriging:
     container_name: 1_PC_Model_Learning_Kriging
     build:
       context: ./src
       dockerfile: Dockerfile_1_PC_Model_Learning
-    environment:
-      MODEL_ALGORITHM: Kriging
-      MODEL_PARAMETERS: 
-        kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
-        optimizer: "None"
-        max_iter: 10000
-      KAFKA_BROKER_URL: kafka:9093
-      IN_TOPIC: DB_raw_data
-      IN_GROUP: Kriging
-      IN_SCHEMA_FILE: ./schema/data.avsc
-      OUT_TOPIC: AB_model_data
-      OUT_SCHEMA_FILE: ./schema/model.avsc
-
+    restart: always
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 1_pc_model_learning_kriging
+    
   2_pc_model_appl_opt:
     container_name: 2_PC_Model_appl_opt
     build:
       context: ./src
       dockerfile: Dockerfile_2_PC_Model_appl_opt
-    environment:
-      KAFKA_BROKER_URL: kafka:9093
-      IN_TOPIC: AB_model_data
-      IN_GROUP: model_appl
-      IN_SCHEMA_FILE: ./schema/model.avsc
-      OUT_TOPIC: AB_model_application
-      OUT_SCHEMA_FILE: ./schema/model_appl.avsc
-
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 2_pc_model_appl_opt
+      
   3_pc_evaluation:
     container_name: 3_PC_Evaluation
     build:
       context: ./src
       dockerfile: Dockerfile_3_PC_Evaluation
-    environment:
-      KAFKA_BROKER_URL: kafka:9093
-      IN_TOPIC: AB_model_application
-      IN_GROUP: evaluation
-      IN_SCHEMA_FILE: ./schema/model_appl.avsc
-      OUT_TOPIC: AB_model_evaluation
-      OUT_SCHEMA_FILE: ./schema/new_x.avsc
-
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, Initial_Design, 3_pc_evaluation
+    depends_on: 
+      - 4_pc_adaption
+      
   4_pc_adaption:
     container_name: 4_PC_Adaption
     build:
       context: ./src
       dockerfile: Dockerfile_4_PC_Adaption
-    environment:
-      KAFKA_BROKER_URL: kafka:9093
-      IN_TOPIC: AB_model_evaluation
-      IN_GROUP: adaption
-      IN_SCHEMA_FILE: ./schema/new_x.avsc
-      OUT_TOPIC: adaption
-      OUT_SCHEMA_FILE: ./schema/new_x.avsc
-      API_URL: http://5_API_CPPS_Controller:8000 
-
-  5_api_cpps_controller:
-    container_name: 5_API_CPPS_Controller
-    hostname: 5_API_CPPS_Controller
-    build:
-      context: ./src
-      dockerfile: Dockerfile_5_API_CPPS_Controller
-    expose: 
-    - "8000"
-    ports:
-    - "8001:8000"  
-
-
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 4_pc_adaption
+    depends_on: 
+      - 0_api_cpps_controller
+      
 networks:
   default:
     external:
