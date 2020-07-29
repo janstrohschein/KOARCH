@@ -72,8 +72,8 @@ for msg in new_pc.consumer:
 
         # print(f'n = {len(X)}')
         rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
-        print(f"Update CPPS model with new data (x={round(new_data['x'], 3)}, y={round(new_data['y'], 3)}). "
-              f"RMSE of the model: {round(rmse_score, 3)}")
+        print(f"Update model with (x={round(new_data['x'], 3)}, y={round(new_data['y'], 3)}) -> "
+              f"RMSE: {round(rmse_score, 3)}")
 
         real_time = round(time.perf_counter() - start, 4)
         process_time = round(time.process_time() - start_process, 4)

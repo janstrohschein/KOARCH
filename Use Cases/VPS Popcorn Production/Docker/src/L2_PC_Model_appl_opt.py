@@ -72,8 +72,8 @@ for msg in new_pc.consumer:
     surrogate_x = result.x[0]
     surrogate_y = result.fun
 
-    print(f"The optimization algorithm {new_model['model_name']} suggests the "
-          f"values x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
+    print(f"The {new_model['model_name']} optimization suggests "
+          f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
 
     """
     "name": "Model_Application",

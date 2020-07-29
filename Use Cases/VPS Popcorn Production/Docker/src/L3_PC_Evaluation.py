@@ -102,27 +102,28 @@ class CognitionPC(KafkaPC):
         selected_algo = best_quality['model_name']
         best_x = best_quality['x']
 
-        print(f"The value x={round(best_x, 3)} of the algorithm {selected_algo}({selected_algo_id}) "
-              f"is applied to the CPPS (overall_quality={round(best_quality['overall_quality'], 3)})."
+        print(f"Algorithm selection: {selected_algo}({selected_algo_id})\nDetails:")
+
+        print(best_quality[["model_name",
+                            "x",
+                            "pred_y",
+                            "pred_y_norm",
+                            "y",
+                            "y_norm",
+                            "rmse",
+                            "rmse_norm",
+                            "CPU_ms",
+                            "RAM",
+                            "pred_quality",
+                            "real_quality",
+                            "resources",
+                            "overall_quality"
+                            ]
+                           ]
+              # .to_frame().T
               )
 
-        print(self.df.loc[selected_algo_id, ["model_name",
-                                             "x",
-                                             "pred_y",
-                                             "pred_y_norm",
-                                             "y",
-                                             "y_norm",
-                                             "rmse",
-                                             "rmse_norm",
-                                             "pred_quality",
-                                             "real_quality",
-                                             "CPU_ms",
-                                             "RAM",
-                                             "resources"
-                                             ]
-                          ]
-              .T
-              )
+        print(f"Send x={round(best_x, 3)} to Adaption.")
 
         return selected_algo_id, selected_algo, best_x
 
@@ -164,7 +165,6 @@ class CognitionPC(KafkaPC):
     def assign_real_y(self, x, y):
         if self.df.empty is False:
             self.df.loc[self.df['x'] == x, 'y'] = y
-            # normalize y_delta?
             self.df['y_delta'] = self.df.apply(self.calc_y_delta, axis=1)
 
             self.normalize_values('y', 'y_norm')
@@ -270,7 +270,7 @@ class CognitionPC(KafkaPC):
         if self.current_data_point < self.N_INITIAL_DESIGN:
             self.send_new_x(x=self.X[self.current_data_point])
 
-            print(f'Sent next point from initial design x={self.X[self.current_data_point]}')
+            print(f'Sent next point from initial design x={self.X[self.current_data_point]} to Adaption.')
 
         # then send new data points
         else:
@@ -278,10 +278,9 @@ class CognitionPC(KafkaPC):
             if self.df.empty is True:
                 self.send_new_x(x=new_monitoring['x'])
 
-                print(
-                    f"The value x={new_monitoring['x']} is sent to the "
-                    f"CPPS, since no optimization results arrived yet."
-                )
+                print(f"Send x={new_monitoring['x']} to the CPPS"
+                      f"since no optimization results arrived yet."
+                      )
 
             # otherwise select and send best x
             else:
@@ -328,9 +327,9 @@ new_cog.send_new_x(x=x)
 new_cog.current_data_point += 1
 
 print(
-    f"Creating initial design of the system by applying {new_cog.N_INITIAL_DESIGN} "
+    f"Creating initial design of the system by applying {new_cog.N_INITIAL_DESIGN}\n "
     f"equally distributed values x over the whole working area of the CPPS."
-    f"\nSent x={x}"
+    f"\nSend x={x} to Adaption."
 )
 
 for msg in new_cog.consumer:

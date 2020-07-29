@@ -42,7 +42,8 @@ while current_data_point < MAX_PRODUCTION_CYCLES:
     ENDPOINT = "/production_parameter/x"
     URL = API_URL + ENDPOINT
 
-    print("The CPPS loads the current value for x from the CPPS Controller")
+    print(f"\nProduction cycle {current_data_point}")
+    print("Load the current x from the CPPS Controller.")
     api_request = requests.get(url=URL)
     new_x = json.loads(api_request.content)
     new_y = new_objective.get_objective(new_x)
@@ -53,6 +54,6 @@ while current_data_point < MAX_PRODUCTION_CYCLES:
                       'y': new_y}
 
     new_pc.send_msg(new_data_point)
-    print(f"The CPPS produced with x={round(new_x, 3)} and got y={round(new_y, 3)}")
+    print(f"The CPPS produced with x={round(new_x, 3)} -> y={round(new_y, 3)}")
     current_data_point += 1
     time.sleep(5)

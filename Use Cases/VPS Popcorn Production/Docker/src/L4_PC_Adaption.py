@@ -51,5 +51,5 @@ for msg in new_pc.consumer:
     params = {"value": new_message['new_x']}
 
     # sending get request and saving the response as response object
-    print(f"The Adaption sent x={round(new_message['new_x'], 3)} to the CPPS Controller")
+    print(f"Send x={round(new_message['new_x'], 3)} to the CPPS Controller")
     r = requests.put(url=URL, params=params)
