@@ -123,7 +123,7 @@ class CognitionPC(KafkaPC):
               # .to_frame().T
               )
 
-        print(f"Send x={round(best_x, 3)} to Adaption.")
+        print(f"Send x={round(best_x, 3)} to Adaption")
 
         return selected_algo_id, selected_algo, best_x
 
@@ -327,8 +327,8 @@ new_cog.send_new_x(x=x)
 new_cog.current_data_point += 1
 
 print(
-    f"Creating initial design of the system by applying {new_cog.N_INITIAL_DESIGN}\n "
-    f"equally distributed values x over the whole working area of the CPPS."
+    f"Creating initial design of the system by applying {new_cog.N_INITIAL_DESIGN} equally distributed\n"
+    f"values x over the whole working area of the CPPS."
     f"\nSend x={x} to Adaption."
 )
 

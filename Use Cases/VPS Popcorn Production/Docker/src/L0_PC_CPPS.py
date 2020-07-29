@@ -43,7 +43,7 @@ while current_data_point < MAX_PRODUCTION_CYCLES:
     URL = API_URL + ENDPOINT
 
     print(f"\nProduction cycle {current_data_point}")
-    print("Load the current x from the CPPS Controller.")
+    print("Load the current x from the CPPS Controller")
     api_request = requests.get(url=URL)
     new_x = json.loads(api_request.content)
     new_y = new_objective.get_objective(new_x)
