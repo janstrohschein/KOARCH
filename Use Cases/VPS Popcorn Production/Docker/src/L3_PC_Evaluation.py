@@ -1,7 +1,6 @@
 import os
 from time import sleep
 from datetime import datetime
-# from dataclasses import dataclass
 
 import pandas as pd
 import numpy as np
@@ -24,12 +23,13 @@ class CognitionPC(KafkaPC):
             "n_data_points",
             "id_start_x",
             "model_size",
-            "best_x",
-            "best_pred_y",
-            "best_pred_y_norm",
+            "x",
+            "pred_y",
+            "pred_y_norm",
             "y",
             "y_norm",
             "y_delta",
+            "y_delta_norm",
             "rmse",
             "rmse_norm",
             "mae",
@@ -41,7 +41,6 @@ class CognitionPC(KafkaPC):
             "pred_quality",
             "real_quality",
             "resources",
-            "overall_quality",
             "timestamp",
         ]
 
@@ -75,10 +74,10 @@ class CognitionPC(KafkaPC):
         self.X = np.linspace(x_min, x_max, num=n_initial_design)
 
     def strategy_min_best_pred_y(self):
-        min_best_pred_y = self.df.loc[self.df["best_pred_y"].idxmin()]
-        selected_algo_id = self.df["best_pred_y"].idxmin()
+        min_best_pred_y = self.df.loc[self.df["pred_y"].idxmin()]
+        selected_algo_id = self.df["pred_y"].idxmin()
         selected_algo = min_best_pred_y['model_name']
-        best_x = min_best_pred_y['best_x']
+        best_x = min_best_pred_y['x']
 
         return selected_algo_id, selected_algo, best_x
 
@@ -86,22 +85,44 @@ class CognitionPC(KafkaPC):
         df_pred_y = self.df[self.df.y.isnull()].copy()
         df_real_y = self.df[self.df.y.notnull()].copy()
 
-        df_pred_y['pred_quality'] = df_pred_y['pred_quality'] * self.config['USER_WEIGHTS']['QUALITY']
-        df_pred_y['resources'] = df_pred_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
-        df_real_y['real_quality'] = df_real_y['real_quality'] * self.config['USER_WEIGHTS']['QUALITY']
-        df_real_y['resources'] = df_real_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
-
-        df_pred_y['overall_quality'] = df_pred_y.apply(lambda row: self.calc_avg((row['pred_quality'],
-                                                                                  row['resources'])), axis=1)
-
-        df_real_y['overall_quality'] = df_real_y.apply(lambda row: self.calc_avg((row['real_quality'],
-                                                                                  row['resources'])), axis=1)
+        if df_pred_y.empty is False:
+            df_pred_y['pred_quality'] = df_pred_y['pred_quality'] * self.config['USER_WEIGHTS']['QUALITY']
+            df_pred_y['resources'] = df_pred_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
+            df_pred_y['overall_quality'] = df_pred_y.apply(lambda row: self.calc_avg((row['pred_quality'],
+                                                                                      row['resources'])), axis=1)
+        if df_real_y.empty is False:
+            df_real_y['real_quality'] = df_real_y['real_quality'] * self.config['USER_WEIGHTS']['QUALITY']
+            df_real_y['resources'] = df_real_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
+            df_real_y['overall_quality'] = df_real_y.apply(lambda row: self.calc_avg((row['real_quality'],
+                                                                                      row['resources'])), axis=1)
         combined_df = pd.concat([df_pred_y, df_real_y], axis=0, sort=False)
         best_quality = combined_df.loc[combined_df['overall_quality'].idxmin()]
 
         selected_algo_id = best_quality.name
         selected_algo = best_quality['model_name']
-        best_x = best_quality['best_x']
+        best_x = best_quality['x']
+
+        print(f"The value x={round(best_x, 3)} of the algorithm {selected_algo}({selected_algo_id}) "
+              f"is applied to the CPPS (overall_quality={round(best_quality['overall_quality'], 3)})."
+              )
+
+        print(self.df.loc[selected_algo_id, ["model_name",
+                                             "x",
+                                             "pred_y",
+                                             "pred_y_norm",
+                                             "y",
+                                             "y_norm",
+                                             "rmse",
+                                             "rmse_norm",
+                                             "pred_quality",
+                                             "real_quality",
+                                             "CPU_ms",
+                                             "RAM",
+                                             "resources"
+                                             ]
+                          ]
+              .T
+              )
 
         return selected_algo_id, selected_algo, best_x
 
@@ -126,7 +147,7 @@ class CognitionPC(KafkaPC):
         self.send_msg(new_x)
 
     def calc_y_delta(self, row):
-        return abs(row['y'] - row['best_pred_y'])
+        return abs(row['y'] - row['pred_y'])
 
     def calc_avg(self, columns):
         result = 0
@@ -142,11 +163,12 @@ class CognitionPC(KafkaPC):
 
     def assign_real_y(self, x, y):
         if self.df.empty is False:
-            self.df.loc[self.df['best_x'] == x, 'y'] = y
+            self.df.loc[self.df['x'] == x, 'y'] = y
             # normalize y_delta?
             self.df['y_delta'] = self.df.apply(self.calc_y_delta, axis=1)
 
             self.normalize_values('y', 'y_norm')
+            self.normalize_values('y_delta', 'y_delta_norm')
 
     def store_algo_choice(self, selected_algo_id, selected_algo, selected_x):
         self.selected_algo['selected_algo_id'] = selected_algo_id
@@ -163,8 +185,8 @@ class CognitionPC(KafkaPC):
             {"name": "n_data_points", "type": ["int"]},
             {"name": "id_start_x", "type": ["int"]},
             {"name": "model_size", "type": ["int"]},
-            {"name": "best_x", "type": ["float"]},
-            {"name": "best_pred_y", "type": ["float"]},
+            {"name": "x", "type": ["float"]},
+            {"name": "pred_y", "type": ["float"]},
             {"name": "rmse", "type": ["null, float"]},
             {"name": "mae", "type": ["null, float"]},
             {"name": "rsquared", "type": ["null, float"]},
@@ -176,20 +198,22 @@ class CognitionPC(KafkaPC):
         new_model_appl["timestamp"] = datetime.now()
 
         self.df = self.df.append(new_model_appl, ignore_index=True)
-        self.normalize_values('best_pred_y', 'best_pred_y_norm')
+        self.normalize_values('pred_y', 'pred_y_norm')
         self.normalize_values('rmse', 'rmse_norm')
         self.normalize_values('CPU_ms', 'CPU_norm')
         self.normalize_values('RAM', 'RAM_norm')
 
-        self.df['pred_quality'] = self.df.apply(lambda row: self.calc_avg((row['best_pred_y_norm'],
+        self.df['pred_quality'] = self.df.apply(lambda row: self.calc_avg((row['pred_y_norm'],
                                                                            row['rmse_norm'])), axis=1)
+
         self.df['resources'] = self.df.apply(lambda row: self.calc_avg((row['CPU_norm'], row['RAM_norm'])), axis=1)
+        """
         print(
             self.df[
                 [
                     "model_name",
-                    "best_x",
-                    "best_pred_y",
+                    "x",
+                    "pred_y",
                     "rmse",
                     "rsquared",
                     "CPU_ms",
@@ -197,6 +221,7 @@ class CognitionPC(KafkaPC):
                 ]
             ].iloc[-1:]
         )
+        """
 
     def process_monitoring(self, msg):
 
@@ -249,7 +274,7 @@ class CognitionPC(KafkaPC):
 
         # then send new data points
         else:
-            # send last value, if no result arrived yet. necessary?
+            # send last value, if no result arrived yet. necessary? otherwise uses the last value from CPPS controller.
             if self.df.empty is True:
                 self.send_new_x(x=new_monitoring['x'])
 
@@ -261,34 +286,12 @@ class CognitionPC(KafkaPC):
             # otherwise select and send best x
             else:
                 self.assign_real_y(new_monitoring['x'], new_monitoring['y'])
-                self.df['real_quality'] = self.df.apply(lambda row: self.calc_avg((row['y_norm'], row['y_delta'],
+                self.df['real_quality'] = self.df.apply(lambda row: self.calc_avg((row['y_norm'], row['y_delta_norm'],
                                                                                    row['rmse_norm'])), axis=1)
+
                 selected_algo_id, selected_algo, selected_x = self.get_best_x()
-
                 self.store_algo_choice(selected_algo_id, selected_algo, selected_x)
-
                 self.send_new_x(x=selected_x)
-
-                print(f"The value x={round(selected_x, 3)} of the algorithm "
-                      f"{selected_algo}({selected_algo_id}) is applied to the CPPS."
-                      )
-
-                print(self.df.loc[selected_algo_id, ["model_name",
-                                                     "best_x",
-                                                     "best_pred_y",
-                                                     "best_pred_y_norm",
-                                                     "y",
-                                                     "y_norm",
-                                                     "rmse",
-                                                     "rmse_norm",
-                                                     "pred_quality",
-                                                     "real_quality",
-                                                     "CPU_ms",
-                                                     "RAM",
-                                                     "resources"
-                                                     ]
-                                  ]
-                      )
 
         self.current_data_point += 1
 
@@ -306,13 +309,6 @@ env_vars = {'in_topic': {'AB_model_application': './schema/model_appl.avsc',
             'out_topic': 'AB_model_evaluation',
             'out_schema_file': './schema/new_x.avsc'
             }
-"""
-
-"""generate initial design"""
-"""
-N_INITIAL_DESIGN = 5
-X_MIN = 4000.0
-X_MAX = 10100.0
 """
 
 new_cog = CognitionPC(**env_vars)

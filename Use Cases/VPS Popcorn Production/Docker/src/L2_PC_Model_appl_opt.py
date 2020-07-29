@@ -72,12 +72,8 @@ for msg in new_pc.consumer:
     surrogate_x = result.x[0]
     surrogate_y = result.fun
 
-    # print('Best Result: x=%.3f, y=%.3f' % (surrogate_x, surrogate_y))
-    # print(f'{new_model["model_name"]}, n={new_model["n_data_points"]}, x={surrogate_x}, y={surrogate_y}')
     print(f"The optimization algorithm {new_model['model_name']} suggests the "
           f"values x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
-
-    # new_pc.commit_offset(msg)
 
     """
     "name": "Model_Application",
@@ -88,8 +84,8 @@ for msg in new_pc.consumer:
         {"name": "n_data_points", "type": ["int"]},
         {"name": "id_start_x", "type": ["int"]},
         {"name": "model_size", "type": ["int"]},
-        {"name": "best_x", "type": ["float"]},
-        {"name": "best_pred_y", "type": ["float"]},
+        {"name": "x", "type": ["float"]},
+        {"name": "pred_y", "type": ["float"]},
         {"name": "rmse", "type": ["null, float"]},
         {"name": "mae", "type": ["null, float"]},
         {"name": "rsquared", "type": ["null, float"]},
@@ -103,8 +99,8 @@ for msg in new_pc.consumer:
                        'n_data_points': new_model['n_data_points'],
                        'id_start_x': new_model['id_start_x'],
                        'model_size': new_model['model_size'],
-                       'best_x': surrogate_x,
-                       'best_pred_y': surrogate_y,
+                       'x': surrogate_x,
+                       'pred_y': surrogate_y,
                        'rmse': new_model['rmse'],
                        'mae': new_model['mae'],
                        'rsquared': new_model['rsquared'],
@@ -113,4 +109,3 @@ for msg in new_pc.consumer:
                        }
 
     new_pc.send_msg(model_appl_data)
-    # print('Sent data')
