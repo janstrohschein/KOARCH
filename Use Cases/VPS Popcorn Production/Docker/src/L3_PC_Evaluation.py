@@ -57,11 +57,12 @@ class CognitionPC(KafkaPC):
         self.X_MIN = self.config['X_MIN']
         self.X_MAX = self.config['X_MAX']
         self.generate_initial_design(self.N_INITIAL_DESIGN, self.X_MIN, self.X_MAX)
+        """
         self.selected_algo = {'selected_algo_id': None,
                               'selected_algo': None,
                               'selected_x': None,
                               }
-
+        """
         # maps topics and functions, which process the incoming data
         self.func_dict = {
             "AB_model_application": self.process_model_application,
@@ -82,6 +83,7 @@ class CognitionPC(KafkaPC):
         return selected_algo_id, selected_algo, best_x
 
     def strategy_model_quality(self):
+        selected_algo_id = selected_algo = best_x = None
         df_pred_y = self.df[self.df.y.isnull()].copy()
         df_real_y = self.df[self.df.y.notnull()].copy()
 
@@ -90,40 +92,42 @@ class CognitionPC(KafkaPC):
             df_pred_y['resources'] = df_pred_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
             df_pred_y['overall_quality'] = df_pred_y.apply(lambda row: self.calc_avg((row['pred_quality'],
                                                                                       row['resources'])), axis=1)
+
         if df_real_y.empty is False:
             df_real_y['real_quality'] = df_real_y['real_quality'] * self.config['USER_WEIGHTS']['QUALITY']
             df_real_y['resources'] = df_real_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
             df_real_y['overall_quality'] = df_real_y.apply(lambda row: self.calc_avg((row['real_quality'],
                                                                                       row['resources'])), axis=1)
+
         combined_df = pd.concat([df_pred_y, df_real_y], axis=0, sort=False)
-        best_quality = combined_df.loc[combined_df['overall_quality'].idxmin()]
+        if combined_df.empty is False:
+            best_quality = combined_df.loc[combined_df['overall_quality'].idxmin()]
 
-        selected_algo_id = best_quality.name
-        selected_algo = best_quality['model_name']
-        best_x = best_quality['x']
+            selected_algo_id = best_quality.name
+            selected_algo = best_quality['model_name']
+            best_x = best_quality['x']
 
-        print(f"Algorithm selection: {selected_algo}({selected_algo_id})\nDetails:")
+            print(f"Algorithm selection: {selected_algo}({selected_algo_id})\nDetails:")
 
-        print(best_quality[["model_name",
-                            "x",
-                            "pred_y",
-                            "pred_y_norm",
-                            "y",
-                            "y_norm",
-                            "rmse",
-                            "rmse_norm",
-                            "CPU_ms",
-                            "RAM",
-                            "pred_quality",
-                            "real_quality",
-                            "resources",
-                            "overall_quality"
-                            ]
-                           ]
-              # .to_frame().T
-              )
+            print(best_quality[["model_name",
+                                "x",
+                                "pred_y",
+                                "pred_y_norm",
+                                "y",
+                                "y_norm",
+                                "rmse",
+                                "rmse_norm",
+                                "CPU_ms",
+                                "RAM",
+                                "pred_quality",
+                                "real_quality",
+                                "resources",
+                                "overall_quality"
+                                ]
+                               ]
+                  )
 
-        print(f"Send x={round(best_x, 3)} to Adaption")
+            print(f"Send x={round(best_x, 3)} to Adaption")
 
         return selected_algo_id, selected_algo, best_x
 
@@ -170,10 +174,12 @@ class CognitionPC(KafkaPC):
             self.normalize_values('y', 'y_norm')
             self.normalize_values('y_delta', 'y_delta_norm')
 
+    """
     def store_algo_choice(self, selected_algo_id, selected_algo, selected_x):
         self.selected_algo['selected_algo_id'] = selected_algo_id
         self.selected_algo['selected_algo'] = selected_algo
         self.selected_algo['selected_x'] = selected_x
+    """
 
     def process_model_application(self, msg):
         """
@@ -289,8 +295,9 @@ class CognitionPC(KafkaPC):
                                                                                    row['rmse_norm'])), axis=1)
 
                 selected_algo_id, selected_algo, selected_x = self.get_best_x()
-                self.store_algo_choice(selected_algo_id, selected_algo, selected_x)
-                self.send_new_x(x=selected_x)
+                # self.store_algo_choice(selected_algo_id, selected_algo, selected_x)
+                if selected_algo_id is not None:
+                    self.send_new_x(x=selected_x)
 
         self.current_data_point += 1
 
@@ -299,16 +306,6 @@ env_vars = {
     "config_path": os.getenv("config_path"),
     "config_section": os.getenv("config_section"),
 }
-
-"""
-env_vars = {'in_topic': {'AB_model_application': './schema/model_appl.avsc',
-                         'AB_monitoring': './schema/monitoring.avsc'},
-            'in_group': 'evaluation',
-            'in_schema_file': ['./schema/model_appl.avsc', './schema/monitoring.avsc'],
-            'out_topic': 'AB_model_evaluation',
-            'out_schema_file': './schema/new_x.avsc'
-            }
-"""
 
 new_cog = CognitionPC(**env_vars)
 
