@@ -1,0 +1,9 @@
+FROM python:3.7-slim-buster
+
+COPY ./configurations/requirements_API.txt /
+RUN pip install -r requirements_API.txt
+
+COPY . /src/
+WORKDIR /src
+
+CMD ["uvicorn", "L5_API_HMI:results_api", "--host", "0.0.0.0", "--log-level", "warning"]

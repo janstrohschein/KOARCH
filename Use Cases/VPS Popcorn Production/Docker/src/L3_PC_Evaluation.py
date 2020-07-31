@@ -145,10 +145,12 @@ class CognitionPC(KafkaPC):
 
         return selected_algo_id, selected_algo, best_x
 
-    def send_new_x(self, x):
-        new_x = {
-            "new_x": x,
-        }
+    def send_new_x(self, id, x, phase, algorithm):
+        new_x = {"id": id,
+                 "new_x": x,
+                 "phase": phase,
+                 "algorithm": algorithm
+                 }
         self.send_msg(new_x)
 
     def calc_y_delta(self, row):
@@ -271,33 +273,38 @@ class CognitionPC(KafkaPC):
 
 
         """
-
+        id = self.current_data_point
         # send initial design first
         if self.current_data_point < self.N_INITIAL_DESIGN:
-            self.send_new_x(x=self.X[self.current_data_point])
+            phase = "init"
+            algorithm = "initial design"
+            self.send_new_x(id=id, x=self.X[self.current_data_point], phase=phase, algorithm=algorithm)
 
             print(f'Sent next point from initial design x={self.X[self.current_data_point]} to Adaption.')
 
         # then send new data points
         else:
-            # send last value, if no result arrived yet. necessary? otherwise uses the last value from CPPS controller.
-            if self.df.empty is True:
+            phase = "observation"
+            # OLD: send last value, if no result arrived yet. otherwise uses the last value from CPPS controller.
+            # NEW: select best value, otherwise CPPS will use last value from controller
+            if self.df.empty is False:
+                """
                 self.send_new_x(x=new_monitoring['x'])
 
                 print(f"Send x={new_monitoring['x']} to the CPPS"
                       f"since no optimization results arrived yet."
                       )
-
+                """
             # otherwise select and send best x
-            else:
+            # else:
                 self.assign_real_y(new_monitoring['x'], new_monitoring['y'])
                 self.df['real_quality'] = self.df.apply(lambda row: self.calc_avg((row['y_norm'], row['y_delta_norm'],
                                                                                    row['rmse_norm'])), axis=1)
 
                 selected_algo_id, selected_algo, selected_x = self.get_best_x()
-                # self.store_algo_choice(selected_algo_id, selected_algo, selected_x)
+                algorithm = f"{selected_algo}({selected_algo_id})"
                 if selected_algo_id is not None:
-                    self.send_new_x(x=selected_x)
+                    self.send_new_x(id=id, x=selected_x, phase=phase, algorithm=algorithm)
 
         self.current_data_point += 1
 
@@ -316,11 +323,13 @@ new_cog = CognitionPC(**env_vars)
  ]
 """
 
-id_x = new_cog.current_data_point
+id = new_cog.current_data_point
 x = new_cog.X[new_cog.current_data_point]
+phase = "init"
+algorithm = "initial design"
 
 sleep(3)
-new_cog.send_new_x(x=x)
+new_cog.send_new_x(id=id, x=x, phase=phase, algorithm=algorithm)
 new_cog.current_data_point += 1
 
 print(

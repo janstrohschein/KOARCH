@@ -2,33 +2,8 @@ import os
 import requests
 from classes.KafkaPC import KafkaPC
 
-"""
-- leitet das neue X an das CPPS zur Auswertung weiter
-
-"""
-
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
-
-"""
-env_vars = {'kafka_broker_url': os.getenv('KAFKA_BROKER_URL'),
-            'in_topic': os.getenv('IN_TOPIC'),
-            'in_group': os.getenv('IN_GROUP'),
-            'in_schema_file': os.getenv('IN_SCHEMA_FILE'),
-            'out_topic': os.getenv('OUT_TOPIC'),
-            'out_schema_file': os.getenv('OUT_SCHEMA_FILE')}
-"""
-
-""" lokal
-env_vars = {'in_topic': 'AB_model_evaluation',
-            'in_group': 'adaption',
-            'in_schema_file': './schema/new_x.avsc',
-            'out_topic': 'adaption',
-            'out_schema_file': './schema/new_x.avsc'
-            }
-
-API_URL = "http://127.0.0.1:8000"
-"""
 
 new_pc = KafkaPC(**env_vars)
 

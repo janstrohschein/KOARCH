@@ -34,7 +34,7 @@ time.sleep(5)
 
 while current_data_point < MAX_PRODUCTION_CYCLES:
 
-    if current_data_point == N_INITIAL_DESIGN - 1:
+    if current_data_point == N_INITIAL_DESIGN:
         phase = 'observation'
 
     # API_URL = "http://127.0.0.1:8000"
@@ -48,8 +48,8 @@ while current_data_point < MAX_PRODUCTION_CYCLES:
     new_x = json.loads(api_request.content)
     new_y = new_objective.get_objective(new_x)
 
-    new_data_point = {'phase': phase,
-                      'id_x': current_data_point,
+    new_data_point = {'id': current_data_point,
+                      'phase': phase,
                       'x': new_x,
                       'y': new_y}
 

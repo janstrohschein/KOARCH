@@ -52,7 +52,7 @@ for msg in new_pc.consumer:
     """
     new_data = new_pc.decode_avro_msg(msg)
 
-    new_data_point = new_window.Data_Point(new_data['id_x'], new_data['x'], new_data['y'])
+    new_data_point = new_window.Data_Point(new_data['id'], new_data['x'], new_data['y'])
     new_window.append_and_check(new_data_point)
 
     if len(new_window.data) < MIN_DATA_POINTS:
@@ -109,7 +109,7 @@ for msg in new_pc.consumer:
 
         model_data = {'phase': new_data['phase'],
                       'model_name': MODEL_ALGORITHM,
-                      'id_x': new_data['id_x'],
+                      'id': new_data['id'],
                       'n_data_points': len(X),
                       'id_start_x': id_start_x,
                       'model': model_pickle,

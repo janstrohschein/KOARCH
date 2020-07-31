@@ -47,7 +47,7 @@ for msg in new_pc.consumer:
     """
 
     new_data_point = {'phase': new_data['phase'],
-                      'id_x': new_data['id_x'],
+                      'id': new_data['id'],
                       'x': new_data['x'],
                       'y': new_data['y']}
 

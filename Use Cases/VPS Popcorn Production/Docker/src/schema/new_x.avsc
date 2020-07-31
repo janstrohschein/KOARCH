@@ -1,6 +1,9 @@
 {"type": "record",
  "name": "New_X",
  "fields": [
+    {"name": "id", "type": ["int"]},
+    {"name": "phase", "type": ["string"]},
+    {"name": "algorithm", "type": ["string"]},
     {"name": "new_x", "type": ["float"]}
     ]
     }

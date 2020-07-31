@@ -95,7 +95,7 @@ for msg in new_pc.consumer:
     """
     model_appl_data = {'phase': new_model['phase'],
                        'model_name': new_model['model_name'],
-                       'id_x': new_model['id_x'],
+                       'id': new_model['id'],
                        'n_data_points': new_model['n_data_points'],
                        'id_start_x': new_model['id_start_x'],
                        'model_size': new_model['model_size'],

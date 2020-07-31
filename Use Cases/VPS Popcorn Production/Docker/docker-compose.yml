@@ -81,6 +81,31 @@ services:
       config_section: General, 4_pc_adaption
     depends_on: 
       - 0_api_cpps_controller
+    
+  4_c_reporting:
+    container_name: 4_C_Reporting
+    build:
+      context: ./src
+      dockerfile: Dockerfile_4_C_Reporting
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 4_c_reporting
+    depends_on: 
+      - 5_api_hmi
+
+  5_api_hmi:
+    container_name: 5_API_HMI
+    hostname: 5_API_HMI
+    build:
+      context: ./src
+      dockerfile: Dockerfile_5_API_HMI
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: 4_c_reporting
+    expose: 
+    - "8000"
+    ports:
+    - "8000:8000"
       
 networks:
   default:

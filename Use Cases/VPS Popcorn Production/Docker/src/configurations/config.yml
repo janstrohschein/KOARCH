@@ -66,3 +66,16 @@ Initial_Design:
     AB_model_evaluation: ./schema/new_x.avsc
   IN_GROUP: adaption
   API_URL: http://0_API_CPPS_Controller:8000
+
+4_c_reporting:
+  IN_TOPIC:
+    AB_model_evaluation: ./schema/new_x.avsc
+    AB_monitoring: ./schema/monitoring.avsc
+    AB_model_application: ./schema/model_appl.avsc
+  IN_GROUP: reporting
+  API_OUT:
+    - AB_model_evaluation
+    - AB_monitoring
+    - AB_model_application
+  API_URL: http://5_API_HMI:8000
+      
