@@ -5,6 +5,7 @@ from classes.KafkaPC import KafkaPC
 
 
 def process_topics(msg):
+    """ forwards the incoming message to the API endpoint """
 
     new_message = new_c.decode_avro_msg(msg)
     ENDPOINT_PARAMETER = msg.topic
@@ -28,7 +29,7 @@ func_dict = {"AB_model_application": process_topics,
 new_c = KafkaPC(**env_vars)
 
 API_URL = new_c.config['API_URL']
-ENDPOINT = "/topic/"
+ENDPOINT = new_c.config['API_ENDPOINT']
 
 for msg in new_c.consumer:
 
