@@ -78,4 +78,5 @@ Initial_Design:
     - AB_monitoring
     - AB_model_application
   API_URL: http://5_API_HMI:8000
+  API_ENDPOINT: /topic/
       
