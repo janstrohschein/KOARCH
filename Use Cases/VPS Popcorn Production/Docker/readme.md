@@ -63,6 +63,12 @@ The described workflow is also shown in the figure below:
 
 <img src="./docs/vps_use_case_workflow.jpg" width="800px">
 
+## Reporting
+The reporting module collects data from several topics and forwards the messages to the HMI module.
+There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
+To access the HMI please visit: `127.0.0.1:8000/docs`  
+
+## Stop the Experiment
 Please press `Ctrl + C` in each terminal, to stop the experiment as well as the Kafka broker.
 Execute both commands to remove the containers:\
 `docker-compose down`\
@@ -76,4 +82,5 @@ A lot of things happened in the background to make this work:
 This sets the environment for the container, e.g. the URL for the Kafka broker, the incoming / outgoing topics for our modules and also the serialization schema.
 + Avro serializes the messages according to schemas defined in `./src/schema/`.
 Messages that do not comply to the specified schema raise an error and can´t be send.
++ The reporting module and the HMI can be configured via `./src/configurations/config.yml`. The reporting module specifies all the API endpoints it wants to use under `API_OUT`. The HMI module defines to read the configuration section of the reporting module in the `docker-compose.yml` and creates the necessary endpoints. This allows to dynamically collect and combine data from several modules in one API.
 
