@@ -1,10 +1,11 @@
 import os
 import json
 import sys
+import csv
 from enum import Enum
 import yaml
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 
 def read_config(config_path, config_section):
@@ -48,6 +49,21 @@ async def get_results():
 async def get_result(topic_name: TypeEnum):
 
     return JSONResponse(results[topic_name.value], status_code=200)
+
+
+@results_api.get("/topic_csv/{topic_name}")
+async def get_result_csv(topic_name: TypeEnum):
+    """ Exports the current results into a CSV file."""
+
+    field_names = list(results[topic_name.value][0].keys())
+
+    with open("results.csv", 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=field_names)
+        writer.writeheader()
+        for data in results[topic_name.value]:
+            writer.writerow(data)
+
+    return FileResponse(path="results.csv", filename=f"{topic_name.value}.csv")
 
 
 @results_api.post("/topic/{topic_name}")
