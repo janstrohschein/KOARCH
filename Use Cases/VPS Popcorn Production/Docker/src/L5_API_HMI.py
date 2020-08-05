@@ -41,12 +41,13 @@ results_api = FastAPI()
 
 @results_api.get("/topics")
 async def get_results():
-
+    """ Returns all results """
     return JSONResponse(results, status_code=200)
 
 
 @results_api.get("/topic/{topic_name}")
 async def get_result(topic_name: TypeEnum):
+    """ Returns results for a specific topic """
 
     return JSONResponse(results[topic_name.value], status_code=200)
 
@@ -68,6 +69,7 @@ async def get_result_csv(topic_name: TypeEnum):
 
 @results_api.post("/topic/{topic_name}")
 async def post_result(topic_name: TypeEnum, row: str):
+    """ Appends a row to the results of a specific topic """
 
     row_encoded = json.loads(row)
     results[topic_name.value].append(row_encoded)

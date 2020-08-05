@@ -4,7 +4,7 @@ import json
 from classes.KafkaPC import KafkaPC
 
 
-def process_topics(msg):
+def forward_topic(msg):
     """ forwards the incoming message to the API endpoint """
 
     new_message = new_c.decode_avro_msg(msg)
@@ -21,10 +21,9 @@ def process_topics(msg):
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
-
-func_dict = {"AB_model_application": process_topics,
-             "AB_monitoring": process_topics,
-             "AB_model_evaluation": process_topics}
+func_dict = {"AB_model_application": forward_topic,
+             "AB_monitoring": forward_topic,
+             "AB_model_evaluation": forward_topic}
 
 new_c = KafkaPC(**env_vars)
 
