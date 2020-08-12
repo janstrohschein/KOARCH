@@ -57,12 +57,7 @@ class CognitionPC(KafkaPC):
         self.X_MIN = self.config['X_MIN']
         self.X_MAX = self.config['X_MAX']
         self.generate_initial_design(self.N_INITIAL_DESIGN, self.X_MIN, self.X_MAX)
-        """
-        self.selected_algo = {'selected_algo_id': None,
-                              'selected_algo': None,
-                              'selected_x': None,
-                              }
-        """
+
         # maps topics and functions, which process the incoming data
         self.func_dict = {
             "AB_model_application": self.process_model_application,
@@ -112,11 +107,11 @@ class CognitionPC(KafkaPC):
             print(best_quality[["model_name",
                                 "x",
                                 "pred_y",
-                                "pred_y_norm",
+                                # "pred_y_norm",
                                 "y",
-                                "y_norm",
+                                # "y_norm",
                                 "rmse",
-                                "rmse_norm",
+                                # "rmse_norm",
                                 "CPU_ms",
                                 "RAM",
                                 "pred_quality",
@@ -175,13 +170,6 @@ class CognitionPC(KafkaPC):
 
             self.normalize_values('y', 'y_norm')
             self.normalize_values('y_delta', 'y_delta_norm')
-
-    """
-    def store_algo_choice(self, selected_algo_id, selected_algo, selected_x):
-        self.selected_algo['selected_algo_id'] = selected_algo_id
-        self.selected_algo['selected_algo'] = selected_algo
-        self.selected_algo['selected_x'] = selected_x
-    """
 
     def process_model_application(self, msg):
         """
@@ -324,19 +312,22 @@ new_cog = CognitionPC(**env_vars)
 """
 
 id = new_cog.current_data_point
-x = new_cog.X[new_cog.current_data_point]
+algorithm = "initial design"
 phase = "init"
 algorithm = "initial design"
 
 sleep(3)
-new_cog.send_new_x(id=id, x=x, phase=phase, algorithm=algorithm)
-new_cog.current_data_point += 1
+# new_cog.send_new_x(id=id, x=x, phase=phase, algorithm=algorithm)
+
+new_cog.send_new_x(id=id, x=new_cog.X[new_cog.current_data_point], phase=phase, algorithm=algorithm)
 
 print(
     f"Creating initial design of the system by applying {new_cog.N_INITIAL_DESIGN} equally distributed\n"
     f"values x over the whole working area of the CPPS."
-    f"\nSend x={x} to Adaption."
+    f"\nSend x={new_cog.X[new_cog.current_data_point]} to Adaption."
 )
+
+new_cog.current_data_point += 1
 
 for msg in new_cog.consumer:
     new_cog.func_dict[msg.topic](msg)

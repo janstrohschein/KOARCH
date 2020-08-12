@@ -74,9 +74,9 @@ Initial_Design:
     AB_model_application: ./schema/model_appl.avsc
   IN_GROUP: reporting
   API_OUT:
-    - AB_model_evaluation
-    - AB_monitoring
-    - AB_model_application
+    AB_model_evaluation: forward_topic 
+    AB_monitoring: forward_topic
+    AB_model_application: forward_topic
   API_URL: http://5_API_HMI:8000
   API_ENDPOINT: /topic/
       

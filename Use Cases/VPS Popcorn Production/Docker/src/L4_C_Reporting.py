@@ -21,15 +21,21 @@ def forward_topic(msg):
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
+"""
 func_dict = {"AB_model_application": forward_topic,
              "AB_monitoring": forward_topic,
              "AB_model_evaluation": forward_topic}
+"""
 
 new_c = KafkaPC(**env_vars)
+
+func_dict = new_c.config['API_OUT']
 
 API_URL = new_c.config['API_URL']
 ENDPOINT = new_c.config['API_ENDPOINT']
 
 for msg in new_c.consumer:
-
-    func_dict[msg.topic](msg)
+    try:
+        eval(func_dict[msg.topic])(msg)
+    except Exception as e:
+        print(f"Processing Topic: {msg.topic} with Function: {func_dict[msg.topic]}\n Error: {e}")

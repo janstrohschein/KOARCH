@@ -83,4 +83,3 @@ This sets the environment for the container, e.g. the URL for the Kafka broker, 
 + Avro serializes the messages according to schemas defined in `./src/schema/`.
 Messages that do not comply to the specified schema raise an error and can´t be send.
 + The reporting module and the HMI can be configured via `./src/configurations/config.yml`. The reporting module specifies all the API endpoints it wants to use under `API_OUT`. The HMI module defines to read the configuration section of the reporting module in the `docker-compose.yml` and creates the necessary endpoints. This allows to dynamically collect and combine data from several modules in one API.
-
