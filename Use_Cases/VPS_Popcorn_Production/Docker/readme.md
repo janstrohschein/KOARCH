@@ -66,8 +66,6 @@ The described workflow is also shown in the figure below:
 ## Reporting
 The reporting module collects data from several topics and forwards the messages to the HMI module.
 There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
-The reporting module collects data from several topics and forwards the messages to the HMI module.
-There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
 To access the HMI please visit: `127.0.0.1:8000/docs`  
 
 ## Stop the Experiment
