@@ -20,7 +20,7 @@ More details about the use case can be found in [our pre-print](https://arxiv.or
 
 The specific architecture for this use case is displayed in the diagram below:
 
-<img src="./docs/vps_use_case_architecture.jpg" width="400px">
+<img src="./docs/vps_use_case_architecture.jpg" width="600px">
 
 Next we would like to present the implementation of our CAAI architecture for this use case.
 All modules are implemented as Docker Containers and communicate via Kafka.
