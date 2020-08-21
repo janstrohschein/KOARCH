@@ -64,6 +64,8 @@ The described workflow is also shown in the figure below:
 <img src="./docs/vps_use_case_workflow.jpg" width="800px">
 
 ## Access to additional information
+While the experiment is running, the user can retrieve additional information through various APIs:
+
 + Production Parameter API\
 The CPPS Controller stores the most recent values for all production parameters.
 To access the HMI please visit: `127.0.0.1:8000/docs`
