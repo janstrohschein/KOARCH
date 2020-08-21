@@ -10,7 +10,7 @@ services:
     expose: 
     - "8000"
     ports:
-    - "8001:8000"  
+    - "8000:8000"  
 
   0_pc_cpps:
     container_name: 0_PC_CPPS
@@ -40,6 +40,8 @@ services:
     environment: 
       config_path: ./configurations/config.yml
       config_section: General, 1_pc_model_learning_rf
+    depends_on: 
+      - 5_api_knowledge
 
   1_pc_model_learning_kriging:
     container_name: 1_PC_Model_Learning_Kriging
@@ -50,7 +52,9 @@ services:
     environment: 
       config_path: ./configurations/config.yml
       config_section: General, 1_pc_model_learning_kriging
-    
+    depends_on: 
+      - 5_api_knowledge
+
   2_pc_model_appl_opt:
     container_name: 2_PC_Model_appl_opt
     build:
@@ -105,7 +109,18 @@ services:
     expose: 
     - "8000"
     ports:
-    - "8000:8000"
+    - "8001:8000"
+
+  5_api_knowledge:
+    container_name: 5_API_Knowledge
+    hostname: 5_API_Knowledge
+    build:
+      context: ./src
+      dockerfile: Dockerfile_5_API_Knowledge
+    expose: 
+    - "8000"
+    ports:
+    - "8002:8000"
       
 networks:
   default:

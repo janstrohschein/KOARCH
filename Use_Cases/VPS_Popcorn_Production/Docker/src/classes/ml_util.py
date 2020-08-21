@@ -67,7 +67,7 @@ class ModelLearner:
             self.reshape_x = True
             self.reshape_y = True
 
-        elif learning_algorithm == "RF":
+        elif learning_algorithm == "Random Forest":
             self.model = RandomForestRegressor(**parameter_eval)
             self.reshape_x = True
             self.reshape_y = False

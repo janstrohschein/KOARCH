@@ -3,6 +3,8 @@ import tracemalloc
 import time
 from sys import getsizeof
 import pickle
+import json
+import requests
 
 from classes.KafkaPC import KafkaPC
 from classes.ml_util import ModelLearner, DataWindow, get_cv_scores
@@ -14,20 +16,41 @@ if not sys.warnoptions:
     os.environ["PYTHONWARNINGS"] = "ignore"
 
 
+def get_model_parameters(API_URL):
+
+    ENDPOINT_USE_CASE = "/use_case/"
+    URL = API_URL + ENDPOINT_USE_CASE
+    api_request = requests.get(url=URL)
+    use_case_info = json.loads(api_request.content)
+
+    payload = {"use_case": use_case_info['use_case'],
+               "goal": use_case_info['goal'],
+               "feature": use_case_info['feature'],
+               "algorithm": MODEL_ALGORITHM}
+
+    ENDPOINT_KNOWLEDGE = "/knowledge/algorithm/"
+    URL = API_URL + ENDPOINT_KNOWLEDGE
+    api_request = requests.get(url=URL, params=payload)
+    algo_info = json.loads(api_request.content)
+
+    MODEL_PARAMETERS = {}
+
+    for key, value in algo_info["parameter"].items():
+        if type(value) is str:
+            MODEL_PARAMETERS[key] = value
+        elif type(value) is dict:
+            MODEL_PARAMETERS[key] = value['default']
+
+    return MODEL_PARAMETERS
+
+
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
 """
-env_vars = {'kafka_broker_url': os.getenv('KAFKA_BROKER_URL'),
-            'in_topic': os.getenv('IN_TOPIC'),
-            'in_group': os.getenv('IN_GROUP'),
-            'in_schema_file': os.getenv('IN_SCHEMA_FILE'),
-            'out_topic': os.getenv('OUT_TOPIC'),
-            'out_schema_file': os.getenv('OUT_SCHEMA_FILE')}
-
 env_vars = {'in_topic': {'DB_raw_data': './schema/data.avsc'},
             'in_group': 'kriging',
-            # 'in_schema_file': './schema/data.avsc',
+            'in_schema_file': './schema/data.avsc',
             'out_topic': 'AB_model_data',
             'out_schema_file': './schema/model.avsc'}
 """
@@ -35,7 +58,9 @@ env_vars = {'in_topic': {'DB_raw_data': './schema/data.avsc'},
 new_pc = KafkaPC(**env_vars)
 
 MODEL_ALGORITHM = new_pc.config['MODEL_ALGORITHM']
-MODEL_PARAMETERS = new_pc.config['MODEL_PARAMETERS']
+
+API_URL = new_pc.config['API_URL']
+MODEL_PARAMETERS = get_model_parameters(API_URL)
 
 new_window = DataWindow()
 MIN_DATA_POINTS = 5

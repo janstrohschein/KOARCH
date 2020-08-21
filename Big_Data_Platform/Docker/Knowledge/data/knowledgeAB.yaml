@@ -4,9 +4,9 @@ Optimization:
       algorithms:
         Random Forest:
           parameter: 
-            n_estimators:  
+            NumberOfTrees:  
               type: int
-              default: 3
+              default: 4
               min: 1
               max: 100
           metadata: 
@@ -21,12 +21,6 @@ Optimization:
           input: preprocessed data
         Kriging:
           parameter: 
-            kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
-            n_restarts_optimizer:
-              type: int
-              default: 5
-              min: 0
-              max: 15
           metadata: 
             Class: Surrogate
             RAM usage initial: -1

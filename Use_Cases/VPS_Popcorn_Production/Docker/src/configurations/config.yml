@@ -1,7 +1,7 @@
 General:
   KAFKA_BROKER_URL: kafka:9093
-  KAFKA_CONSUMER_TIMEOUT_MS: 120000
   # KAFKA_BROKER_URL: localhost:9092
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
 
 Initial_Design:
   N_INITIAL_DESIGN: 5
@@ -23,7 +23,7 @@ Initial_Design:
     AB_monitoring: ./schema/monitoring.avsc
 
 1_pc_model_learning_rf:
-  MODEL_ALGORITHM: RF
+  MODEL_ALGORITHM: Random Forest
   MODEL_PARAMETERS:
     n_estimators: 3
   IN_TOPIC:
@@ -31,6 +31,7 @@ Initial_Design:
   IN_GROUP: RF
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
+  API_URL: http://5_API_Knowledge:8000
 
 1_pc_model_learning_kriging:
   MODEL_ALGORITHM: Kriging
@@ -42,6 +43,7 @@ Initial_Design:
   IN_GROUP: Kriging
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
+  API_URL: http://5_API_Knowledge:8000
 
 2_pc_model_appl_opt:
   IN_TOPIC:

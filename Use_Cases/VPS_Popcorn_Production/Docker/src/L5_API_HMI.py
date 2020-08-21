@@ -30,7 +30,6 @@ if config_path is not None and config_section is not None:
     config_section = config_section.replace(' ', '').split(',')
     config = read_config(config_path, config_section)
 
-
 results = {key: [] for key in config["API_OUT"]}
 custom_enum_values = {key: key for key in config["API_OUT"]}
 

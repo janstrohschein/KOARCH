@@ -12,9 +12,9 @@ env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
 """
-env_vars = {#'in_topic': 'adaption',
-            #'in_group': 'CPPS',
-            #'in_schema_file': './schema/new_x.avsc',
+env_vars = {'in_topic': 'adaption',
+            'in_group': 'CPPS',
+            'in_schema_file': './schema/new_x.avsc',
             'out_topic': 'DB_raw_data',
             'out_schema_file': './schema/data.avsc'}
 """
