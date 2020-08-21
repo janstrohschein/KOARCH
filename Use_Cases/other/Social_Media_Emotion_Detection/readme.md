@@ -2,17 +2,11 @@
 
 This use case implements a first prototype of our big data platform and uses an automated approach to study the emotions of a larger group of social media users on Twitter over time. It is possible to extract emotions from the text of their status updates as shown by Tasoulis et al. and Colneric and Demsar ([Tasoulis et al., 2018](https://arxiv.org/abs/1804.00482), [Colneric & Demsar, 2018](https://ieeexplore.ieee.org/document/8295234)). This analysis is based on the work of Colneric and Demsar ([github](https://github.com/nikicc/twitter-emotion-recognition)) and investigates if the emotions of users or groups of users become more negative over time as suggested by other studies.
 
-
-
-
-
 # Big Data Platform
 
 The platform uses Docker and Kafka to implement the applications as microservices with communication capabilities. Data schemata specify the interfaces between applications and ensure data quality. 
 
 <img src="./docs/big_data_platform.jpg" width="800px">
-
-
 
 # Workflow
 
@@ -24,11 +18,10 @@ The platform uses Docker and Kafka to implement the applications as microservice
 
 <img src="./docs/workflow.jpg" width="800px">
 
-
-
 # Preparation
-
-The implementation consists of several Docker containers. Please follow the instructions on [Docker Docs](https://docs.docker.com/install/) to install Docker for your platform. It is also required to create a Twitter developer account at [Twitter Dev Website](https://developer.twitter.com/en/apply-for-access) and enter the credentials in "./src/configurations/twitter.ini". Afterwards open a console and complete the following steps:
+The implementation consists of several Docker containers, so please install Docker and docker-compose. 
+Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
+It is also required to create a Twitter developer account at [Twitter Dev Website](https://developer.twitter.com/en/apply-for-access) and enter the credentials in "./src/configurations/twitter.ini". Afterwards open a console and execute the following commands:
 
 - Create Docker Network
   
@@ -91,8 +84,6 @@ The implementation consists of several Docker containers. Please follow the inst
   docker-compose -f docker-compose_kafka.yml up --build -d
   ```
 
-  
-
 # Collect tweets and classifications
 
 - Use Docker Compose to start the pipeline
@@ -126,8 +117,6 @@ The implementation consists of several Docker containers. Please follow the inst
     ```
     \q
     ```
-  
-    
 
 # Analysis
 

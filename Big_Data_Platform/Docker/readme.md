@@ -11,5 +11,10 @@ On some OS the Docker installation does not include docker-compose. You can find
 
 # Building blocks
 The subfolders contain the different building blocks of the Big Data Platform. 
+- Cognition
+- DB
+- HMI
+- Kafka\
 All modules rely on the messaging ability for indirect communication with other modules.
-Thus the Kafka building block is the base class for most other modules and more specialized blocks like a connector to PostgresDB can inherit the additional Kafka functionality.
+Thus the Kafka building block is the base class for most other modules and more specialized blocks like a connector to PostgresDB inherit the additional Kafka functionality.
+- Knowledge

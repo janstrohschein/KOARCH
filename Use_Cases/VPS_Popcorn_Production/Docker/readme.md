@@ -18,16 +18,16 @@ The scalar weights of the corresponding objectives, w<sub>i</sub>,  are chosen b
 As a default, equal weights are used.
 More details about the use case can be found in [our pre-print](https://arxiv.org/abs/2003.00925). 
 
+The specific architecture for this use case is displayed in the diagram below:
+
+<img src="./docs/vps_use_case_architecture.jpg" width="400px">
+
 Next we would like to present the implementation of our CAAI architecture for this use case.
 All modules are implemented as Docker Containers and communicate via Kafka.
 
-
 # Preparation 
-Please install Docker and docker-compose to run the containers.
-You find instructions for the Docker installation on their [website](https://docs.docker.com/get-docker/). 
-To test the Docker installation you can open a terminal and execute `docker run hello-world`.
-
-On some OS the Docker installation does not include docker-compose. You can find information for the installation [here](https://docs.docker.com/compose/install/)  in case you get a message that docker-compose is missing.
+Please install Docker and docker-compose to run the containers. 
+Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 
 Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
 `docker network create caai`
@@ -64,6 +64,8 @@ The described workflow is also shown in the figure below:
 <img src="./docs/vps_use_case_workflow.jpg" width="800px">
 
 ## Reporting
+The reporting module collects data from several topics and forwards the messages to the HMI module.
+There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
 The reporting module collects data from several topics and forwards the messages to the HMI module.
 There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
 To access the HMI please visit: `127.0.0.1:8000/docs`  

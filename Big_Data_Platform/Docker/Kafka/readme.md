@@ -15,8 +15,9 @@ The figure below depicts the workflow consisting of the following steps:
 <img src="./docs/kafka_workflow.jpg" width="609px">
 
 
-
 ## Example
+Please install Docker and docker-compose to run the containers. 
+Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
 `docker network create caai`
 
