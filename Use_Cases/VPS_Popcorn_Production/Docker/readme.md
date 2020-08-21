@@ -63,10 +63,19 @@ The described workflow is also shown in the figure below:
 
 <img src="./docs/vps_use_case_workflow.jpg" width="800px">
 
-## Reporting
+## Access to additional information
++ Production Parameter API\
+The CPPS Controller stores the most recent values for all production parameters.
+To access the HMI please visit: `127.0.0.1:8000/docs`
+
++ Reporting API\
 The reporting module collects data from several topics and forwards the messages to the HMI module.
 There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
-To access the HMI please visit: `127.0.0.1:8000/docs`  
+To access the HMI please visit: `127.0.0.1:8001/docs`  
+
++ Knowledge API\
+The knowledge module provides the use case information as well as the algorithm knowledge.
+To access the HMI please visit: `127.0.0.2:8002/docs`
 
 ## Stop the Experiment
 Please press `Ctrl + C` in each terminal, to stop the experiment as well as the Kafka broker.
