@@ -1,14 +1,10 @@
-import sys
 import os
 import time
-import logging
 
-# Import the necessary methods from tweepy library
-#from tweepy import OAuthHandler
-#from tweepy import API
 from tweepy import Cursor
 
 from classes.TwitterP import TwitterP
+
 
 def clean_string(input_string):
 
@@ -17,6 +13,7 @@ def clean_string(input_string):
         return cleaned_string
     else:
         return input_string
+
 
 env_vars = {'config_path': os.getenv('CONFIG_PATH'),
             'out_topic': os.getenv('OUT_TOPIC'),
@@ -44,21 +41,21 @@ while True:
 
     try:
         for trend in trends:
-            #print(trend.get('name'))
+            # print(trend.get('name'))
             trend_tweets = new_pc.api.search(trend['query'])
 
             for tweet in trend_tweets:
                 tweets.append(tweet)
 
-    except:
-        print("Error retrieving trend tweets", sys.exc_info())
+    except Exception as e:
+        print(f"Error retrieving trend tweets: {e}")
 
     print('Got trends')
 
     for tweet in tweets:
         '''
         see documentation for user objects at
-        https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/user-object.html 
+        https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/user-object.html
         '''
         tweet_count += 1
 
@@ -71,13 +68,13 @@ while True:
             print('User #', user_count, 'added: ', tweet.author.name)
 
             author = {
-                'id_str' : tweet.author.id_str,
+                'id_str': tweet.author.id_str,
                 'user_name': clean_string(tweet.author.name),
                 'user_location': clean_string(tweet.author.location),
                 'language': clean_string(tweet.author.lang),
                 'account_created_at': str(tweet.author.created_at),
-                'statuses_count': tweet.author.statuses_count,  # The number of Tweets (including retweets) issued by the user.
-                'favorites_count': tweet.author.favourites_count, # The number of Tweets this user has liked in the account's lifetime.
+                'statuses_count': tweet.author.statuses_count,  # The number of Tweets (& retweets) issued by the user.
+                'favorites_count': tweet.author.favourites_count,  # The number of Tweets this user has liked
                 'followers_count': tweet.author.followers_count,  # The number of followers this account currently has.
                 'friends_count': tweet.author.friends_count,  # The number of users this account is following
                 'verified': tweet.author.verified
@@ -87,23 +84,23 @@ while True:
             for page in Cursor(new_pc.api.followers, user_id=tweet.author.id_str).pages():
                 for user in page:
                     if user.id_str not in user_set:
-                        #print('Follower', 'added: ', user.name)
+                        #  print('Follower', 'added: ', user.name)
                         user_set.add(user.id_str)
 
                         following_user = {
-                        'id_str': user.id_str,
-                        'user_name': clean_string(user.name),
-                        'user_location': clean_string(user.location),
-                        'language': clean_string(user.lang),
-                        'account_created_at': str(user.created_at),
-                        'statuses_count': user.statuses_count, # The number of Tweets (including retweets) issued by the user.
-                        'favorites_count': user.favourites_count, # The number of Tweets this user has liked in the account's lifetime.
-                        'followers_count': user.followers_count, # The number of followers this account currently has.
-                        'friends_count': user.friends_count,  # The number of users this account is following
-                        'verified': user.verified
+                            'id_str': user.id_str,
+                            'user_name': clean_string(user.name),
+                            'user_location': clean_string(user.location),
+                            'language': clean_string(user.lang),
+                            'account_created_at': str(user.created_at),
+                            'statuses_count': user.statuses_count,  # The number of Tweets (& retweets) by the user.
+                            'favorites_count': user.favourites_count,  # The number of Tweets this user has liked.
+                            'followers_count': user.followers_count,  # The number of followers this account has.
+                            'friends_count': user.friends_count,  # The number of users this account is following
+                            'verified': user.verified
                         }
                         new_pc.send_msg(following_user)
-                        #print('Sent user')
+                        # print('Sent user')
                         time.sleep(15)
 
                     else:
