@@ -8,6 +8,18 @@ The main goal of KOARCH is to minimize the manual effort to make computational i
 
 The KOARCH researchers can draw on results and knowledge of several related projects. In this research project incorporated are the Institute for Data Science, Engineering, and Analytics (IDE+A) and the Institute for Computer Science from the faculty of Computer Science and Engineering from the TH Köln, the Institute Industrial IT (inIT) of the OWL University of Applied Sciences in Lemgo as well as partners from the industry.
 
+The Github Repository is structured as follows:
+
+- Big Data Platform\
+  Contains the building blocks for [Docker](Big_Data_Platform/Docker/readme.md) and [Kubernetes](Big_Data_Platform/Kubernetes/readme.md)
+- Use Cases
+  - [Social Media Emotion Detection](Use_Cases/other/Social_Media_Emotion_Detection/readme.md)\
+  The social media use case collects tweets from Twitter and analyses the text.
+  This first iteration proves the architectural foundations and shows the containerization and communication of the independent modules.
+  - [VPS Popcorn Production](Use_Cases/VPS_Popcorn_Production/Docker/readme.md)\
+  The VPS use case optimizes the production of popcorn through the simultaneous execution and evaluation of several machine learning algorithms.
+  This second iteration implements the cognition module and several APIs for information storage and retrieval.
+
 The project "KOARCH" is sponsored by the German Federal Ministry of Education and Research (BMBF) under funding code 13FH007IA6 and 13FH007IB6.
 
 <img src="./docs/BMBF.jpg" width="200px">

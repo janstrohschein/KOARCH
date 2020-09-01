@@ -1,7 +1,7 @@
-# VPS Popcorn Production Use Case
+# VPS Popcorn Production
 We use the versatile production system (VPS), which is located in the SmartFactoryOWL, for evaluation of the cognitive component.
 The VPS is a modular production system, which processes corn to produce popcorn which is used as packaging material.
-Due to its modularity, it can be adapted to the current order easily. 
+Due to its modularity, it can be adapted to the current order easily.
 Efficiently operating the VPS is a challenge because of many parameters influence the result, which cannot be measured inline, e.g., the moisture of the corn.
 Thus, a data-driven optimization is a promising method to increase efficiency, which is performed using the CAAI and the introduced cognitive component.
 
@@ -14,9 +14,9 @@ As the given optimization problem can be regarded as relatively simple, we will 
 This results in the following optimization problem:\
 <img src="./docs/optimization_formula.svg" width="400px">
 
-The scalar weights of the corresponding objectives, w<sub>i</sub>,  are chosen based on user's preferences. 
+The scalar weights of the corresponding objectives, w<sub>i</sub>,  are chosen based on user's preferences.
 As a default, equal weights are used.
-More details about the use case can be found in [our pre-print](https://arxiv.org/abs/2003.00925). 
+More details about the use case can be found in [our pre-print](https://arxiv.org/abs/2003.00925).
 
 The specific architecture for this use case is displayed in the diagram below:
 
@@ -25,8 +25,8 @@ The specific architecture for this use case is displayed in the diagram below:
 Next we would like to present the implementation of our CAAI architecture for this use case.
 All modules are implemented as Docker Containers and communicate via Kafka.
 
-# Preparation 
-Please install Docker and docker-compose to run the containers. 
+# Preparation
+Please install Docker and docker-compose to run the containers.
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 
 Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
@@ -48,16 +48,16 @@ The Cognition publishes those as starting points to the Analytics Bus, where the
 
 ## Continuous operation
 + The CPPS Module (0) builds a model of the production process with data from experiments on the real CPPS during start-up.
-This model is used to evaluate the incoming points for x and derive the corresponding y-value. 
+This model is used to evaluate the incoming points for x and derive the corresponding y-value.
 The CPPS (0) sends both points to the Data Bus.
 + As we use message-based communication, we can subscribe any number of modules to a topic and each will receive the data.
 In this use case the Monitoring (1) and two Model Learning (1) modules listen to new data from the CPPS (0).
 The Monitoring (1) module transfers the CPPS data from the Data Bus to the Analytics Bus, so the Cognition (3) can evaluate the process data.
 The Model Learning (1) modules, implementing Kriging and Random Forest algorithms, use leave-one-out cross-validation to calculate RMSE, MAE and R<sup>2</sup> and send those metrics as well as the trained model to the Analytics Bus.
 + The Model Application + Optimization (2) module receives both models and uses differential evolution to search for an improved solution.
-The best predicted y and the corresponding x for each algorithm is published to the Analytics Bus. 
-+ The Cognition (3) is able to evaluate the suggested new values. 
-Once the Cognition decided a new value to try in production, it is send to the Adaption (4), which instructs the CPPS controller and concludes the iteration. 
+The best predicted y and the corresponding x for each algorithm is published to the Analytics Bus.
++ The Cognition (3) is able to evaluate the suggested new values.
+Once the Cognition decided a new value to try in production, it is send to the Adaption (4), which instructs the CPPS controller and concludes the iteration.
 
 The described workflow is also shown in the figure below:
 
@@ -73,7 +73,7 @@ To access the HMI please visit: `127.0.0.1:8000/docs`
 + Reporting API\
 The reporting module collects data from several topics and forwards the messages to the HMI module.
 There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
-To access the HMI please visit: `127.0.0.1:8001/docs`  
+To access the HMI please visit: `127.0.0.1:8001/docs`
 
 + Knowledge API\
 The knowledge module provides the use case information as well as the algorithm knowledge.
@@ -89,7 +89,7 @@ Execute both commands to remove the containers:\
 A lot of things happened in the background to make this work:
 + Docker-compose builds the Containers from the Dockerfiles in `src`.
 + The Dockerfiles specify the base image, install the requirements found in `./src/configurations/`, copy the sources into the container and set the program to execute when the container starts.
-+ The Docker-compose files also specify the path to the configuration file and the relevant sections for each container. 
++ The Docker-compose files also specify the path to the configuration file and the relevant sections for each container.
 This sets the environment for the container, e.g. the URL for the Kafka broker, the incoming / outgoing topics for our modules and also the serialization schema.
 + Avro serializes the messages according to schemas defined in `./src/schema/`.
 Messages that do not comply to the specified schema raise an error and can´t be send.

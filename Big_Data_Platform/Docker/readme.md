@@ -14,7 +14,8 @@ The subfolders contain the different building blocks of the Big Data Platform.
 - Cognition
 - DB
 - HMI
-- Kafka\
+- [Kafka](Kafka/readme.md)\
 All modules rely on the messaging ability for indirect communication with other modules.
 Thus the Kafka building block is the base class for most other modules and more specialized blocks like a connector to PostgresDB inherit the additional Kafka functionality.
-- Knowledge
+- [Knowledge](Knowledge/readme.md)
+The knowledge module is implemented as an API to store, modify and retrieve the knowledge at any time.
