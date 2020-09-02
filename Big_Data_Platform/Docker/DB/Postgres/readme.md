@@ -1,9 +1,8 @@
 # PostgreSQL
 [PostgreSQL](https://www.postgresql.org/) also known as Postgres is a free and open-source relational database management system written in C.
 
-The example creates a persistent Docker volume, initializes the Postgres DB with the provided schema and stores data received from Kafka. 
-
 # Example
+The example creates a persistent Docker volume, initializes the containerized Postgres DB with the provided schema and stores data received from Kafka. 
 ## Preparation
 The implementation consists of several Docker containers, so please install Docker and docker-compose. 
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
