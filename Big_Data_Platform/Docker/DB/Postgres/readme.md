@@ -1,8 +1,12 @@
-# Postgres
+# PostgreSQL
+[PostgreSQL](https://www.postgresql.org/) also known as Postgres is a free and open-source relational database management system written in C.
 
-# Preparation
+The example creates a persistent Docker volume, initializes the Postgres DB with the provided schema and stores data received from Kafka. 
+
+# Example
+## Preparation
 The implementation consists of several Docker containers, so please install Docker and docker-compose. 
-Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).\
+Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 Please make sure that your Docker Settings allow to share the local filesystem with the container to create a persistent volume.
 Since Docker 2.20 this has to be enabled manually, the instructions can be found [here](https://stackoverflow.com/questions/60754297/docker-compose-failed-to-build-filesharing-has-been-cancelled).
 
@@ -29,7 +33,7 @@ Since Docker 2.20 this has to be enabled manually, the instructions can be found
 - Start Kafka Containers\
   `docker-compose -f docker-compose_kafka.yml up --build -d`
 
-# Send users to DB
+## Send user entries to Postgres DB
 - Use Docker Compose to start the pipeline\
   `docker-compose up --build -d`
 - check for incoming data points in PostgresDB "User DB"
@@ -45,7 +49,8 @@ Since Docker 2.20 this has to be enabled manually, the instructions can be found
     `\q`
   - quit bash session inside container\
     `exit`
-# Shutdown Docker Containers
+
+## Shutdown Docker Containers
 - Stop Kafka Containers\
     `docker-compose -f docker-compose_kafka.yml down`
 - Stop other Containers and DB\
