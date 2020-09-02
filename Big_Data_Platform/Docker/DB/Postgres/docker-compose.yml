@@ -1,0 +1,42 @@
+version: '2'
+    
+services:
+  0p_send_users:
+    container_name: 0p_send_users
+    build:
+      context: ./src
+      dockerfile: Dockerfile_0p
+    environment: 
+        config_path: ./configurations/config.yml
+        config_section: General, 0p_send_users
+
+  1c_postgres_db:
+    container_name: 1c_postgres_db
+    hostname: 1c_postgres_db
+    image: postgres:alpine
+    ports:
+    - "5432:5432"
+    volumes:
+      - 1c_postgres_volume:/var/lib/postgresql/data
+  
+  1c_persist_to_postgres:
+    container_name: 1c_persist_to_postgres
+    build:
+      context: ./src
+      dockerfile: Dockerfile_1c_postgres
+    environment: 
+        config_path: ./configurations/config.yml
+        config_section: General, 1c_persist_to_postgres
+    links:
+      - 1c_postgres_db
+    depends_on:
+      - 1c_postgres_db
+
+networks:
+  default:
+    external:
+      name: caai
+
+volumes:
+  1c_postgres_volume:
+    external: true

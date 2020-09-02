@@ -1,0 +1,13 @@
+{"type": "record",
+ "name": "User",
+ "fields": [{"name": "id_str", "type": ["string"]},
+    {"name": "user_name", "type": ["null", "string"]},
+    {"name": "user_location", "type": ["null", "string"]},
+    {"name": "account_created_at", "type": ["null", "string"]},
+    {"name": "statuses_count", "type": ["null", "long", "int"]},
+    {"name": "favorites_count", "type": ["null", "long", "int"]},
+    {"name": "followers_count", "type": ["null", "long", "int"]},
+    {"name": "friends_count", "type": ["null", "long", "int"]},
+    {"name": "verified", "type": ["null", "boolean"]}
+    ]
+    }
