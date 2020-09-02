@@ -1,0 +1,23 @@
+General:
+  KAFKA_BROKER_URL: kafka:9093
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
+
+1_p_count:
+  OUT_TOPIC:
+    AB_counts: ./schema/count.avsc
+
+1_p_double_count:
+  OUT_TOPIC:
+    AB_double_counts: ./schema/count.avsc
+  
+2_c_reporting:
+  IN_TOPIC:
+    AB_counts: ./schema/count.avsc
+    AB_double_counts: ./schema/count.avsc
+  IN_GROUP: reporting
+  API_OUT:
+    AB_counts: forward_topic 
+    AB_double_counts: forward_topic
+  API_URL: http://3_API_HMI:8000
+  API_ENDPOINT: /topic/
+      

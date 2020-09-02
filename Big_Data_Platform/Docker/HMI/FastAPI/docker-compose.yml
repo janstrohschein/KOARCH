@@ -1,0 +1,51 @@
+version: '2'
+
+services:
+  1_p_count:
+    container_name: 1_P_Count
+    hostname: 1_P_Count
+    build:
+      context: ./src
+      dockerfile: Dockerfile_1_P_count
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 1_p_count
+
+  1_p_double_count:
+    container_name: 1_P_Double_Count
+    build:
+      context: ./src
+      dockerfile: Dockerfile_1_P_double_count
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 1_p_double_count
+    
+  2_c_reporting:
+    container_name: 2_C_Reporting
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2_C_Reporting
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 2_c_reporting
+    depends_on: 
+      - 3_api_hmi
+
+  3_api_hmi:
+    container_name: 3_API_HMI
+    hostname: 3_API_HMI
+    build:
+      context: ./src
+      dockerfile: Dockerfile_3_API_HMI
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: 2_c_reporting
+    expose: 
+    - "8000"
+    ports:
+    - "8001:8000"
+      
+networks:
+  default:
+    external:
+      name: caai
