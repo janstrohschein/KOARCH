@@ -47,10 +47,10 @@ The HMI can be accessed in a browser at:
 `http://localhost:8001/docs`
 
 All routes and functions defined in L3_API_HMI.py are accessible via the HMI:
-- GET: Return all results via: `/topics/`
-- GET: Return results for a specific topic via: `/topic/{topic_name}/`
-- GET: Export the results for a specific topic to CSV via: `/topic_csv/{topic_name}/`
-- POST: Add a row to a specific topic via: `/topic/{topic_name}/`
+- (GET) Return all results via: `/topics/`
+- (GET) Return results for a specific topic via: `/topic/{topic_name}/`
+- (GET) Export the results for a specific topic to CSV via: `/topic_csv/{topic_name}/`
+- (POST) Add a row to a specific topic via: `/topic/{topic_name}/`
 
 The interface also shows the equivalent curl request, so the query can be translated into code.
 
