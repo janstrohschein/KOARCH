@@ -1,13 +1,8 @@
 #  Knowledge Module
 The knowledge module stores information about the use case and knowledge about the available algorithms.
 
-# FastAPI
 FastAPI is used to implement APIs according to the [OpenAPI specification](http://spec.openapis.org/oas/v3.0.3).
 The framework enables a quick and easy implementation and automatically generates a Human-Machine-Interface (HMI) based on the API specification.
-
-# Preparation
-Please install Docker and docker-compose to run the containers.
-Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 
 # Example
 The example container starts a FastAPI service and provides the use case information and algorithm knowledge.
@@ -17,6 +12,9 @@ The example container starts a FastAPI service and provides the use case informa
 - Docker-compose (`docker-compose.yml`) uses the instructions from `./src/Dockerfile` to build the container.
 - The Dockerfile uses a base image and installs the required packages as specified in `./src/configurations/requirements.txt`.
 
+## Preparation
+Please install Docker and docker-compose to run the containers.
+Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 To launch the example please open a terminal and execute the following command:\
 `docker-compose up`
 
@@ -57,6 +55,6 @@ All routes and functions defined in knowledge.py are accessible via the HMI:
   No Parameters
 
 
-# Shutdown Docker Containers
+## Shutdown Docker Containers
 - Stop FastAPI container\
     `docker-compose down`
