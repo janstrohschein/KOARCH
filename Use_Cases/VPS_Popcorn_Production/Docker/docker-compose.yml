@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile_0_PC_CPPS
     environment: 
       config_path: ./configurations/config.yml
-      config_section: General, Initial_Design, 0_pc_cpps
+      config_section: General, Initial_Design, Objective_Function, 0_pc_cpps
     depends_on: 
       - 3_pc_evaluation
 
@@ -71,7 +71,7 @@ services:
       dockerfile: Dockerfile_3_PC_Evaluation
     environment: 
       config_path: ./configurations/config.yml
-      config_section: General, Initial_Design, 3_pc_evaluation
+      config_section: General, Initial_Design, Objective_Function, 3_pc_evaluation
     depends_on: 
       - 4_pc_adaption
       

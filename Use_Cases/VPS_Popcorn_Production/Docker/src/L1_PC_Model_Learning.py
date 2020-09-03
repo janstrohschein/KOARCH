@@ -7,7 +7,7 @@ import json
 import requests
 
 from classes.KafkaPC import KafkaPC
-from classes.ml_util import ModelLearner, DataWindow, get_cv_scores
+from classes.caai_util import ModelLearner, DataWindow, get_cv_scores
 import sys
 import warnings
 

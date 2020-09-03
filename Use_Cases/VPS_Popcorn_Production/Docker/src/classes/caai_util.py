@@ -17,23 +17,25 @@ class ObjectiveFunction:
         self.X = None
         self.y = None
 
-    def load_data(self, path="data/vpsFeatures.csv"):
+    def load_data(self, data_path, x_columns, y_columns, seperator=";", decimal_sign=","):
 
-        extract_columns = ["conveyorRuntimeMean", "yAgg"]
-        extract_columns_types = {"conveyorRuntimeMean": float, "yAgg": float}
+        # extract_columns = ["conveyorRuntimeMean", "yAgg"]
+        extract_columns = list(x_columns.keys()) + list(y_columns.keys())
+        # extract_columns_types = {"conveyorRuntimeMean": float, "yAgg": float}
+        extract_columns_types = {**x_columns, **y_columns}
 
         vps_df = pd.read_csv(
-            path,
-            sep=";",
+            data_path,
+            sep=seperator,
             usecols=extract_columns,
             dtype=extract_columns_types,
-            decimal=",",
+            decimal=decimal_sign,
         )
 
         vps_df = vps_df.drop_duplicates()
 
-        self.X = np.array(vps_df["conveyorRuntimeMean"]).reshape(-1, 1)
-        self.y = np.array(vps_df["yAgg"])
+        self.X = np.array(vps_df[x_columns.keys()]).reshape(-1, 1)
+        self.y = np.array(vps_df[y_columns.keys()])
 
         return True
 
@@ -115,20 +117,3 @@ def get_cv_scores(model, X, y):
     r2_score = r2(y, y_pred)
 
     return rmse_score, mae_score, r2_score
-
-
-""" delete if no longer needed
-def get_parameter_dict_from_yml(parameter_string):
-    parameter_name = [x for x in re.finditer(r'\"([a-zA-Z_-]+)\"', parameter_string)]
-    parameter = [x for x in re.finditer(r': \"(.*?)\"', parameter_string)]
-
-    parameter_name = [item.group(1) for item in parameter_name]
-    parameter = [item.group(1) for item in parameter]
-
-    d = {}
-    len_parameter = len(parameter)
-    for i in range(len_parameter):
-        d[parameter_name[i]] = parameter[i]
-
-    return d
-"""

@@ -9,11 +9,19 @@ Initial_Design:
   X_MIN: 4000.0
   X_MAX: 10100.0 
 
+Objective_Function:
+  data_path: ./data/vpsFeatures.csv
+  # data_path: ./data/vpsFeatures_It2_AlterMais.csv
+  # data_path: ./data/vpsFeatures_It2_Premium.csv
+  x_columns:
+    conveyorRuntimeMean: float
+  y_columns:
+    yAgg: float
+
 0_pc_cpps:
   OUT_TOPIC:
     DB_raw_data: ./schema/data.avsc
   API_URL: http://0_API_CPPS_Controller:8000
-  PRODUCTION_CYCLE: 10
 
 1_pc_monitoring:
   IN_TOPIC:

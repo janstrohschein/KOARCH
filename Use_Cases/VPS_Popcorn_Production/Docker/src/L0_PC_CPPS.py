@@ -1,29 +1,22 @@
 import requests
 import json
 import time
-
 import os
 
 from classes.KafkaPC import KafkaPC
-from classes.ml_util import ObjectiveFunction
+from classes.caai_util import ObjectiveFunction
 
 
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
-"""
-env_vars = {'in_topic': 'adaption',
-            'in_group': 'CPPS',
-            'in_schema_file': './schema/new_x.avsc',
-            'out_topic': 'DB_raw_data',
-            'out_schema_file': './schema/data.avsc'}
-"""
+new_pc = KafkaPC(**env_vars)
 
 new_objective = ObjectiveFunction()
-new_objective.load_data()
+new_objective.load_data(data_path=new_pc.config['data_path'],
+                        x_columns=new_pc.config['x_columns'],
+                        y_columns=new_pc.config['y_columns'])
 new_objective.fit_model()
-
-new_pc = KafkaPC(**env_vars)
 
 N_INITIAL_DESIGN = new_pc.config['N_INITIAL_DESIGN']
 MAX_PRODUCTION_CYCLES = new_pc.config['MAX_PRODUCTION_CYCLES']
