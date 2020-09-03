@@ -10,12 +10,12 @@ production_parameters = {
 
 
 @CPPS_Controller.get("/production_parameters/")
-async def read_items():
+async def get_items():
     return JSONResponse(production_parameters, status_code=200)
 
 
 @CPPS_Controller.get("/production_parameter/{parameter}")
-async def read_item(parameter: str):
+async def get_item(parameter: str):
 
     parameter = production_parameters.get(parameter, "Key does not exist")
     status_code = 400 if parameter == "Key does not exist" else 200

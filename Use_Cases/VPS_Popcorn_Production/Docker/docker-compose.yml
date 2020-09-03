@@ -81,8 +81,8 @@ services:
       context: ./src
       dockerfile: Dockerfile_4_PC_Adaption
     environment: 
-      config_path: ./configurations/config.yml
-      config_section: General, 4_pc_adaption
+        config_path: ./configurations/config.yml
+        config_section: General, 4_pc_adaption
     depends_on: 
       - 0_api_cpps_controller
     

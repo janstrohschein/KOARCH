@@ -15,7 +15,11 @@ The example container starts a FastAPI service and provides the use case informa
 ## Preparation
 Please install Docker and docker-compose to run the containers.
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
-To launch the example please open a terminal and execute the following command:\
+
+Before starting the container we create a network, for easier communication between containers, by running this command in a terminal:\
+`docker network create caai`
+
+To launch the example please execute the following command in a terminal:\
 `docker-compose up`
 
 ## Access the Webinterface
@@ -56,5 +60,5 @@ All routes and functions defined in knowledge.py are accessible via the HMI:
 
 
 ## Shutdown Docker Containers
-- Stop FastAPI container\
+Stop and remove FastAPI container:\
     `docker-compose down`
