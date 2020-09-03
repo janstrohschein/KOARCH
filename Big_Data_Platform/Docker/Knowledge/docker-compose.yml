@@ -5,7 +5,7 @@ services:
     container_name: API_Knowledge
     hostname: API_Knowledge 
     build:
-      context: .
+      context: ./src
       dockerfile: Dockerfile
     expose: 
     - "8000"

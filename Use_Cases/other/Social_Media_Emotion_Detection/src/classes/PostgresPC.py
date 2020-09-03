@@ -2,6 +2,7 @@ import psycopg2
 
 from classes.KafkaPC import KafkaPC
 
+
 class PostgresPC(KafkaPC):
     def __init__(self, config_path=None, in_topic=None, in_group=None, in_schema_file=None, out_topic=None, out_schema_file=None):
         super().__init__(config_path, in_topic, in_group, in_schema_file, out_topic, out_schema_file)
