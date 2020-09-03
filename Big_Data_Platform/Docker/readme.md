@@ -18,7 +18,7 @@ The subfolders contain the different building blocks of the Big Data Platform.
 - HMI
   - [FastAPI](HMI/FastAPI/readme.md)\
   Provides access to data for humans and other systems based on the OpenAPI specification.
-  - [Jupyter](HMI/Jupyter/readme.md)
+  - [Jupyter](HMI/Jupyter/readme.md)\
   The Jupyter datascience notebook includes libraries for data analysis in Julia, Python and R.
 - [Kafka](Kafka/readme.md)\
 All modules rely on the messaging ability for indirect communication with other modules.
