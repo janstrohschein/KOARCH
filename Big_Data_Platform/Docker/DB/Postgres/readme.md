@@ -7,6 +7,7 @@ The example creates a persistent Docker volume, initializes the containerized Po
 ## Preparation
 The implementation consists of several Docker containers, so please install Docker and docker-compose. 
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
+
 Please make sure that your Docker Settings allow to share the local filesystem with the container to create a persistent volume.
 Since Docker 2.20 this has to be enabled manually, the instructions can be found [here](https://stackoverflow.com/questions/60754297/docker-compose-failed-to-build-filesharing-has-been-cancelled).
 

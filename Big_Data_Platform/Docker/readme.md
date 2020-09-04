@@ -11,7 +11,8 @@ On some OS the Docker installation does not include docker-compose. You can find
 
 # Building blocks
 The subfolders contain the different building blocks of the Big Data Platform. 
-- [Cognition](Cognition/readme.md)
+- [Cognition](Cognition/readme.md)\
+The Cognition evaluates results of machine learning algorithms on production process information and selects which algorithm provides the parameters for the next production cycle. 
 - DB
   - [Postgres](DB/Postgres/readme.md)\
   The relational database stores structured data. 
@@ -26,7 +27,7 @@ Thus the Kafka building block is the base class for most other modules and more 
 - [Knowledge](Knowledge/readme.md)\
 The knowledge module is implemented as an API to store, modify and retrieve the knowledge at any time.
 
-# General Docker Structure
+# General CAAI Structure
 The different building blocks or use cases are implemented as Docker containers.
 Several containers are managed together via docker-compose files.
 The following structure shows all the possible different parts:

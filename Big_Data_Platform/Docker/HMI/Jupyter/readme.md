@@ -13,6 +13,9 @@ This example has the following functionality:
 Please install Docker and docker-compose to run the containers.
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 
+Please make sure that your Docker Settings allow to share the local filesystem with the container to create a persistent volume.
+Since Docker 2.20 this has to be enabled manually, the instructions can be found [here](https://stackoverflow.com/questions/60754297/docker-compose-failed-to-build-filesharing-has-been-cancelled).
+
 Before starting the container we create a network, for easier communication between containers, by running this command in a terminal:\
 `docker network create caai`
 

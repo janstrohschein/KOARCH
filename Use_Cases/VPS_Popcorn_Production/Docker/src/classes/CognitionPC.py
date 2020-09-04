@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Tuple
 
 import pandas as pd
 import numpy as np
@@ -70,7 +71,12 @@ class CognitionPC(KafkaPC):
 
         self.X = np.linspace(self.X_MIN, self.X_MAX, num=self.N_INITIAL_DESIGN)
 
-    def strategy_min_best_pred_y(self):
+    def strategy_min_best_pred_y(self) -> Tuple[int, str, float]:
+        """ Finds the algorithm with the lowest prediction for the y-value.
+
+        Returns:
+            selected_algo_id (int), selected_algo (str), best_x (float)
+        """
         min_best_pred_y = self.df.loc[self.df["pred_y"].idxmin()]
         selected_algo_id = self.df["pred_y"].idxmin()
         selected_algo = min_best_pred_y['model_name']
@@ -78,7 +84,20 @@ class CognitionPC(KafkaPC):
 
         return selected_algo_id, selected_algo, best_x
 
-    def strategy_model_quality(self):
+    def strategy_model_quality(self) -> Tuple[int, str, float]:
+        """ Finds the algorithm with the best overall quality.
+
+        Steps:
+        - calculates the quality for algorithms without a real y-value, also considering the
+          resources and the user weights for quality and resource consumption
+        - calculates the quality for algorithms with a real y-value, also considering the
+          resources and the user weights for quality and resource consumption
+        - combines the calculated quality values and selects the best (min) quality
+
+        Returns:
+            selected_algo_id (int), selected_algo (str), best_x (float)
+        """
+
         selected_algo_id = selected_algo = best_x = None
         df_pred_y = self.df[self.df.y.isnull()].copy()
         df_real_y = self.df[self.df.y.notnull()].copy()
@@ -124,17 +143,24 @@ class CognitionPC(KafkaPC):
 
         return selected_algo_id, selected_algo, best_x
 
-    def get_best_x(self, strategy="model_quality"):
+    def get_best_x(self, strategy="model_quality") -> Tuple[int, str, float]:
+        """ Uses different strategies to find the best new x-value.
+            The strategies can be extended by creating a new function and
+            adding it to the strategy dictionary.
 
-        selected_algo_id = None
-        selected_algo = None
-        best_x = None
+        Args:
+            strategy (str, optional): Defaults to "model_quality".
 
-        if strategy == 'min_best_pred_y':
-            selected_algo_id, selected_algo, best_x = self.strategy_min_best_pred_y()
+        Returns:
+            selected_algo_id (int), selected_algo (str), best_x (float)
+        """
 
-        elif strategy == 'model_quality':
-            selected_algo_id, selected_algo, best_x = self.strategy_model_quality()
+        selected_algo_id = selected_algo = best_x = None
+
+        strategy_dict = {'min_best_pred_y': self.strategy_min_best_pred_y,
+                         'model_quality': self.strategy_model_quality}
+
+        selected_algo_id, selected_algo, best_x = strategy_dict[strategy]()
 
         return selected_algo_id, selected_algo, best_x
 
@@ -173,11 +199,11 @@ class CognitionPC(KafkaPC):
             self.df.loc[self.df['x'] == x, 'y'] = y
             self.df['y_delta'] = self.df.apply(self.calc_y_delta, axis=1)
 
-            self.normalize_values('y', 'y_norm')
-            self.normalize_values('y_delta', 'y_delta_norm')
-
     def process_model_application(self, msg):
-        """
+        """ Processes incoming messages from the model application and normalizes the values
+            to predict model quality and rate resource consumption.
+
+        Incoming Avro Message:
         "name": "Model_Application",
         "fields": [
             {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
@@ -195,6 +221,7 @@ class CognitionPC(KafkaPC):
             {"name": "RAM", "type": ["int"]}
         ]
         """
+
         new_model_appl = self.decode_avro_msg(msg)
         new_model_appl["timestamp"] = datetime.now()
 
@@ -210,10 +237,16 @@ class CognitionPC(KafkaPC):
         self.df['resources'] = self.df.apply(lambda row: self.calc_avg((row['CPU_norm'], row['RAM_norm'])), axis=1)
 
     def process_monitoring(self, msg):
+        """ Processes incoming messages from the production monitoring tool and
+            selects the parameter for the next production cycle.
 
-        new_monitoring = self.decode_avro_msg(msg)
+        Steps:
+        - use production information to assign the real y-value to the algorithm
+        - calculate the real quality for an algorithm
+        - selects the best algorithm and the according x-value for the next cycle
+        - sends message to the adaption module
 
-        """
+        Incoming Avro Message:
         "name": "Data",
         "fields": [
             {"name": "phase", "type": ["string"]},
@@ -221,37 +254,19 @@ class CognitionPC(KafkaPC):
             {"name": "x", "type": ["float"]},
             {"name": "y", "type": ["float"]}
             ]
+
+        Outgoing Avro Message:
+        "name": "New_X",
+        "fields": [
+            {"name": "id", "type": ["int"]},
+            {"name": "phase", "type": ["string"]},
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "new_x", "type": ["float"]}
+            ]
         """
 
-        """
-        [x] reales y muss dem Algorithmus der vorherigen Iteration zugeordnet werden
+        new_monitoring = self.decode_avro_msg(msg)
 
-
-        [x] wenn Modell Wert sendet
-        pred_model_quality = get_pred_model_quality(surrogate_y, new_model['rmse'])
-        - normalisieren über alle Module
-        - beide 1/2
-
-
-        [x] wenn Monitoring reales Ergebnis sendet
-        real_model_quality = get_real_model_quality(surrogate_y, real_y, rmse)
-        - delta_y = | surrogate_y - real_y |
-        - normalisieren
-        - alle 1/3
-
-        [x] resources = CPU, RAM
-        - normalisieren
-        - beide 1/2
-
-
-
-        [x] wenn neues X ausgewählt wird
-        quality = real_model_quality if real_model_quality is not None else pred_model_quality
-        model = min(quality * user_spec + resources * user_spec)
-
-
-        """
-        id = self.current_data_point
         # send initial design first
         if self.current_data_point < self.N_INITIAL_DESIGN:
 
@@ -264,12 +279,14 @@ class CognitionPC(KafkaPC):
             # select best value, otherwise CPPS will use last value from controller
             if self.df.empty is False:
                 self.assign_real_y(new_monitoring['x'], new_monitoring['y'])
+                self.normalize_values('y', 'y_norm')
+                self.normalize_values('y_delta', 'y_delta_norm')
                 self.df['real_quality'] = self.df.apply(lambda row: self.calc_avg((row['y_norm'], row['y_delta_norm'],
                                                                                    row['rmse_norm'])), axis=1)
 
                 selected_algo_id, selected_algo, selected_x = self.get_best_x()
                 algorithm = f"{selected_algo}({selected_algo_id})"
                 if selected_algo_id is not None:
-                    self.send_new_x(id=id, x=selected_x, phase=phase, algorithm=algorithm)
+                    self.send_new_x(id=self.current_data_point, x=selected_x, phase=phase, algorithm=algorithm)
 
         self.current_data_point += 1
