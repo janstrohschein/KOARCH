@@ -60,14 +60,19 @@ use_case_dict = {"use_case": "Optimization",
 
 @knowledgebase.get("/use_case/")
 async def get_usecase():
-    """ Returns the Use Case Info """
+    """ Returns the Use Case Info."""
 
     return JSONResponse(use_case_dict, status_code=200)
 
 
 @knowledgebase.put("/use_case/")
 async def put_usecase(use_case: str, goal: str, feature: str):
-    """ Update the Use Case Info """
+    """ Update the Use Case Info.\n
+    Example Input:\n
+    use_case = Optimization\n
+    goal = minimize\n
+    feature = minimum\n
+    """
 
     use_case_dict["use_case"] = use_case
     use_case_dict["goal"] = goal
@@ -86,7 +91,8 @@ async def get_knowledge():
 @knowledgebase.get("/knowledge/use_case/")
 async def get_usecase_knowledge(use_case: str):
     """ Filters the knowledge for a specific usecase.\n
-    Example Usecase: Optimization
+    Example Input:\n
+    use_case = Optimization
     """
 
     usecase_knowledge = knowledge.get(use_case, "Key does not exist")

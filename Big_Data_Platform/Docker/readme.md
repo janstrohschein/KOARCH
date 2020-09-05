@@ -2,6 +2,17 @@
 The components of the big data platform are various software building blocks, each implemented in a Docker container.
 Modules do not communicate directly with each other, but use messaging to publish and subscribe to relevant topics.
 
+The components of the big data platform are various software building blocks, each implemented in a Docker container. The goal of the BDP is to provide a modular ecosystem that can be easily extended and adapted to a certain use case. Therefore, messaging is used to publish and subscribe to relevant topics, instead of direct communication of the modules.
+
+## Use Cases
+The big data platform on Docker is used in two use cases:
+- [Social Media Emotion Detection](Use_Cases/other/Social_Media_Emotion_Detection/readme.md)\
+The social media use case collects tweets from Twitter and analyses the text.
+This first iteration proves the architectural foundations and shows the containerization and communication of the independent modules.
+- [VPS Popcorn Production](Use_Cases/VPS_Popcorn_Production/Docker/readme.md)\
+The VPS use case optimizes the production of popcorn through the simultaneous execution and evaluation of several machine learning algorithms.
+This second iteration implements the cognition module and several APIs for information storage and retrieval.
+
 # Docker Installation
 Please install Docker and docker-compose to run the containers.
 You find instructions for the Docker installation on their [website](https://docs.docker.com/get-docker/). 
@@ -28,7 +39,7 @@ Thus the Kafka building block is the base class for most other modules and more 
 The knowledge module is implemented as an API to store, modify and retrieve the knowledge at any time.
 
 # General CAAI Structure
-The different building blocks or use cases are implemented as Docker containers.
+The different building blocks that compose a use case are implemented as Docker container.
 Several containers are managed together via docker-compose files.
 The following structure shows all the possible different parts:
 
@@ -57,12 +68,13 @@ The subfolder contains the different classes, e.g., the Kafka class, for other m
 ### |-- configurations
 The configurations folder stores several files:
 - the `config.yml` contains the configuration for all modules in the project. 
-The relevant sections for each module are specified in the `docker-compose.yml`.
+  Furthermore, the config file includes general use case specific configuration, e.g., regarding the objective function or the initial design. 
+  The description of each service in the docker-compose file specifies which sections of the config file will be used in the container. 
 - the `requirements.txt` contains all the packages that need to be installed in a container. 
 The Dockerfile copies the file into the container and installs the packages during the build process.
 ### |-- schema
-The containers use indirect communication with a messaging approach.
-All messages are verified with the related Avro schema, which is stored in an `.avsc` file.
+The modules use indirect communication with a messaging approach.
+All messages are send via Kafka and verified with the related Avro schema, which is stored in an `.avsc` file.
 Each module specifies its input- and output-topics and the associated schemas in the `config.yml`.
 ## |- docker-compose files
 Several services are combined into a docker-compose file, which allows to manage all services together.

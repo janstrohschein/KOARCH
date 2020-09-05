@@ -1,12 +1,12 @@
 # FastAPI
 FastAPI is used to implement APIs according to the [OpenAPI specification](http://spec.openapis.org/oas/v3.0.3).
-The framework enables a quick and easy implementation and automatically generates a Human-Machine-Interface (HMI) based on the API specification.
+The framework enables a quick and easy implementation and automatically generates a web interface based on the API specification.
 
 # Preparation
 Please install Docker and docker-compose to run the containers.
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 
-Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
+Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:\
 `docker network create caai`
 
 Now you can launch the Kafka broker with the following command:\
@@ -42,11 +42,11 @@ Those messages can be processed further or just forwarded to the destination API
   API_ENDPOINT: /topic/
 ```
 ## Access the Webinterface
-The FastAPI provides a webinterface based on the API description.
-The HMI can be accessed in a browser at:
-`http://localhost:8001/docs`
+The FastAPI provides a webinterface based on the API description, which can be accessed in a browser at:
+`http://localhost:8001/docs` or 
+`http://127.0.0.1:8001/docs`
 
-All routes and functions defined in L3_API_HMI.py are accessible via the HMI:
+All routes and functions defined in L3_API_HMI.py are accessible via the web interface:
 - (GET) Return all results via: `/topics/`
 - (GET) Return results for a specific topic via: `/topic/{topic_name}/`
 - (GET) Export the results for a specific topic to CSV via: `/topic_csv/{topic_name}/`
@@ -56,7 +56,11 @@ The interface also shows the equivalent curl request, so the query can be transl
 
 
 # Shutdown Docker Containers
-- Stop Kafka Containers\
-    `docker-compose -f docker-compose_kafka.yml down`
-- Stop other Containers and DB\
-    `docker-compose down`
+- Stop Kafka Container:\
+  `ctrl + c`
+- Remove Kafka container:\
+  `docker-compose -f docker-compose_kafka.yml down`
+- Stop the FastAPI container with:\
+  `ctrl + c`
+- Remove FastAPI container:\
+  `docker-compose down`

@@ -1,5 +1,4 @@
 # KOARCH
-
 Development of a reference architecture for machine optimization based on computational intelligence and big data.
 
 Conventional manufacturing plants reach their limits due to dynamic developments on the global markets, increasing product variety and complexity as well as continuously increasing requirements on system software. Computational intelligence methods promise flexible adaption and extension of the plants, while being able to automatically detect invalid system states, applying condition monitoring and predictive control and maintenance. Additionally, consumption of resources, i.e. time and energy, can be optimized. However, the integration of suitable solutions in companies often fails. 
