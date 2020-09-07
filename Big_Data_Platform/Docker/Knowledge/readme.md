@@ -18,8 +18,8 @@ To launch the example please execute the following command in a terminal:\
 `docker-compose up`
 
 ## Access the Webinterface
-The FastAPI provides a web interface based on the API description, which can be accessed in a browser at:
-`http://localhost:8001/docs` or
+The FastAPI provides a web interface based on the API description, which can be accessed in a browser at:\
+`http://localhost:8001/docs` or\
 `http://127.0.0.1:8001/docs`
 
 All routes and functions defined in knowledge.py are accessible via the web interface:

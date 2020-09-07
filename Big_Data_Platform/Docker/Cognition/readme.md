@@ -8,6 +8,10 @@ The purpose of the pipelines is the optimization of the production process.
 
 The cognition module evaluates the pipelines' quality, and switches to promising pipelines during the operational phase if necessary, e.g., if they are likely more efficient w.r.t. accuracy or resource consumption (or both). 
 
+The Cognition depends on several other modules and can not be isolated easily. 
+Therefore it is easier to show the capabilities of the cognitive module through a use case.
+The VPS use case implementation with detailed explanations and a demonstration of the Cognition can be found [here](../../../Use_Cases/VPS_Popcorn_Production/Docker/readme.md).
+
 The Cognition in its current state implements the following functionality:
 - Initializes the objective function with historic data. The user defines the parameters for the objective function in `./src/configurations/config.yml` :
   ```
@@ -44,7 +48,3 @@ The Cognition in its current state implements the following functionality:
     best_algorithm = min(model_quality * user_weight + resources * user_weight)
     ```
   - sends the new parameters to the adaption module
-
-The Cognition depends on several other modules and can not be isolated easily. 
-Therefore it is easier to show the capabilities of the cognitive module through a use case.
-The VPS use case implementation with detailed explanations and a demonstration of the Cognition can be found [here](../../../Use_Cases/VPS_Popcorn_Production/Docker/readme.md).

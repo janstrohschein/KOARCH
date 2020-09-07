@@ -21,9 +21,9 @@ It is possible to share the entire hard disk or just the folder that stores the 
     `docker-compose -f docker-compose_init_dbs.yml up --build -d`
     This will create the tables in the database as specified in `./src/configurations/1c_init.sql`\
   - Check if the DB initialization was successful
-    - connect to Postgres container and open a bash terminal\
+    - connect to Postgres container and open the bash terminal inside the container\
       `docker exec -it 1c_postgres_db /bin/bash`
-    - use the bash terminal to connect to Postgres instance inside the container\
+    - type the following command into the bash terminal to connect to Postgres instance inside the container\
       `psql -h localhost -p 5432 -U postgres`
     - show table definition for "Twitter Users"\
       `\dt`

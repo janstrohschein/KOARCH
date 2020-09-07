@@ -1,7 +1,4 @@
 # Big Data Platform in Docker
-The components of the big data platform are various software building blocks, each implemented in a Docker container.
-Modules do not communicate directly with each other, but use messaging to publish and subscribe to relevant topics.
-
 The components of the big data platform are various software building blocks, each implemented in a Docker container. The goal of the BDP is to provide a modular ecosystem that can be easily extended and adapted to a certain use case. Therefore, messaging is used to publish and subscribe to relevant topics, instead of direct communication of the modules.
 
 ## Use Cases
@@ -41,7 +38,7 @@ The knowledge module is implemented as an API to store, modify and retrieve the 
 # General CAAI Structure
 The different building blocks that compose a use case are implemented as Docker container.
 Several containers are managed together via docker-compose files.
-The following structure shows all the possible different parts:
+The following structure shows all the possible different parts for a building block in this project:
 
 ```
 Building Block
