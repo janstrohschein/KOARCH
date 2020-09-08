@@ -62,7 +62,9 @@ class CognitionPC(KafkaPC):
                                      y_columns=self.config['y_columns'])
         self.new_objective.fit_model()
 
-    def generate_test_function():
+    def generate_test_function(self):
+        """ insert description """
+        # comments
         pass
 
     def generate_initial_design(self):
