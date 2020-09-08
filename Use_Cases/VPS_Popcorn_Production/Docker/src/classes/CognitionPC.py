@@ -47,7 +47,7 @@ class CognitionPC(KafkaPC):
         self.current_data_point = 0
         self.initialize_objective_function()
         self.generate_initial_design()
-
+        self.generate_test_function()
         # maps topics and functions, which process the incoming data
         self.func_dict = {
             "AB_model_application": self.process_model_application,
@@ -61,6 +61,9 @@ class CognitionPC(KafkaPC):
                                      x_columns=self.config['x_columns'],
                                      y_columns=self.config['y_columns'])
         self.new_objective.fit_model()
+
+    def generate_test_function():
+        pass
 
     def generate_initial_design(self):
         """ number n_initial_design equally spaced X between X_MIN, X_MAX """
