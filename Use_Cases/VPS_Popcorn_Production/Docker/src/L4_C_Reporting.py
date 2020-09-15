@@ -18,24 +18,53 @@ def forward_topic(msg):
     requests.post(url=URL, params=params)
 
 
+def plot_data(msg):
+    print('in plot_data')
+    # ersetzen durch die Felder deines Schemas und die richtigen Felder der msg
+    # anschließend Kommentar entfernen
+
+    # new_data_point = {'plot': 'single',
+    #                   'x': msg.new_x,
+    #                   'y': msg.new_y}
+
+    # new_c.send_msg(new_data_point)
+
+
+def plot_data_multi(msg):
+    print('in plot_data_multi')
+    # ersetzen durch die Felder deines Schemas und die richtigen Felder der msg
+    # anschließend Kommentar entfernen
+
+    # new_data_point = {'plot': 'multi',
+    #                   'x': msg.new_x,
+    #                   'y': msg.new_y}
+
+    # new_c.send_msg(new_data_point)
+
+
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
-"""
-func_dict = {"AB_model_application": forward_topic,
-             "AB_monitoring": forward_topic,
-             "AB_model_evaluation": forward_topic}
-"""
-
 new_c = KafkaPC(**env_vars)
 
-func_dict = new_c.config['API_OUT']
+api_dict = new_c.config['API_OUT']
+plot_dict = new_c.config['PLOT_TOPIC']
+
 
 API_URL = new_c.config['API_URL']
 ENDPOINT = new_c.config['API_ENDPOINT']
 
 for msg in new_c.consumer:
+    # tests if msg.topic is in api_dict and calls function from dict
     try:
-        eval(func_dict[msg.topic])(msg)
+        if api_dict.get(msg.topic) is not None:
+            eval(api_dict[msg.topic])(msg)
     except Exception as e:
-        print(f"Processing Topic: {msg.topic} with Function: {func_dict[msg.topic]}\n Error: {e}")
+        print(f"Processing Topic: {msg.topic} with Function: {api_dict[msg.topic]}\n Error: {e}")
+
+    # tests if msg.topic is in plot_dict and calls function from dict
+    try:
+        if plot_dict.get(msg.topic) is not None:
+            eval(plot_dict[msg.topic])(msg)
+    except Exception as e:
+        print(f"Processing Topic: {msg.topic} with Function: {plot_dict[msg.topic]}\n Error: {e}")

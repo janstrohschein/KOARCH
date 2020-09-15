@@ -1,0 +1,12 @@
+{"type": "record",
+ "name": "Plot",
+ "fields": [
+    {"name": "plot", "type": ["string"]},
+    {"name": "x", "type": ["string"]},
+    {"name":"y", "type": { 
+            "type": "array",
+            "items": "string"
+         } 
+      } 
+    ]
+    }

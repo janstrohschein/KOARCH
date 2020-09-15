@@ -83,6 +83,11 @@ Objective_Function:
     AB_monitoring: ./schema/monitoring.avsc
     AB_model_application: ./schema/model_appl.avsc
   IN_GROUP: reporting
+  OUT_TOPIC:
+    AB_plot_data: ./schema/plot.avsc
+  PLOT_TOPIC:
+    AB_model_evaluation: plot_data_multi
+    AB_monitoring: plot_data
   API_OUT:
     AB_model_evaluation: forward_topic 
     AB_monitoring: forward_topic
