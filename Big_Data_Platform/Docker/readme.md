@@ -40,7 +40,7 @@ The different building blocks that compose a use case are implemented as Docker 
 Several containers are managed together via docker-compose files.
 A docker-compose file contains the information to build the required containers as shown below:
 
-<img src="./docs/CAAI_Docker_Container.jpg" width="1200px">
+<img src="./docs/CAAI_Docker_Container.jpg">
 
 The following folder structure shows all the possible different parts for a building block in this project:
 
