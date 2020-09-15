@@ -38,7 +38,11 @@ The knowledge module is implemented as an API to store, modify and retrieve the 
 # General CAAI Structure
 The different building blocks that compose a use case are implemented as Docker container.
 Several containers are managed together via docker-compose files.
-The following structure shows all the possible different parts for a building block in this project:
+A docker-compose file contains the information to build the required containers as shown below:
+
+<img src="./docs/CAAI_Docker_Container.jpg" width="600px">
+
+The following folder structure shows all the possible different parts for a building block in this project:
 
 ```
 Building Block
@@ -85,4 +89,4 @@ Each service entry consists of:
 Furthermore it is also possible to define a common network for all containers and to specify how Docker volumes should be used. 
 
 ## |- readme
-The `readme.md` explains the module / use case and gives usage instructions. 
+The `readme.md` explains the module/use case and gives usage instructions. 
