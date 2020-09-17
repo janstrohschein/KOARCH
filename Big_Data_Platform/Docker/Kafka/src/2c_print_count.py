@@ -4,12 +4,8 @@ from classes.KafkaPC import KafkaPC
 
 print("start 2c_print_count")
 
-env_vars = {
-    "kafka_broker_url": os.getenv("KAFKA_BROKER_URL"),
-    "in_topic": os.getenv("IN_TOPIC"),
-    "in_group": os.getenv("IN_GROUP"),
-    "in_schema_file": os.getenv("IN_SCHEMA_FILE"),
-}
+env_vars = {'config_path': os.getenv('config_path'),
+            'config_section': os.getenv('config_section')}
 
 new_c = KafkaPC(**env_vars)
 print("created KafkaPC")

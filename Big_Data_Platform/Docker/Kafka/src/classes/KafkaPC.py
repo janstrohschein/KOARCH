@@ -1,115 +1,109 @@
 import sys
 import io
-import os
-from configparser import ConfigParser
+import yaml
 
 from kafka import KafkaProducer, KafkaConsumer
-
+from kafka.structs import OffsetAndMetadata, TopicPartition
 from avro.io import BinaryEncoder, DatumWriter
 import avro.schema
 
 
 class KafkaPC():
-    def __init__(self, kafka_broker_url="localhost:9092", config_path=None, in_topic=None, in_group=None, in_schema_file=None, out_topic=None,
-                 out_schema_file=None):
+    def __init__(self, config_path, config_section):
         super(KafkaPC, self).__init__()
 
         self.config = {}
-        if config_path is not None:
-            self.read_config(config_path)
+        if config_path is not None and config_section is not None:
+            config_section = config_section.replace(' ', '').split(',')
+            self.read_config(config_path, config_section)
 
-        KAFKA_BROKER_URL = kafka_broker_url
+        if self.config.get('IN_TOPIC') and self.config.get('IN_GROUP'):
+            self.consumer = KafkaConsumer(group_id=self.config['IN_GROUP'],
+                                          bootstrap_servers=[self.config['KAFKA_BROKER_URL']],
+                                          )
+            self.in_topic = list(self.config['IN_TOPIC'].keys())
+            self.consumer.subscribe(self.in_topic)
 
-        self.in_topic = in_topic
+            self.in_schema = {}
+            for topic, schema in self.config['IN_TOPIC'].items():
+                self.in_schema[topic] = self.read_avro_schema(schema)
 
-        if in_topic and in_group:
-            self.consumer = KafkaConsumer(in_topic, group_id=in_group, bootstrap_servers=[KAFKA_BROKER_URL])
+        if self.config.get('OUT_TOPIC'):
+            self.out_topic = list(self.config['OUT_TOPIC'].keys())
+            self.out_schema = {}
+            for topic, schema in self.config['OUT_TOPIC'].items():
+                self.out_schema[topic] = self.read_avro_schema(schema)
+            self.producer = KafkaProducer(linger_ms=50, bootstrap_servers=[self.config['KAFKA_BROKER_URL']])
 
-        self.out_topic = out_topic
-
-        if in_schema_file:
-            self.in_schema_file = in_schema_file
-            self.in_schema = self.read_avro_schema(self.in_schema_file)
-        else:
-            self.in_schema_file = None
-            self.in_schema = None
-
-        if out_schema_file:
-            self.out_schema_file = out_schema_file
-            self.out_schema = self.read_avro_schema(self.out_schema_file)
-        else:
-            self.out_schema_file = None
-            self.out_schema = None
-
-        # if no broker_id is provided the KafkaProducer will connect
-        # on localhost:9092
-        self.producer = KafkaProducer(linger_ms=500, bootstrap_servers=[KAFKA_BROKER_URL])
-
-
-    def read_config(self, config_path):
-        config = ConfigParser()
-        config.read(config_path, encoding='utf-8')
-
+    def read_config(self, config_path, config_section):
         try:
-            sections = config.sections()
-            if len(sections) == 0:
-                sys.exit()
-            for section in sections:
+            with open(config_path, "r") as ymlfile:
+                config = yaml.load(ymlfile, Loader=yaml.FullLoader)
+                for section in config_section:
+                    for key, value in config[section].items():
+                        self.config[key] = value
 
-                self.config[section] = {}
-                for option in config.options(section):
-                    self.config[section][option] = config.get(section, option).split(',')
-        except:
-            print("The config file path is not valid")
+        except Exception as e:
+            print(f'Failed to read the config: {repr(e)}')
             sys.exit()
 
     def read_avro_schema(self, schema):
         return avro.schema.Parse(open(schema).read())
 
+    """ can we delete this function, if we don´t want to send messages WITHOUT schema?
     def decode_msg(self, msg):
         try:
             decoded = msg.value.decode("utf-8")
             return decoded
-        except:
-            print("Error decoding data", sys.exc_info())
-
+        except Exception as e:
+            print(f'Error decoding data: {repr(e)}')
+            sys.exit()
+    """
     def decode_avro_msg(self, msg):
         try:
             bytes_reader = io.BytesIO(msg.value)
             decoder = avro.io.BinaryDecoder(bytes_reader)
-            reader = avro.io.DatumReader(self.in_schema)
+            reader = avro.io.DatumReader(self.in_schema[msg.topic])
             return reader.read(decoder)
-        except:
-            print("Error decoding avro data", sys.exc_info())
+        except Exception as e:
+            print(f'Error decoding avro data: {repr(e)}')
+            sys.exit()
 
-    def __encode(self, data, schema=None):
-        if schema is None:
-            out_schema = self.out_schema
-        else:
-            out_schema = schema
+    def __encode(self, data, schema):
 
         raw_bytes = None
         try:
-            writer = DatumWriter(out_schema)
+            writer = DatumWriter(schema)
             bytes_writer = io.BytesIO()
             encoder = BinaryEncoder(bytes_writer)
             writer.write(data, encoder)
             raw_bytes = bytes_writer.getvalue()
-        except:
-            print("Error encoding data", sys.exc_info())
+
+        except Exception as e:
+            print(f'Error encoding data: {repr(e)}')
+
         return raw_bytes
 
-    def send_msg(self, data, topic=None, key=0, schema=None):
-        # encode the data with the specified Avro out_schema
-        raw_bytes = self.__encode(data, schema)
-        if topic == None:
-            out_topic = self.out_topic
+    def send_msg(self, data, key=0, topic=None):
+
+        # if no topic is provided, the first topic in the list is used as default
+        if topic is None:
+            out_topic = self.out_topic[0]
         else:
             out_topic = topic
+
+        schema = self.out_schema[out_topic]
+        # encode the data with the specified Avro out_schema
+        raw_bytes = self.__encode(data, schema)
 
         # publish the message if encoding was successful
         if raw_bytes is not None:
             try:
                 self.producer.send(out_topic, raw_bytes, partition=key)
-            except:
-                print("Error sending message to kafka: ", sys.exc_info())
+            except Exception as e:
+                print(f'Error sending data to Kafka: {repr(e)}')
+
+    def commit_offset(self, msg):
+        tp = TopicPartition(msg.topic, msg.partition)
+        offsets = {tp: OffsetAndMetadata(msg.offset, None)}
+        self.consumer.commit(offsets=offsets)

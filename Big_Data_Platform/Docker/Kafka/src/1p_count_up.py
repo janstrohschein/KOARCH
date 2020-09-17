@@ -5,11 +5,8 @@ from classes.KafkaPC import KafkaPC
 
 print("start 1p_count_up")
 
-env_vars = {
-    "kafka_broker_url": os.getenv("KAFKA_BROKER_URL"),
-    "out_topic": os.getenv("OUT_TOPIC"),
-    "out_schema_file": os.getenv("OUT_SCHEMA_FILE"),
-}
+env_vars = {'config_path': os.getenv('config_path'),
+            'config_section': os.getenv('config_section')}
 
 new_p = KafkaPC(**env_vars)
 print("created KafkaPC")

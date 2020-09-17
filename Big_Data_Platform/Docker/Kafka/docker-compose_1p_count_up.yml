@@ -7,9 +7,8 @@ services:
       context: ./src
       dockerfile: Dockerfile_1p_count_up
     environment:
-      KAFKA_BROKER_URL: kafka:9093
-      OUT_TOPIC: count
-      OUT_SCHEMA_FILE: ./schema/count.avsc
+      config_path: ./configurations/config.yml
+      config_section: General, 1p_count_up
 
 networks:
   default:
