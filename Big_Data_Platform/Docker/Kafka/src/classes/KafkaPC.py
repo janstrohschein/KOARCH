@@ -3,49 +3,73 @@ import io
 import yaml
 
 from kafka import KafkaProducer, KafkaConsumer
-from kafka.structs import OffsetAndMetadata, TopicPartition
+# from kafka.structs import OffsetAndMetadata, TopicPartition
 from avro.io import BinaryEncoder, DatumWriter
 import avro.schema
 
 
-class KafkaPC():
+class KafkaPC:
     def __init__(self, config_path, config_section):
         super(KafkaPC, self).__init__()
 
-        self.config = {}
-        if config_path is not None and config_section is not None:
-            config_section = config_section.replace(' ', '').split(',')
-            self.read_config(config_path, config_section)
+        self.in_topic = None
+        self.out_topic = None
+        self.in_schema = None
+        self.out_schema = None
 
-        if self.config.get('IN_TOPIC') and self.config.get('IN_GROUP'):
-            self.consumer = KafkaConsumer(group_id=self.config['IN_GROUP'],
-                                          bootstrap_servers=[self.config['KAFKA_BROKER_URL']],
-                                          )
-            self.in_topic = list(self.config['IN_TOPIC'].keys())
-            self.consumer.subscribe(self.in_topic)
-
-            self.in_schema = {}
-            for topic, schema in self.config['IN_TOPIC'].items():
-                self.in_schema[topic] = self.read_avro_schema(schema)
-
-        if self.config.get('OUT_TOPIC'):
-            self.out_topic = list(self.config['OUT_TOPIC'].keys())
-            self.out_schema = {}
-            for topic, schema in self.config['OUT_TOPIC'].items():
-                self.out_schema[topic] = self.read_avro_schema(schema)
-            self.producer = KafkaProducer(linger_ms=50, bootstrap_servers=[self.config['KAFKA_BROKER_URL']])
+        self.read_config(config_path, config_section)
+        self.read_topics()
+        self.create_consumer()
+        self.create_producer()
 
     def read_config(self, config_path, config_section):
+
+        self.config = {}
+        if config_path is not None and config_section is not None:
+            config_section = config_section.replace(" ", "").split(",")
+
+        else:
+            raise ValueError("Configuration requires config_path and config_section")
         try:
             with open(config_path, "r") as ymlfile:
                 config = yaml.load(ymlfile, Loader=yaml.FullLoader)
                 for section in config_section:
                     for key, value in config[section].items():
                         self.config[key] = value
-
         except Exception as e:
-            print(f'Failed to read the config: {repr(e)}')
+            print(f"Failed to read the config: {repr(e)}")
             sys.exit()
+
+    def read_topics(self):
+
+        if self.config.get("IN_TOPIC") and self.config.get("IN_GROUP"):
+            self.in_topic = list(self.config["IN_TOPIC"].keys())
+            self.in_schema = {}
+            for topic, schema in self.config["IN_TOPIC"].items():
+                self.in_schema[topic] = self.read_avro_schema(schema)
+
+        if self.config.get("OUT_TOPIC"):
+            self.out_topic = list(self.config["OUT_TOPIC"].keys())
+            self.out_schema = {}
+            for topic, schema in self.config["OUT_TOPIC"].items():
+                self.out_schema[topic] = self.read_avro_schema(schema)
+
+    def create_consumer(self):
+
+        if self.config.get("IN_TOPIC") and self.config.get("IN_GROUP"):
+            self.consumer = KafkaConsumer(
+                group_id=self.config["IN_GROUP"],
+                bootstrap_servers=[self.config["KAFKA_BROKER_URL"]],
+                auto_offset_reset='earliest'
+            )
+            self.consumer.subscribe(self.in_topic)
+
+    def create_producer(self):
+
+        if self.config.get("OUT_TOPIC"):
+            self.producer = KafkaProducer(
+                linger_ms=50, bootstrap_servers=[self.config["KAFKA_BROKER_URL"]]
+            )
 
     def read_avro_schema(self, schema):
         return avro.schema.Parse(open(schema).read())
@@ -59,6 +83,7 @@ class KafkaPC():
             print(f'Error decoding data: {repr(e)}')
             sys.exit()
     """
+
     def decode_avro_msg(self, msg):
         try:
             bytes_reader = io.BytesIO(msg.value)
@@ -66,7 +91,7 @@ class KafkaPC():
             reader = avro.io.DatumReader(self.in_schema[msg.topic])
             return reader.read(decoder)
         except Exception as e:
-            print(f'Error decoding avro data: {repr(e)}')
+            print(f"Error decoding avro data: {repr(e)}")
             sys.exit()
 
     def __encode(self, data, schema):
@@ -80,7 +105,7 @@ class KafkaPC():
             raw_bytes = bytes_writer.getvalue()
 
         except Exception as e:
-            print(f'Error encoding data: {repr(e)}')
+            print(f"Error encoding data: {repr(e)}")
 
         return raw_bytes
 
@@ -101,9 +126,11 @@ class KafkaPC():
             try:
                 self.producer.send(out_topic, raw_bytes, partition=key)
             except Exception as e:
-                print(f'Error sending data to Kafka: {repr(e)}')
+                print(f"Error sending data to Kafka: {repr(e)}")
 
+    """ remove if no longer required
     def commit_offset(self, msg):
         tp = TopicPartition(msg.topic, msg.partition)
         offsets = {tp: OffsetAndMetadata(msg.offset, None)}
         self.consumer.commit(offsets=offsets)
+    """
