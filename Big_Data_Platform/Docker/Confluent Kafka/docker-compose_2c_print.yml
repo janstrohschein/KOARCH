@@ -1,14 +1,14 @@
 version: '2'
 
 services:
-  2c_print_count:
-    container_name: 2c_print_count
+  2c_print:
+    container_name: 2c_print
     build:
       context: ./src
-      dockerfile: Dockerfile_2c_print_count
+      dockerfile: Dockerfile_2c_print
     environment:
       config_path: ./configurations/config.yml
-      config_section: General, 2c_print_count
+      config_section: General, 2c_print
 
 networks:
   default:

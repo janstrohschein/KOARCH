@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 COPY . /src
 WORKDIR /src
 
-CMD ["python", "-u", "2c_print_count.py"]
+CMD ["python", "-u", "2c_print.py"]

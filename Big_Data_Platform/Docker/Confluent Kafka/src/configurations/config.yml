@@ -11,7 +11,7 @@ General:
   OUT_TOPIC:
     multiples: ./schema/multiples.avsc
 
-2c_print_count:
+2c_print:
   IN_TOPIC:
     count: ./schema/count.avsc
     multiples: ./schema/multiples.avsc

@@ -73,9 +73,9 @@ class KafkaPC():
             self.consumer.subscribe(self.in_topic)
 
     def create_producer(self):
-
-        producer_conf = {'bootstrap.servers': self.config['KAFKA_BROKER_URL']}
-        self.producer = Producer(producer_conf)
+        if self.config.get('OUT_TOPIC'):
+            producer_conf = {'bootstrap.servers': self.config['KAFKA_BROKER_URL']}
+            self.producer = Producer(producer_conf)
 
     def read_config(self, config_path, config_section):
         self.config = {}
