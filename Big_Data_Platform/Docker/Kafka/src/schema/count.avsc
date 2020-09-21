@@ -1,4 +1,5 @@
-{"type": "record",
+{"namespace": "caai.example.kafka",
+ "type": "record",
  "name": "Count",
  "fields": [{"name": "count", "type": ["int"]}
     ]

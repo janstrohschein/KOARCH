@@ -29,7 +29,7 @@ Docker also  opens port 9092 for communication between localhost and the contain
 
 Open two additional terminals and execute the commands below to send and receive messages:\
 `docker-compose -f docker-compose_1p_count_up.yml up`\
-`docker-compose -f docker-compose_2c_print_out.yml up`
+`docker-compose -f docker-compose_2c_print_count.yml up`
 
 You should see the first program counting up and sending those numbers to the broker.
 The second program receives the numbers from the broker and prints them.
@@ -38,6 +38,8 @@ The receiving program waits for further messages until the time-out is reached.
 You can stop the second program and the Kafka Container with `Ctrl-C`.
 After the containers stopped you can execute the following command to remove the containers:
 `docker-compose -f docker-compose_1p_count_up.yml down`
+`docker-compose -f docker-compose_2c_print_count.yml down`
+`docker-compose -f docker-compose_kafka.yml down`
 
 A lot of things happened in the background to make this work:
 + Docker-compose builds the Containers from the Dockerfiles in `src`.
