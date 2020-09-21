@@ -1,0 +1,18 @@
+version: "2"
+services:
+  kafdrop:
+    container_name: kafdrop
+    hostname: kafdrop
+    image: obsidiandynamics/kafdrop
+    restart: "no"
+    ports:
+      - "9000:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:9093"
+      SCHEMAREGISTRY_CONNECT: "http://schema-registry:8081"
+      JVM_OPTS: "-Xms32M -Xmx64M"
+
+networks:
+  default:
+    external:
+      name: caai
