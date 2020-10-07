@@ -34,7 +34,7 @@ def plot_data(msg):
                        'y': {"x": msgdata["x"],"y": msgdata["y"]}}
 
     new_c.send_msg(new_data_point)
-    print("Nachricht gesendet")
+    print("message sent")
 
 
 def plot_data_multi(msg):
@@ -55,7 +55,7 @@ def plot_data_multi(msg):
                        'y': {"new_x": msgdata["new_x"], "algorithm": splitData[0]}}
 
     new_c.send_msg(new_data_point)
-    print("Nachricht gesendet")
+    print("message sent")
 
 
 env_vars = {'config_path': os.getenv('config_path'),

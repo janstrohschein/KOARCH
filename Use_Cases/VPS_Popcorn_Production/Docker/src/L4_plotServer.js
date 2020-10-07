@@ -23,7 +23,7 @@ var kafka = require('kafka-node'),
 	options = {
 		kafkaHost: 'kafka:9093',
 		autoCommit: false,
-		fromOffset: 'latest',
+		fromOffset: 'earliest',
 		commitOffsetsOnFirstJoin: false,
 		encoding: 'buffer'
 	}
@@ -38,7 +38,7 @@ consumer.on('error', function (err) {
 });
 
 consumer.on('message', function (message) {
-	console.log("Nachricht erhalten");
+	console.log("Message received");
 	var decodedMessage = type.fromBuffer(message.value);
 	var plotData = {};
 	x_int_to_date = decodedMessage.x_int_to_date;
