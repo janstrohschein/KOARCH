@@ -94,4 +94,8 @@ Objective_Function:
     AB_model_application: forward_topic
   API_URL: http://5_API_HMI:8000
   API_ENDPOINT: /topic/
+
+4_plot_data:
+  IN_TOPIC:
+    AB_plot_data: ./schema/plot.avsc
       

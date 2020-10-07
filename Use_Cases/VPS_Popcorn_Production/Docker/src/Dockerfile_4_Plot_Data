@@ -1,0 +1,13 @@
+FROM node:12
+
+COPY ./configurations/package*.json ./
+RUN npm install
+
+RUN apt-get update
+RUN apt-get install -y python-pip
+RUN pip install plotly==4.10.0
+
+COPY . /src
+WORKDIR /src
+
+CMD ["node", "L4_plotServer.js"]

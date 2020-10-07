@@ -20,26 +20,42 @@ def forward_topic(msg):
 
 def plot_data(msg):
     print('in plot_data')
-    # ersetzen durch die Felder deines Schemas und die richtigen Felder der msg
-    # anschließend Kommentar entfernen
+    msgdata = new_c.decode_avro_msg(msg)
 
-    # new_data_point = {'plot': 'single',
-    #                   'x': msg.new_x,
-    #                   'y': msg.new_y}
+    #plot tells if message is send as topic for plotData or plotMultipleData
+    #x_label is the label of xaxis
+    #x_data is data of xaxis
+    #x_int_to_date: set it True if your x_data is an integer-value, but you want to convert it to datetime
+    #y - yaxis-Data
+    new_data_point = {'plot': 'single',
+                       'x_label': 'id',
+                       'x_data': msgdata["id"],
+                       'x_int_to_date': False,
+                       'y': {"x": msgdata["x"],"y": msgdata["y"]}}
 
-    # new_c.send_msg(new_data_point)
+    new_c.send_msg(new_data_point)
+    print("Nachricht gesendet")
 
 
 def plot_data_multi(msg):
     print('in plot_data_multi')
-    # ersetzen durch die Felder deines Schemas und die richtigen Felder der msg
-    # anschließend Kommentar entfernen
+    msgdata = new_c.decode_avro_msg(msg)
+    splitData = msgdata["algorithm"].split("(")
 
-    # new_data_point = {'plot': 'multi',
-    #                   'x': msg.new_x,
-    #                   'y': msg.new_y}
+    #plot tells if message is send as topic for plotData or plotMultipleData
+    #x_label is the label of xaxis
+    #x_data is data of xaxis
+    #x_int_to_date: set it True if your x_data is an integer-value, but you want to convert it to datetime
+    #y - yaxis-Data
+    new_data_point = {'plot': 'multi',
+                       'multiplefilter': 'algorithm',
+                       'x_label': "id",
+                       'x_data': msgdata["id"],
+                       'x_int_to_date': False,
+                       'y': {"new_x": msgdata["new_x"], "algorithm": splitData[0]}}
 
-    # new_c.send_msg(new_data_point)
+    new_c.send_msg(new_data_point)
+    print("Nachricht gesendet")
 
 
 env_vars = {'config_path': os.getenv('config_path'),
