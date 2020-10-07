@@ -82,7 +82,7 @@ li {
 <br><br>
 
 <div>
-<input id="checkbox" type="checkbox" name="autoRefresh">
+<input id="checkbox" type="checkbox" name="autoRefresh" onclick="sessionStorage.setItem('autoRefresh', document.getElementById('checkbox').checked);">
 <label for="checkbox">auto plot refresh</label>
 </div>
 
@@ -230,17 +230,26 @@ if len(sys.argv) == 4:
 
 print("""<script src="/socket.io/socket.io.js"></script>
 <script>
+if (sessionStorage.getItem("autoRefresh") !== null) {
+	document.getElementById("checkbox").checked = sessionStorage.getItem("autoRefresh");
+}
+
 if (sessionStorage.getItem(window.location.href) === null) {
 	showPlot('"""+defaultDataRowname+"""')
 }
 else {
 	showPlot(sessionStorage.getItem(window.location.href));
 }
+
 var socket = io();
+
 socket.on("refresh", () => {
 	if (document.getElementById("checkbox").checked == true) {
 		window.location.reload();
   	}
+	else {
+		checkboxStorage = false;
+	}
 });
 </script>""")
 print("</body>")
