@@ -2,11 +2,14 @@
  "name": "Plot",
  "fields": [
     {"name": "plot", "type": ["string"]},
-    {"name": "x", "type": ["string"]},
-    {"name":"y", "type": { 
-            "type": "array",
-            "items": "string"
+    {"name": "multiplefilter", "type": ["null", "string"]},
+    {"name": "x_label", "type": ["string"]},
+    {"name": "x_data", "type": ["int", "string"]},
+    {"name": "x_int_to_date", "type": "boolean"},
+    {"name": "y", "type": { 
+            "type": "map",
+            "values": ["float", "string"]
          } 
       } 
     ]
-    }
+}

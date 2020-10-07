@@ -85,6 +85,19 @@ services:
         config_section: General, 4_pc_adaption
     depends_on: 
       - 0_api_cpps_controller
+
+  4_plot_data:
+    container_name: 4_Plot_Data
+    build: 
+      context: ./src
+      dockerfile: Dockerfile_4_Plot_Data
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: 4_plot_data
+    expose: 
+    - "8000"
+    ports:
+    - "8003:8000"
     
   4_c_reporting:
     container_name: 4_C_Reporting
@@ -121,7 +134,7 @@ services:
     - "8000"
     ports:
     - "8002:8000"
-      
+
 networks:
   default:
     external:
