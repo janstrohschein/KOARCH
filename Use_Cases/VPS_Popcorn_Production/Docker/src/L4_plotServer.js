@@ -6,14 +6,13 @@ var avro = require('avsc');
 
 const {spawn} = require('child_process');
 const fs = require('fs');
+const { decode } = require('punycode');
 
 const importedSchema = fs.readFileSync('./schema/plot.avsc', 'utf8');
 
 
-var data = [];
-var dataMultiple = [];
-var x_label;
-var multiplefilter;
+var data = {};
+var dataMultiple = {};
 
 const type = avro.Type.forSchema(JSON.parse(importedSchema));
 
@@ -40,24 +39,30 @@ consumer.on('error', function (err) {
 consumer.on('message', function (message) {
 	console.log("Message received");
 	var decodedMessage = type.fromBuffer(message.value);
-	var plotData = {};
-	x_int_to_date = decodedMessage.x_int_to_date;
-	x_label = decodedMessage.x_label;
-	if (x_int_to_date) {
+
+	if (decodedMessage.x_int_to_date) {
 		var temp = new Date(decodedMessage.x_data * 1000);
 		decodedMessage.x_data = temp.toISOString().split('T')[0] + ' ' + temp.toTimeString().split(' ')[0];
 	}
-	plotData[decodedMessage.x_label] = decodedMessage.x_data;
-	for (property in decodedMessage.y) {
-		plotData[property] = decodedMessage.y[property];
-	}
+
+	delete decodedMessage.x_int_to_date;
+	delete decodedMessage.plot;
+
 	if (decodedMessage.multiplefilter != null) {
-		multiplefilter = decodedMessage.multiplefilter;
-		dataMultiple.push(plotData);
+		if (!(decodedMessage.source in dataMultiple)) {
+			dataMultiple[decodedMessage.source] = [];
+		}
+		dataMultiple[decodedMessage.source].push(decodedMessage);
 	}
 	else {
-		data.push(plotData);
+		if (!(decodedMessage.source in data)) {
+			data[decodedMessage.source] = [];
+		}
+		data[decodedMessage.source].push(decodedMessage);
 	}
+
+	delete decodedMessage.source;
+
 	io.emit("refresh");
 });
 
@@ -67,7 +72,7 @@ app.get('/plotData', (req, res) => {
 	
 	var dataToSend = '';
 	// change the last parameter to name of given xaxis key
-	const python = spawn('python', ['L4_plotData.py', JSON.stringify(data), x_label]);
+	const python = spawn('python', ['L4_plotData.py', JSON.stringify(data)]);
 	python.stdout.on('data', function(data) {
 		dataToSend += data.toString();
 	});
@@ -86,7 +91,7 @@ app.get('/plotMultipleData', (req, res) => {
 
 	var dataToSend = '';
 	// change 3rd parameter to name of given xaxiskey nad 4th parameter to key of user
-	const python = spawn('python', ['L4_plotData.py', JSON.stringify(dataMultiple), x_label, multiplefilter]);
+	const python = spawn('python', ['L4_plotData.py', JSON.stringify(dataMultiple)]);
 	python.stdout.on('data', function(data) {
 		dataToSend += data.toString();
 	});

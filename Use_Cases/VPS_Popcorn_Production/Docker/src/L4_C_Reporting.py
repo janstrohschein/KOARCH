@@ -29,6 +29,7 @@ def plot_data(msg):
     #y - yaxis-Data
     new_data_point = {'plot': 'single',
                        'x_label': 'id',
+                       'source': 'sourceNam',
                        'x_data': msgdata["id"],
                        'x_int_to_date': False,
                        'y': {"x": msgdata["x"],"y": msgdata["y"]}}
@@ -50,6 +51,7 @@ def plot_data_multi(msg):
     new_data_point = {'plot': 'multi',
                        'multiplefilter': 'algorithm',
                        'x_label': "id",
+                       'source': 'sourceName',
                        'x_data': msgdata["id"],
                        'x_int_to_date': False,
                        'y': {"new_x": msgdata["new_x"], "algorithm": splitData[0]}}
