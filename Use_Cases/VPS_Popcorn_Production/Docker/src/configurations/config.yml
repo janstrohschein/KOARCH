@@ -87,7 +87,8 @@ Objective_Function:
     AB_plot_data: ./schema/plot.avsc
   PLOT_TOPIC:
     AB_model_evaluation: plot_data_multi
-    AB_monitoring: plot_data
+    AB_monitoring: plot_monitoring
+    AB_model_application : plot_model_application
   API_OUT:
     AB_model_evaluation: forward_topic 
     AB_monitoring: forward_topic

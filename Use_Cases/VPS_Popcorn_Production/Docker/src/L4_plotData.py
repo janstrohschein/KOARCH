@@ -3,7 +3,7 @@ import sys
 import json
 import numbers
 
-#Using plotly.express
+# Using plotly.express
 import plotly.graph_objects as go
 from datetime import datetime
 
@@ -15,11 +15,12 @@ try:
 except IndexError:
 	sys.stderr.write("No data available")
 	exit(1)
-except json.JSONDecodeError:
-	sys.stderr.write("Data is not a JSON-String")
-	exit(2)
 
-#format, in which date should be converted later
+except json.JSONDecodeError:
+    sys.stderr.write("Data is not a JSON-String")
+    exit(2)
+
+# format, in which date should be converted later
 dateFormat = "%Y-%m-%d %H:%M:%S"
 
 #get dataRowNames that should be plotted
@@ -34,6 +35,7 @@ for source in userData:
 
 #html-code of navbar
 print("""<!DOCTYPE html>
+
 <html>
 <head>
 <style>
@@ -62,7 +64,9 @@ li {
 </head>
 <body>
 
-<ul id="navi" style="display: grid; grid-template-columns: repeat(auto-fit, 226px);">"""+dynamicNav+"""</ul>
+<ul id="navi" style="display: grid; grid-template-columns: repeat(auto-fit, 226px);">"""
+    + dynamicNav
+    + """</ul>
 <br><br>
 
 <div>
@@ -72,6 +76,7 @@ li {
 
 <script>
 function showPlot(plotKey) {
+
 	sessionStorage.setItem(window.location.href, plotKey);
 	var showElements = document.getElementsByClassName("visibleElements");
 	for (var i = 0; i < showElements.length; i++) {
@@ -87,23 +92,18 @@ function showPlot(plotKey) {
 
 	document.getElementById(`graph-${plotKey}`).style.display='block';
 	window.dispatchEvent(new Event('resize'));
+
 }
 
 </script>
-""")
+"""
+)
 
 
-
-#create layout function
+# create layout function
 def createLayout(x_axisTitle, y_axisTitle):
-	return go.Layout(
-		xaxis=dict(
-			title=x_axisTitle
-		),
-		yaxis=dict(
-			title=y_axisTitle
-		) 
-	)
+    return go.Layout(xaxis=dict(title=x_axisTitle), yaxis=dict(title=y_axisTitle))
+
 
 # plot one User
 def plotData(userData):
@@ -169,35 +169,38 @@ firstDataPoint = userData[userData.keys()[0]][0]
 
 plotData(userData)
 
-
 if firstDataPoint['y'].keys()[0] == firstDataPoint['multiplefilter']:
 	firstLabelIndex = 1
 else:
 	firstLabelIndex = 0
 
-print("""<script src="/socket.io/socket.io.js"></script>
+
+print(
+    """<script src="/socket.io/socket.io.js"></script>
 <script>
 if (sessionStorage.getItem("autoRefresh") !== null) {
-	document.getElementById("checkbox").checked = sessionStorage.getItem("autoRefresh");
+    document.getElementById("checkbox").checked = sessionStorage.getItem("autoRefresh");
 }
 
 if (sessionStorage.getItem(window.location.href) === null) {
 	showPlot('""" +userData.keys()[0]+ "-"+firstDataPoint['y'].keys()[firstLabelIndex]+"""')
+
 }
 else {
-	showPlot(sessionStorage.getItem(window.location.href));
+    showPlot(sessionStorage.getItem(window.location.href));
 }
 
 var socket = io();
 
 socket.on("refresh", () => {
-	if (document.getElementById("checkbox").checked == true) {
-		window.location.reload();
-  	}
-	else {
-		checkboxStorage = false;
-	}
+    if (document.getElementById("checkbox").checked == true) {
+        window.location.reload();
+      }
+    else {
+        checkboxStorage = false;
+    }
 });
-</script>""")
+</script>"""
+)
 print("</body>")
 print("</html>")
