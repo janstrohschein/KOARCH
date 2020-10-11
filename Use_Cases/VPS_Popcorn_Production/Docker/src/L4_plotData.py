@@ -7,20 +7,15 @@ import numbers
 import plotly.graph_objects as go
 from datetime import datetime
 
-# sys.argv[1] = data (all database data)
-# sys.argv[2] = xaxis (name of datetime column in database)
-# sys.argv[3] = userName (name of userName column in database)
+#sys.argv[1] = data (all database data)
 
 try:
-    # get data from sys.argv[1] and convert them into python dictionary
-    userData = json.loads(sys.argv[1])
-    # get keys from python dictionary in dataRowNames variable
-    dataRowNames = userData[0].keys()
-    # get dateRowName from sys.argv[2]
-    idRowName = sys.argv[2]
+	#get data from sys.argv[1] and convert them into python dictionary
+	userData = json.loads(sys.argv[1])
 except IndexError:
-    sys.stderr.write("Wrong amount of arguments in sys.argv or no data")
-    exit(1)
+	sys.stderr.write("No data available")
+	exit(1)
+
 except json.JSONDecodeError:
     sys.stderr.write("Data is not a JSON-String")
     exit(2)
@@ -28,35 +23,19 @@ except json.JSONDecodeError:
 # format, in which date should be converted later
 dateFormat = "%Y-%m-%d %H:%M:%S"
 
-# list of dates. Need this later to get the borders of graph (min/max)
-idList = []
-for data in userData:
-    try:
-        idList.append(data[idRowName])
-    except KeyError:
-        sys.stderr.write("Given rowname of id in sys.argv[2] doesnt exist in data")
-        exit(4)
+#get dataRowNames that should be plotted
+dynamicNav = ''
 
+for source in userData:
+	for dataRowName in userData[source][0]["y"]:
+		if dataRowName == userData[source][0]["multiplefilter"]:
+			continue
+		dynamicNav += '<li id="navElement-{}-{}" class="navElement"'.format(source, dataRowName)
+		dynamicNav += """ onclick="showPlot('{}-{}');">{}-{}</li>""".format(source, dataRowName, source, dataRowName)
 
-# get dataRowNames that should be plotted
-dynamicNav = ""
-defaultDataRowname = ""
-for dataRowName in dataRowNames:
-    if dataRowName != idRowName and (len(sys.argv) < 4 or dataRowName != sys.argv[3]):
-        if defaultDataRowname == "":
-            defaultDataRowname = dataRowName
-        dynamicNav += '<li id="navElement-' + dataRowName + '" class="navElement"'
-        dynamicNav += (
-            """ onclick="showPlot('"""
-            + dataRowName
-            + """');">"""
-            + dataRowName
-            + """</li>"""
-        )
+#html-code of navbar
+print("""<!DOCTYPE html>
 
-# html-code of navbar
-print(
-    """<!DOCTYPE html>
 <html>
 <head>
 <style>
@@ -97,21 +76,23 @@ li {
 
 <script>
 function showPlot(plotKey) {
-    sessionStorage.setItem(window.location.href, plotKey);
-    var showElements = document.getElementsByClassName("visibleElements");
-    for (var i = 0; i < showElements.length; i++) {
-        showElements[i].style.display='none';
-    }
 
-    if (document.getElementsByClassName("active").length > 0) {
-        var previousActiveNavbarElement = document.getElementsByClassName("active")[0];
-        previousActiveNavbarElement.className = previousActiveNavbarElement.className.replace(" active", "");
-    }
-    var newActiveNavbarElement = document.getElementById(`navElement-${plotKey}`);
-    newActiveNavbarElement.className += " active";
+	sessionStorage.setItem(window.location.href, plotKey);
+	var showElements = document.getElementsByClassName("visibleElements");
+	for (var i = 0; i < showElements.length; i++) {
+		showElements[i].style.display='none';
+	}
 
-    document.getElementById(plotKey).style.display='block';
-    window.dispatchEvent(new Event('resize'));
+	if (document.getElementsByClassName("active").length > 0) {
+		var previousActiveNavbarElement = document.getElementsByClassName("active")[0];
+		previousActiveNavbarElement.className = previousActiveNavbarElement.className.replace(" active", "");
+	}
+	var newActiveNavbarElement = document.getElementById(`navElement-${plotKey}`);
+	newActiveNavbarElement.className += " active";
+
+	document.getElementById(`graph-${plotKey}`).style.display='block';
+	window.dispatchEvent(new Event('resize'));
+
 }
 
 </script>
@@ -125,146 +106,74 @@ def createLayout(x_axisTitle, y_axisTitle):
 
 
 # plot one User
-def plotData(userData, dataRowNames, idRowName, idList):
+def plotData(userData):
+	firstDataPoint = userData[userData.keys()[0]][0]
+	isSingleData = firstDataPoint['multiplefilter'] is None
 
-    for dataRowName in dataRowNames:
+	for source in userData:
+		filterSet = set()
 
-        if dataRowName != idRowName:
+		if not isSingleData:
+			for dataPoint in userData[source]:
+				filterSet.add(dataPoint["y"][dataPoint["multiplefilter"]])
+		else:
+			filterSet.add("")
 
-            x_axisData = []
-            y_axisData = []
-            hoverData = []
-            for data in userData:
+		for dataRowName in userData[source][0]["y"]:
+			if dataRowName == userData[source][0]["multiplefilter"]:
+				continue
 
-                id = data[idRowName]
-                if isinstance(id, basestring):
-                    try:
-                        x_axisData.append(datetime.strptime(id, dateFormat))
-                    except ValueError:
-                        sys.stderr.write(
-                            "Given dates from date row doesnt match the format YYYY-MM-DD HH:MM:SS"
-                        )
-                        exit(3)
-                else:
-                    x_axisData.append(id)
-                # fill y_axisData with associated values
-                if (
-                    not isinstance(data[dataRowName], numbers.Number)
-                    and data[dataRowName] is not None
-                ):
-                    sys.stderr.write("Cannot plot non-numerical data.")
-                    exit(6)
-                y_axisData.append(data[dataRowName])
-                hoverString = ""
-                # fill hoverString with data that should be shown when mousehover a value in the graph
-                for key, value in data.items():
-                    hoverString += str(key) + ": " + str(value) + "<br>"
-                # <extra> is used to define a title for hovered data. If not empty, default is name of trace
-                hoverData.append(hoverString + "<extra></extra>")
+			#create layout with given titles
+			layout = createLayout(userData[source][0]["x_label"], dataRowName)
+			fig = go.Figure(layout=layout)
 
-            # create layout with given titles
-            layout = createLayout(idRowName, dataRowName)
+			for traceName in filterSet:
 
-            # create graph
-            fig = go.Figure(
-                data=[
-                    go.Scatter(
-                        x=x_axisData,
-                        y=y_axisData,
-                        hovertemplate=hoverData,
-                        mode="markers",
-                    )
-                ],
-                layout=layout,
-            )
+				x_axisData = []
+				y_axisData = []
+				hoverData = []
 
-            # print the graph as html
-            print(
-                '<div id="'
-                + dataRowName
-                + '" class="visibleElements" style="display: none;">'
-            )
-            print(fig.to_html())
-            print("</div>")
+				for dataPoint in userData[source]:
+					if isSingleData or dataPoint["y"][dataPoint["multiplefilter"]] == traceName:
+						id = dataPoint["x_data"]
+						if isinstance(id, basestring):
+							try:
+								x_axisData.append(datetime.strptime(id, dateFormat))
+							except ValueError:
+								sys.stderr.write("Given dates from date row doesnt match the format YYYY-MM-DD HH:MM:SS")
+								exit(3)
+						else:
+							x_axisData.append(id)
+						#fill y_axisData with associated values
+						if not isinstance(dataPoint["y"][dataRowName], numbers.Number) and dataPoint["y"][dataRowName] is not None:
+							sys.stderr.write("Cannot plot non-numerical data.")
+							exit(6)
+						y_axisData.append(dataPoint["y"][dataRowName])
+						hoverString = ""
+						#fill hoverString with data that should be shown when mousehover a value in the graph
+						hoverString += str(dataPoint["x_label"]) + ": " + str(dataPoint["x_data"]) + "<br>"
+						for key, value in dataPoint["y"].items():
+							hoverString += str(key) + ": " + str(value) + "<br>"
+						#<extra> is used to define a title for hovered data. If not empty, default is name of trace
+						hoverData.append(hoverString + "<extra></extra>")
 
+				#create graph
+				fig.add_trace(go.Scatter(x=x_axisData, y=y_axisData, mode="markers", name=traceName, hovertemplate=hoverData))
 
-# plot multiple users in one Graph
-def plotMultipleData(userData, dataRowNames, idRowName, idList):
+			#print the graph as html
+			print('<div id="graph-{}-{}" class="visibleElements" style="display: none;">'.format(source, dataRowName))
+			print(fig.to_html())
+			print("</div>")
 
-    # get rowname of username column
-    userRowName = sys.argv[3]
-    userNames = set()
+firstDataPoint = userData[userData.keys()[0]][0]
 
-    # fill the set with all usernames, no duplicates
-    for data in userData:
-        try:
-            userNames.add(data[userRowName])
-        except KeyError:
-            sys.stderr.write(
-                "Given rowname of username in sys.argv[3] doesnt exist in data"
-            )
-            exit(5)
+plotData(userData)
 
-    for dataRowName in dataRowNames:
+if firstDataPoint['y'].keys()[0] == firstDataPoint['multiplefilter']:
+	firstLabelIndex = 1
+else:
+	firstLabelIndex = 0
 
-        if dataRowName != idRowName and dataRowName != userRowName:
-
-            layout = createLayout(idRowName, dataRowName)
-
-            # create empty layout
-            fig = go.Figure(layout=layout)
-
-            for userName in userNames:
-                x_axisData = []
-                y_axisData = []
-                hoverData = []
-
-                for data in userData:
-                    # check if data belongs to current username
-                    if data[userRowName] == userName:
-                        id = data[idRowName]
-                        # fill x_axisData with associated values and convert them into datetime object
-                        x_axisData.append(id)
-                        # fill y_axisData with associated values
-                        if (
-                            not isinstance(data[dataRowName], numbers.Number)
-                            and data[dataRowName] is not None
-                        ):
-                            sys.stderr.write("Cannot plot non-numerical data.")
-                            exit(6)
-                        y_axisData.append(data[dataRowName])
-                        hoverString = ""
-                        # fill hoverString with data that should be shown when mousehover a value in the graph
-                        for key, value in data.items():
-                            hoverString += str(key) + ": " + str(value) + "<br>"
-                        # <extra> is used to define a title for hovered data. If not empty, default is name of trace
-                        hoverData.append(hoverString + "<extra></extra>")
-
-                # add trace to graph
-                fig.add_trace(
-                    go.Scatter(
-                        x=x_axisData,
-                        y=y_axisData,
-                        mode="markers",
-                        name=userName,
-                        hovertemplate=hoverData,
-                    )
-                )
-
-            # print the graph as html
-            print(
-                '<div id="'
-                + dataRowName
-                + '" class="visibleElements" style="display: none; width:100%;">'
-            )
-            print(fig.to_html())
-            print("</div>")
-
-
-if len(sys.argv) == 3:
-    plotData(userData, dataRowNames, idRowName, idList)
-if len(sys.argv) == 4:
-    plotMultipleData(userData, dataRowNames, idRowName, idList)
 
 print(
     """<script src="/socket.io/socket.io.js"></script>
@@ -274,9 +183,8 @@ if (sessionStorage.getItem("autoRefresh") !== null) {
 }
 
 if (sessionStorage.getItem(window.location.href) === null) {
-    showPlot('"""
-    + defaultDataRowname
-    + """')
+	showPlot('""" +userData.keys()[0]+ "-"+firstDataPoint['y'].keys()[firstLabelIndex]+"""')
+
 }
 else {
     showPlot(sessionStorage.getItem(window.location.href));
