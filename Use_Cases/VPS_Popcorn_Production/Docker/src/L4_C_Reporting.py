@@ -19,7 +19,9 @@ def forward_topic(msg):
 
 
 def plot_monitoring(msg):
-    # print("in plot_data")
+    """
+    localhost:8003/plotData/
+    """
     msgdata = new_c.decode_avro_msg(msg)
 
     # plot tells if message is send as topic for plotData or plotMultipleData
@@ -41,6 +43,9 @@ def plot_monitoring(msg):
 
 
 def plot_model_application(msg):
+    """
+    localhost:8003/plotData/
+    """
 
     msgdata = new_c.decode_avro_msg(msg)
     new_data_point = {
@@ -62,7 +67,10 @@ def plot_model_application(msg):
 
 
 def plot_data_multi(msg):
-    # print("in plot_data_multi")
+    """
+    localhost:8003/plotMultipleData/
+    """
+
     msgdata = new_c.decode_avro_msg(msg)
     splitData = msgdata["algorithm"].split("(")
 

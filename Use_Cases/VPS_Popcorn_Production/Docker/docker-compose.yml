@@ -48,7 +48,6 @@ services:
     build:
       context: ./src
       dockerfile: Dockerfile_1_PC_Model_Learning
-    restart: always
     environment: 
       config_path: ./configurations/config.yml
       config_section: General, 1_pc_model_learning_kriging
