@@ -22,6 +22,6 @@ for msg in new_c.consumer:
                   new_user['followers_count'], new_user['friends_count'], new_user['verified'])
 
     try:
-        new_c.cur.execute(sql, row_values)
+        new_c.execute_statement(sql, row_values)
     except Exception as e:
         print(f"Exception: {e}")
