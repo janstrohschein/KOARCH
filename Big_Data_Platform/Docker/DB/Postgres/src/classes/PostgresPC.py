@@ -24,5 +24,8 @@ class PostgresPC(KafkaPC):
         self.conn.autocommit = True
         self.cur = self.conn.cursor()
 
-    def execute_statement(self, sql_statement, values):
-        self.cur.execute(sql_statement, values)
+    def execute_statement(self, sql_statement, values=None):
+        if values is None:
+            self.cur.execute(sql_statement)
+        else:
+            self.cur.execute(sql_statement, values)
