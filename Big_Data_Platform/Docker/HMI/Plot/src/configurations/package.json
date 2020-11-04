@@ -1,0 +1,19 @@
+{
+  "name": "plotserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "L4_plotServer.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "kafka-node": "^5.0.0",
+    "avsc": "^5.4.22",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node L4_plotServer.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -4,16 +4,13 @@ Optimization:
       algorithms:
         Random Forest:
           parameter: 
-            config_path: ./configurations/config.yml
-            config_section: General, 1p_count_up
-            # n_estimators:  
-            #   type: int
-            #   default: 3
-            #   min: 1
-            #   max: 100
+            n_estimators:  
+              type: int
+              default: 3
+              min: 1
+              max: 100
           metadata: 
             Class: Surrogate
-            Image: koarch/1p-count-up:latest
             RAM usage initial: -1
             RAM usage slope: -1
             CPU usage initial: -1
@@ -24,17 +21,14 @@ Optimization:
           input: preprocessed data
         Kriging:
           parameter: 
-            config_path: ./configurations/config.yml
-            config_section: General, 1p_multiples
-            # kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
-            # n_restarts_optimizer:
-            #   type: int
-            #   default: 5
-            #   min: 0
-            #   max: 15
+            kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
+            n_restarts_optimizer:
+              type: int
+              default: 5
+              min: 0
+              max: 15
           metadata: 
             Class: Surrogate
-            Image: koarch/1p-multiples:latest
             RAM usage initial: -1
             RAM usage slope: -1
             CPU usage initial: -1
@@ -46,11 +40,8 @@ Optimization:
       preprocessed data:
         handleMissingValues:
           parameter: 
-            config_path: ./configurations/config.yml
-            config_section: General, 2c_print
           metadata: 
             Class: MissingValueHandling
-            Image: koarch/2c-print:latest
             RAM usage initial: -1
             RAM usage slope: -1
             CPU usage initial: -1
