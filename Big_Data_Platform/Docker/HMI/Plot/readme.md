@@ -24,8 +24,8 @@ The example consists of 3 modules:
   The plot server can be accessed via the browser at:\
   `localhost:8003/plotData`
 
-The results are shown in the figure below:
-<img src="./docs/szenario1_monitoring_data.png" width="400px">
+The results are shown in the figure below:\
+<img src="./docs/szenario1_monitoring_data.png" width="800px">
 
 The configuration can be done via the `config.yml` and additional transformations of the data within the reporting module `L1_C_Reporting`.
 Currently the `config.yml` specifies the outgoing/incoming topic and schema for the monitoring data (line 7 + 13).
@@ -37,20 +37,20 @@ Please open `config.yml` and remove the comments from the lines 8, 9, 14, 15, 21
 The containers need to be restarted, as shown in the section at the bottom, for the changes to come into effect.
 
 The results are presented in the figures below. 
-The first figure shows that the web interface adds new tabs for the additional data sources.
-<img src="./docs/szenario2_model_application_data.png" width="400px">
+The first figure shows that the web interface adds new tabs for the additional data sources.\
+<img src="./docs/szenario2_model_application_data.png" width="800px">
 
 The second figure displays the first multi-plot.
-The plot shows the x-values that have been chosen for each production cycle, but it also groups the data based on another field. 
-<img src="./docs/szenario2_model_evaluation_data_multi.png" width="400px">
+The plot shows the x-values that have been chosen for each production cycle, but it also groups the data based on another field.\
+<img src="./docs/szenario2_model_evaluation_data_multi.png" width="800px">
 
 ## Szenario 3
 The plotting of the model application data from szenario 2, as shown in the first figure of that szenario, can be enhanced by switching the plot to a multi-plot. 
 To achieve this please open the `config.yml` file again and add a comment to line 22 and remove the comment from line 23.
 The containers need to be restarted, as shown in the section at the bottom, for the changes to come into effect.
 
-The results are shown in the figure below:
-<img src="./docs/szenario3_model_application_data_multi.png" width="400px">
+The results are shown in the figure below:\
+<img src="./docs/szenario3_model_application_data_multi.png" width="800px">
 
 The multi-plot, as defined in the `L1_C_Reporting` module, now shows the CPU resource usage and groups the results based on the algorithm in use.
 
