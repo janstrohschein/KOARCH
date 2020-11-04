@@ -24,7 +24,7 @@ The example consists of 3 modules:
   The plot server can be accessed via the browser at:\
   `localhost:8003/plotData`
 
-The results are shown in the figure below:\
+The results are shown in the figure below:
 
 <img src="./docs/szenario1_monitoring_data.png">
 
@@ -38,12 +38,12 @@ Please open `config.yml` and remove the comments from the lines 8, 9, 14, 15, 21
 The containers need to be restarted, as shown in the section at the bottom, for the changes to come into effect.
 
 The results are presented in the figures below. 
-The first figure shows that the web interface adds new tabs for the additional data sources.\
+The first figure shows that the web interface adds new tabs for the additional data sources.
 
 <img src="./docs/szenario2_model_application_data.png">
 
 The second figure displays the first multi-plot.
-The plot shows the x-values that have been chosen for each production cycle, but it also groups the data based on another field.\
+The plot shows the x-values that have been chosen for each production cycle, but it also groups the data based on another field.
 
 <img src="./docs/szenario2_model_evaluation_data_multi.png">
 
@@ -52,7 +52,7 @@ The plotting of the model application data from szenario 2, as shown in the firs
 To achieve this please open the `config.yml` file again and add a comment to line 22 and remove the comment from line 23.
 The containers need to be restarted, as shown in the section at the bottom, for the changes to come into effect.
 
-The results are shown in the figure below:\
+The results are shown in the figure below:
 
 <img src="./docs/szenario3_model_application_data_multi.png">
 
