@@ -12,7 +12,7 @@ Now you can launch the Kafka broker with the following command:\
 # Example
 The example sends and plots data that was previously captured from the reporting module. Additional functionality will be shown in the following steps. 
 
-## Szenario 1
+## Scenario 1
 The example consists of 3 modules:
 - L0_P_Send_Data \
   Produces simple messages and publishes those to seperate topics via Kafka. Currently sends only monitoring data, but will be extended during the example.
@@ -22,7 +22,7 @@ The example consists of 3 modules:
   Retrieves the messages from the plot topic and creates the plots.
   Currently there is only a single variable plot for the monitoring data. 
   The plot server can be accessed via the browser at:\
-  `localhost:8003/plotData`
+  `localhost:8003/plotData/`
 
 The results are shown in the figure below:
 
@@ -33,11 +33,14 @@ Currently the `config.yml` specifies the outgoing/incoming topic and schema for 
 Line 20 specifies which function processes the incoming monitoring data.
 The associated function in `L1_C_Reporting` decodes the incoming messages, transforms the data into the schema that the plotting module expects, and sends the data to the Kafka topic.
 
-## Szenario 2
+## Scenario 2
 Please open `config.yml` and remove the comments from the lines 8, 9, 14, 15, 21 and 22. 
 The containers need to be restarted, as shown in the section at the bottom, for the changes to come into effect.
 
-The results are presented in the figures below. 
+The results are presented in the figures below and can be accessed via the browser at:\
+`localhost:8003/plotData/` and\
+`localhost:8003/plotMultipleData/`
+ 
 The first figure shows that the web interface adds new tabs for the additional data sources.
 
 <img src="./docs/szenario2_model_application_data.png">
@@ -47,12 +50,13 @@ The plot shows the x-values that have been chosen for each production cycle, but
 
 <img src="./docs/szenario2_model_evaluation_data_multi.png">
 
-## Szenario 3
+## Scenario 3
 The plotting of the model application data from szenario 2, as shown in the first figure of that szenario, can be enhanced by switching the plot to a multi-plot. 
 To achieve this please open the `config.yml` file again and add a comment to line 22 and remove the comment from line 23.
 The containers need to be restarted, as shown in the section at the bottom, for the changes to come into effect.
 
-The results are shown in the figure below:
+The results are shown in the figure below and can be accessed via the browser at:\
+`localhost:8003/plotMultipleData/`
 
 <img src="./docs/szenario3_model_application_data_multi.png">
 
