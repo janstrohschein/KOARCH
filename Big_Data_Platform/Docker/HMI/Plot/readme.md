@@ -46,12 +46,12 @@ The first figure shows that the web interface adds new tabs for the additional d
 <img src="./docs/szenario2_model_application_data.png">
 
 The second figure displays the first multi-plot.
-The plot shows the x-values that have been chosen for each production cycle, but it also groups the data based on another field.
+The plot shows the x-values that have been chosen for each production cycle on the y-axis and groups the data based on the algorithm.
 
 <img src="./docs/szenario2_model_evaluation_data_multi.png">
 
 ## Scenario 3
-The plotting of the model application data from szenario 2, as shown in the first figure of that szenario, can be enhanced by switching the plot to a multi-plot. 
+The plotting of the model application data, as shown in the first figure of scenario 2, can be enhanced by switching the plot to a multi-plot. 
 To achieve this please open the `config.yml` file again and add a comment to line 22 and remove the comment from line 23.
 The containers need to be restarted, as shown in the section at the bottom, for the changes to come into effect.
 
