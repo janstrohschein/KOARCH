@@ -55,7 +55,7 @@ The plot module expects messages from `L1_C_Reporting` to be encoded with the sc
 + "y" contains all the data that should be plotted. Each entry will create another tab with a new plot. It also needs to contain the data for the multi-filter, if the plot is a multi-plot.
 
 
-Please start the Example Containers with:\
+Please start the Example Containers in another terminal window with:\
 `docker-compose up`
 
 This starts the three modules, sends the example data, collects it in the reporting module and forwards the incoming data to the plot server. 
