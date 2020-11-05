@@ -27,7 +27,7 @@ dynamicNav = ""
 
 for source in userData:
     for dataRowName in userData[source][0]["y"]:
-        if dataRowName == userData[source][0]["multiplefilter"]:
+        if dataRowName == userData[source][0]["multi_filter"]:
             continue
         dynamicNav += '<li id="navElement-{}-{}" class="navElement"'.format(
             source, dataRowName
@@ -112,19 +112,19 @@ def createLayout(x_axisTitle, y_axisTitle):
 # plot one User
 def plotData(userData):
     firstDataPoint = userData[userData.keys()[0]][0]
-    isSingleData = firstDataPoint["multiplefilter"] is None
+    isSingleData = firstDataPoint["multi_filter"] is None
 
     for source in userData:
         filterSet = set()
 
         if not isSingleData:
             for dataPoint in userData[source]:
-                filterSet.add(dataPoint["y"][dataPoint["multiplefilter"]])
+                filterSet.add(dataPoint["y"][dataPoint["multi_filter"]])
         else:
             filterSet.add("")
 
         for dataRowName in userData[source][0]["y"]:
-            if dataRowName == userData[source][0]["multiplefilter"]:
+            if dataRowName == userData[source][0]["multi_filter"]:
                 continue
 
             # create layout with given titles
@@ -140,7 +140,7 @@ def plotData(userData):
                 for dataPoint in userData[source]:
                     if (
                         isSingleData
-                        or dataPoint["y"][dataPoint["multiplefilter"]] == traceName
+                        or dataPoint["y"][dataPoint["multi_filter"]] == traceName
                     ):
                         id = dataPoint["x_data"]
                         if isinstance(id, str):
@@ -199,7 +199,7 @@ firstDataPoint = userData[userData.keys()[0]][0]
 
 plotData(userData)
 
-if firstDataPoint["y"].keys()[0] == firstDataPoint["multiplefilter"]:
+if firstDataPoint["y"].keys()[0] == firstDataPoint["multi_filter"]:
     firstLabelIndex = 1
 else:
     firstLabelIndex = 0

@@ -24,6 +24,42 @@ The example consists of 3 modules:
   The plot server can be accessed via the browser at:\
   `localhost:8003/plotData/`
 
+
+The plot module expects messages from `L1_C_Reporting` to be encoded with the schema `./schema/plot.avsc`, which is shown below:
+```
+{"type": "record",
+ "name": "Plot",
+ "fields": [
+    {"name": "plot", "type": {
+       "type": "enum", "name": "plottypes", "symbols": ["single", "multi"]
+       }
+      },
+    {"name": "multi_filter", "type": ["null", "string"]},
+    {"name": "source", "type": ["string"]},
+    {"name": "x_label", "type": ["string"]},
+    {"name": "x_data", "type": ["int", "string"]},
+    {"name": "x_int_to_date", "type": "boolean"},
+    {"name": "y", "type": { 
+            "type": "map",
+            "values": ["float", "string"]
+         } 
+      } 
+    ]
+}
+```
+
++ "plot" is defined as an "enum", with the available values "single" or "multi", which specifies if a single variable is shown, or if data is grouped by another variable.
++ "multi_filter" signifies the variable to group a multi-plot and is not defined for a single plot.
++ "source" is the name of the datasource. Will be used as prefix for the tabs in the web interface.
++ "x_label" specifies the label for the x-axis.
++ "x_data" assigns the variable that should be displayed on the x-axis. Can be an integer value, e.g., an id, or a string, e.g., a timestamp.
++ "x_int_to_date", set this to True if "x_data" is an integer representation of a timestamp to automatically convert the input. Otherwise false.
++ "y" contains all the data that should be plotted. Each entry will create another tab with a new plot. It also needs to contain the data for the multi-filter, if the plot is a multi-plot.
+
+
+
+
+
 The results are shown in the figure below:
 
 <img src="./docs/szenario1_monitoring_data.png">

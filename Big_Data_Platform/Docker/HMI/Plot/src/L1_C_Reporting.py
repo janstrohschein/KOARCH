@@ -41,9 +41,9 @@ def plot_model_evaluation_multi(msg):
     # y - yaxis-Data
     new_data_point = {
         "plot": "multi",
-        "multiplefilter": "algorithm",
-        "x_label": "id",
+        "multi_filter": "algorithm",
         "source": "model_evaluation",
+        "x_label": "id",
         "x_data": msgdata["id"],
         "x_int_to_date": False,
         "y": {"new_x": msgdata["new_x"], "algorithm": splitData[0]},
@@ -85,7 +85,7 @@ def plot_model_application_multi(msg):
 
     new_data_point = {
         "plot": "multi",
-        "multiplefilter": "model_name",
+        "multi_filter": "model_name",
         "source": "model_application",
         "x_label": "id",
         "x_data": msgdata["id"],

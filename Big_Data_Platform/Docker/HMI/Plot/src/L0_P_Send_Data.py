@@ -25,4 +25,4 @@ for topic, rows in data.items():
         for row in rows:
             print(row)
             new_pc.send_msg(row, topic=topic)
-            sleep(0.5)
+            sleep(1)
