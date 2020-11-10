@@ -1,19 +1,27 @@
-import os
 import time
 
-from classes.CKafkaPC import KafkaPC
+from confluent_kafka import Producer
+from confluent_kafka.serialization import StringSerializer, SerializationContext, MessageField
 
 print("start 1p_multiples")
 
-env_vars = {'config_path': os.getenv('config_path'),
-            'config_section': os.getenv('config_section')}
+broker = 'kafka:9093'
+topic = 'multiples'
+conf = {'bootstrap.servers': broker}
 
-new_p = KafkaPC(**env_vars)
+p = Producer(**conf)
+s = StringSerializer()
 print("created KafkaPC")
 
+ctx = SerializationContext(topic, MessageField.VALUE)
 for i in range(10):
 
-    message = {"multiple": i*i}
-    new_p.send_msg(message)
+    # casts int to string for StringSerializer/StringDeserializer
+    message = s(str(i*i), ctx)
+
+    # DeprecationWarning will be resolved in upcoming release
+    # https://github.com/confluentinc/confluent-kafka-python/issues/763
+    p.produce(topic, message)
+
     print(f"Sent message {i*i}")
     time.sleep(1)

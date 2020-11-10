@@ -44,14 +44,19 @@ Open two additional terminals and execute the commands below to send and receive
 `docker-compose -f docker-compose_1p.yml up`\
 `docker-compose -f docker-compose_2c_print.yml up`
 
-You should see the first two programs counting up or multiplying and sending those numbers to the broker.
-The third program receives the numbers from the broker and prints them.
+You should see the first two programs, started through `docker-compose_1p.yml`, counting up or multiplying and sending those numbers to the broker.
+However, `1p_multiples.py` does not use the `CKafkaPC.py` class and produces schema-less data, to represent legacy sources.
+The third program, started via `docker-compose_2c_print.yml`, receives the numbers from the broker and prints them.
+The output from `1p_count_up.py` is a key-value pair, as defined in the schema.
+The output from `1p_multiples.py` is the raw value.
+Even though the data from legacy sources can be received without a schema, it is not possible to use a producer to send the data without a schema to the broker.
+This enforces the use of schemas for well-defined interfaces.
 The publishing program then exits with code 0, because it successfully sent all its messages.
 The receiving program waits for further messages until the time-out is reached.
-You can stop the second program and the Kafka Container with `Ctrl-C`.
-After the containers stopped you can execute the following command to remove the containers:
-`docker-compose -f docker-compose_1p.yml down`
-`docker-compose -f docker-compose_2c_print.yml down`
+You can stop the receiving program and the Kafka Container with `Ctrl-C`.
+After the containers stopped you can execute the following command to remove the containers:\
+`docker-compose -f docker-compose_1p.yml down`\
+`docker-compose -f docker-compose_2c_print.yml down`\
 `docker-compose -f docker-compose_kafka.yml down`
 
 A lot of things happened in the background to make this work:

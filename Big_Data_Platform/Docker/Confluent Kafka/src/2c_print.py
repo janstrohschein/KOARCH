@@ -21,7 +21,7 @@ try:
             print(f"Error occured: {str(msg.error())}")
 
         else:
-            new_message = new_c.decode_avro_msg(msg)
+            new_message = new_c.decode_msg(msg)
             print(f"Received on topic '{msg.topic()}': {new_message}")
 
 except KeyboardInterrupt:

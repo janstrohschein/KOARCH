@@ -15,9 +15,6 @@ services:
     build:
       context: ./src
       dockerfile: Dockerfile_1p_multiples
-    environment:
-      config_path: ./configurations/config.yml
-      config_section: General, 1p_multiples
       
 networks:
   default:
