@@ -45,6 +45,11 @@ Open two additional terminals and execute the commands below to send and receive
 `docker-compose -f docker-compose_2c_print.yml up`
 
 You should see the first two programs, started through `docker-compose_1p.yml`, counting up or multiplying and sending those numbers to the broker.
+The first program `1p_count_up.py` uses the schema `./schema/count.avsc` and registers the schema for the topic in the Schema Registry.
+The Registry API provides several routes to access the schema information:
+- Subject overview (subject = topic + '-value'): `http://localhost:8081/subjects/`
+- Subject details: `http://localhost:8081/subjects/count-value/versions/1`
+
 However, `1p_multiples.py` does not use the `CKafkaPC.py` class and produces schema-less data, to represent legacy sources.
 The third program, started via `docker-compose_2c_print.yml`, receives the numbers from the broker and prints them.
 The output from `1p_count_up.py` is a key-value pair, as defined in the schema.
