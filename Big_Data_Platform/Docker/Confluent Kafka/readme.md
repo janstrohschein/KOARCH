@@ -51,7 +51,7 @@ The Registry API provides several routes to access the schema information:
 - Subject details: `http://localhost:8081/subjects/count-value/versions/1`
 
 However, `1p_multiples.py` does not use the `CKafkaPC.py` class and produces schema-less data, to represent legacy sources.
-The third program, started via `docker-compose_2c_print.yml`, receives the numbers from the broker and prints them.
+The third program, started via `docker-compose_2c_print.yml`, receives the messages from the broker and prints them.
 The output from `1p_count_up.py` is a key-value pair, as defined in the schema.
 The output from `1p_multiples.py` is the raw value.
 Even though the data from legacy sources can be received without a schema, it is not possible to use a producer to send the data without a schema to the broker.
