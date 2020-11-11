@@ -67,7 +67,6 @@ def plot_model_application(msg):
         "x_data": msgdata["id"],
         "x_int_to_date": False,
         "y": {
-            "model_name": msgdata["model_name"],
             "pred_y": msgdata["pred_y"],
             "rmse": msgdata["rmse"],
             "CPU_ms": msgdata["CPU_ms"],
