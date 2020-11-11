@@ -1,7 +1,7 @@
 import os
 import time
 
-from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
 
 print("start 1p_count_up")
 

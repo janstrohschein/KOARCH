@@ -1,6 +1,7 @@
 General:
   KAFKA_BROKER_URL: kafka:9093
   KAFKA_CONSUMER_TIMEOUT_MS: 120000
+  KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
 
 1_p_count:
   OUT_TOPIC:
@@ -12,8 +13,8 @@ General:
   
 2_c_reporting:
   IN_TOPIC:
-    AB_counts: ./schema/count.avsc
-    AB_double_counts: ./schema/count.avsc
+    - AB_counts
+    - AB_double_counts
   IN_GROUP: reporting
   API_OUT:
     AB_counts: forward_topic 
