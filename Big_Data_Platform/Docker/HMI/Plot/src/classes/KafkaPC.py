@@ -3,6 +3,7 @@ import io
 import yaml
 
 from kafka import KafkaProducer, KafkaConsumer
+
 # from kafka.structs import OffsetAndMetadata, TopicPartition
 from avro.io import BinaryEncoder, DatumWriter
 import avro.schema
@@ -60,7 +61,7 @@ class KafkaPC:
             self.consumer = KafkaConsumer(
                 group_id=self.config["IN_GROUP"],
                 bootstrap_servers=[self.config["KAFKA_BROKER_URL"]],
-                auto_offset_reset='earliest'
+                auto_offset_reset="earliest",
             )
             self.consumer.subscribe(self.in_topic)
 
@@ -127,4 +128,3 @@ class KafkaPC:
                 self.producer.send(out_topic, raw_bytes, partition=key)
             except Exception as e:
                 print(f"Error sending data to Kafka: {repr(e)}")
-
