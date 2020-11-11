@@ -41,6 +41,7 @@ try:
 
             try:
                 new_c.execute_statement(sql, row_values)
+                print("Persisted user to DB")
             except Exception as e:
                 print(f"Exception: {e}")
 
