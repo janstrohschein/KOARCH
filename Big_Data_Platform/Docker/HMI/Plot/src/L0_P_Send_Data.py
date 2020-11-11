@@ -1,7 +1,7 @@
 import json
 import os
 from time import sleep
-from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
 
 
 def load_data(file):
