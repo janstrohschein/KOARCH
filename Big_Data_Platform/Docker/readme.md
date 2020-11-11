@@ -54,7 +54,6 @@ Building Block
   | something.py
   | Dockerfile_something
 | docker-compose.yml
-| docker-compose_kafka.yml
 | readme.md
 ```
 
@@ -77,7 +76,7 @@ The Dockerfile copies the file into the container and installs the packages duri
 The modules use indirect communication with a messaging approach.
 All messages are send via Kafka and verified with the related Avro schema, which is stored in an `.avsc` file.
 Each module specifies its input- and output-topics and the associated schemas in the `config.yml`.
-## |- docker-compose files
+## | docker-compose files
 Several services are combined into a docker-compose file, which allows to manage all services together.
 Each service entry consists of:
 - the container and host name.
@@ -88,5 +87,5 @@ Each service entry consists of:
 
 Furthermore it is also possible to define a common network for all containers and to specify how Docker volumes should be used. 
 
-## |- readme
+## | readme
 The `readme.md` explains the module/use case and gives usage instructions. 
