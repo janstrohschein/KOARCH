@@ -2,7 +2,7 @@ import os
 import time
 from dataclasses import dataclass
 
-from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
 
 
 @dataclass

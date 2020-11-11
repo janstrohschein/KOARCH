@@ -1,6 +1,7 @@
 General:
   KAFKA_BROKER_URL: kafka:9093
   KAFKA_CONSUMER_TIMEOUT_MS: 120000
+  KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
 
 0p_send_users:
   OUT_TOPIC:
@@ -8,7 +9,7 @@ General:
 
 1c_persist_to_postgres:
   IN_TOPIC:
-    DB_raw_data: ./schema/users.avsc
+    - DB_raw_data
   IN_GROUP: 'persist_to_postgres'
   POSTGRES:
     host: 1c_postgres_db

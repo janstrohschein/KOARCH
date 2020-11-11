@@ -1,6 +1,6 @@
 import psycopg2
 
-from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
 
 
 class PostgresPC(KafkaPC):
