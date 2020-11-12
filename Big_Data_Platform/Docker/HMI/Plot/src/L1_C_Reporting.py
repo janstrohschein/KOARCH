@@ -1,4 +1,6 @@
 import os
+from time import sleep
+
 from classes.CKafkaPC import KafkaPC
 
 
@@ -110,6 +112,7 @@ env_vars = {
 new_c = KafkaPC(**env_vars)
 
 plot_dict = new_c.config["PLOT_TOPIC"]
+sleep(2)
 try:
     while True:
         msg = new_c.consumer.poll(0.1)
@@ -129,7 +132,7 @@ try:
                 print(
                     f"Processing Topic: {msg.topic()} with Function: {plot_dict[msg.topic()]}\n Error: {e}"
                 )
-            
+
 
 except KeyboardInterrupt:
     pass
