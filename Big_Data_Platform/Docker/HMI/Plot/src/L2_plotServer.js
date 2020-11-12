@@ -45,7 +45,7 @@ consumer.on('message', function (message) {
 		delete decodedMessage.x_int_to_date;
 		delete decodedMessage.plot;
 
-		if (decodedMessage.multiplefilter != null) {
+		if (decodedMessage.multi_filter != null) {
 			if (!(decodedMessage.source in dataMultiple)) {
 				dataMultiple[decodedMessage.source] = [];
 			}
