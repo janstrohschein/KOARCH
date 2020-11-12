@@ -109,8 +109,6 @@ env_vars = {
     "config_section": os.getenv("config_section"),
 }
 
-sleep(5)
-
 new_c = KafkaPC(**env_vars)
 
 plot_dict = new_c.config["PLOT_TOPIC"]

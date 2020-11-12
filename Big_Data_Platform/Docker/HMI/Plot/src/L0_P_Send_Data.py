@@ -21,7 +21,7 @@ for topic, rows in data.items():
     if topic not in new_pc.out_topic:
         continue
     else:
-        print(f"Topic: {topic}")
+        print(f"Send data for topic: {topic}")
         for row in rows:
             print(row)
             new_pc.send_msg(row, topic=topic)

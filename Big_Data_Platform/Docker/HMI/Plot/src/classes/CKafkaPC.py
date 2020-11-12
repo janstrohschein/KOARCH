@@ -1,5 +1,6 @@
 import sys
 import yaml
+from time import sleep
 
 from confluent_kafka import Producer, Consumer
 from confluent_kafka.admin import AdminClient, NewTopic
@@ -36,28 +37,60 @@ class KafkaPC:
         self.create_producer()
 
     def connect_schema_registry(self):
+        MAX_RETRIES = 3
 
         if self.config.get("KAFKA_SCHEMA_REGISTRY_URL") is not None:
             sr_conf = {"url": self.config["KAFKA_SCHEMA_REGISTRY_URL"]}
-            self.schema_registry = SchemaRegistryClient(sr_conf)
+
+            retries = 0
+            while retries < MAX_RETRIES:
+                try:
+                    self.schema_registry = SchemaRegistryClient(sr_conf)
+                    print("Connected to Schema Registry")
+                    break
+                except Exception as e:
+                    retries += 1
+                    print(f"Could not connect to Schema Registry, retry {retries}")
+                    print({repr(e)})
+                    sleep(5)
+            if retries == MAX_RETRIES:
+                raise ConnectionError("Could not connect to Schema Registry")
         else:
             raise ValueError("Need KAFKA_SCHEMA_REGISTRY_URL")
 
     def register_schemas_in_registry(self, suffix="-value"):
+        MAX_RETRIES = 3
 
         for topic, schema in self.out_schema.items():
             subject = topic + suffix
-            try:
-                self.schema_registry.register_schema(subject_name=subject, schema=schema)
-                print(f"Registered schema for topic {topic} in registry")
-            except Exception as e:
-                print(f"Could not register schema for topic {topic} in registry: {repr(e)}")
+            retries = 0
+            while retries < MAX_RETRIES:
+                try:
+                    self.schema_registry.register_schema(
+                        subject_name=subject, schema=schema
+                    )
+                    print(f"Registered schema for topic {topic} in registry")
+                    break
+                except Exception as e:
+                    retries += 1
+                    print(f"Could not register schema for topic {topic} in registry: {repr(e)}")
+                    sleep(5)
+            if retries == MAX_RETRIES:
+                raise ConnectionError("Could not connect to Schema Registry")
 
-    def create_topics_on_broker(self):
-        a = AdminClient({'bootstrap.servers': self.config["KAFKA_BROKER_URL"]})
-        new_topics = [NewTopic(topic, num_partitions=1, replication_factor=1) for topic in self.out_topic]
-        # Call create_topics to asynchronously create topics, a dict
-        # of <topic,future> is returned.
+    def create_topics_on_broker(self, partitions=1, replication=1):
+        a = AdminClient({"bootstrap.servers": self.config["KAFKA_BROKER_URL"]})
+
+        topic_set = set(self.out_topic)
+
+        md = a.list_topics(timeout=10)
+        broker_set = set(md.topics.values())
+        diff_set = topic_set.difference(broker_set)
+        new_topics = [
+            NewTopic(topic, num_partitions=partitions, replication_factor=replication)
+            for topic in diff_set
+        ]
+
         fs = a.create_topics(new_topics)
 
         # Wait for operation to finish.
@@ -67,17 +100,26 @@ class KafkaPC:
         for topic, f in fs.items():
             try:
                 f.result()  # The result itself is None
-                print(f"Topic {topic} created on Kafka broker")
+                print(f"Topic {topic} created on Broker")
             except Exception as e:
-                print(f"Failed to create topic {topic}: {repr(e)}")
+                print(f"Failed to create topic {topic} on Broker: {repr(e)}")
 
     def get_schema_from_registry(self, topic, suffix="-value"):
         response = None
-        try:
-            schema = self.schema_registry.get_latest_version(topic + suffix)
-            response = schema.schema
-        except Exception as e:
-            print(f"Exception: {repr(e)}")
+
+        MAX_RETRIES = 3
+        retries = 0
+        while retries < MAX_RETRIES:
+
+            try:
+                schema = self.schema_registry.get_latest_version(topic + suffix)
+                response = schema.schema
+                print(f"Retrieved schema for topic {topic} from Registry")
+                break
+            except Exception as e:
+                retries += 1
+                print(f"Failed to get schema: {repr(e)}")
+                sleep(3)
         return response
 
     def read_topics(self):
@@ -173,7 +215,7 @@ class KafkaPC:
             return value
         except Exception as e:
             print(f"Error decoding avro data: {repr(e)}")
-            sys.exit()
+            # sys.exit()
 
     def send_msg(self, message, partition=0, topic=None):
 
