@@ -108,11 +108,12 @@ env_vars = {
     "config_path": os.getenv("config_path"),
     "config_section": os.getenv("config_section"),
 }
+sleep(15)
 
 new_c = KafkaPC(**env_vars)
 
 plot_dict = new_c.config["PLOT_TOPIC"]
-sleep(2)
+
 try:
     while True:
         msg = new_c.consumer.poll(0.1)

@@ -5,16 +5,13 @@ var myParser = require('body-parser');
 var avro = require('avsc');
 
 const {spawn} = require('child_process');
-const fs = require('fs');
-const { decode } = require('punycode');
+const avroSchemaRegistry = require('avro-schema-registry');
 
-const importedSchema = fs.readFileSync('./schema/plot.avsc', 'utf8');
-
+const schemaRegistry = 'http://schema-registry:8081';
+const registry = avroSchemaRegistry(schemaRegistry);
 
 var data = {};
 var dataMultiple = {};
-
-const type = avro.Type.forSchema(JSON.parse(importedSchema));
 
 var kafka = require('kafka-node'),
 
@@ -38,32 +35,33 @@ consumer.on('error', function (err) {
 
 consumer.on('message', function (message) {
 	console.log("Message received");
-	var decodedMessage = type.fromBuffer(message.value);
+	registry.decode(message.value).then((decodedMessage) => {
 
-	if (decodedMessage.x_int_to_date) {
-		var temp = new Date(decodedMessage.x_data * 1000);
-		decodedMessage.x_data = temp.toISOString().split('T')[0] + ' ' + temp.toTimeString().split(' ')[0];
-	}
-
-	delete decodedMessage.x_int_to_date;
-	delete decodedMessage.plot;
-
-	if (decodedMessage.multiplefilter != null) {
-		if (!(decodedMessage.source in dataMultiple)) {
-			dataMultiple[decodedMessage.source] = [];
+		if (decodedMessage.x_int_to_date) {
+			var temp = new Date(decodedMessage.x_data * 1000);
+			decodedMessage.x_data = temp.toISOString().split('T')[0] + ' ' + temp.toTimeString().split(' ')[0];
 		}
-		dataMultiple[decodedMessage.source].push(decodedMessage);
-	}
-	else {
-		if (!(decodedMessage.source in data)) {
-			data[decodedMessage.source] = [];
+
+		delete decodedMessage.x_int_to_date;
+		delete decodedMessage.plot;
+
+		if (decodedMessage.multiplefilter != null) {
+			if (!(decodedMessage.source in dataMultiple)) {
+				dataMultiple[decodedMessage.source] = [];
+			}
+			dataMultiple[decodedMessage.source].push(decodedMessage);
 		}
-		data[decodedMessage.source].push(decodedMessage);
-	}
+		else {
+			if (!(decodedMessage.source in data)) {
+				data[decodedMessage.source] = [];
+			}
+			data[decodedMessage.source].push(decodedMessage);
+		}
 
-	delete decodedMessage.source;
+		delete decodedMessage.source;
 
-	io.emit("refresh");
+		io.emit("refresh");
+	})
 });
 
 app.use(myParser.urlencoded({extended: true}));
