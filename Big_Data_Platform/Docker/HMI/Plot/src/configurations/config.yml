@@ -6,21 +6,21 @@ General:
 0_p_send_data:
   OUT_TOPIC:
     AB_monitoring: ./schema/monitoring.avsc
-    #AB_model_evaluation: ./schema/new_x.avsc
-    #AB_model_application: ./schema/model_appl.avsc
+    AB_model_evaluation: ./schema/new_x.avsc
+    AB_model_application: ./schema/model_appl.avsc
 
 1_c_reporting:
   IN_TOPIC:
     - AB_monitoring
-    # -AB_model_evaluation
-    # -AB_model_application
+    - AB_model_evaluation
+    - AB_model_application
   IN_GROUP: reporting
   OUT_TOPIC:
     AB_plot_data: ./schema/plot.avsc
   PLOT_TOPIC:
     AB_monitoring: plot_monitoring
-    #AB_model_evaluation: plot_model_evaluation_multi
-    #AB_model_application: plot_model_application
+    AB_model_evaluation: plot_model_evaluation_multi
+    AB_model_application: plot_model_application
     #AB_model_application: plot_model_application_multi
 
 2_c_plot_data:
