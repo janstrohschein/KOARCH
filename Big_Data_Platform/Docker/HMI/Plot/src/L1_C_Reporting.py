@@ -1,5 +1,6 @@
 import os
 from time import sleep
+
 from classes.CKafkaPC import KafkaPC
 
 
@@ -132,7 +133,7 @@ try:
                 print(
                     f"Processing Topic: {msg.topic()} with Function: {plot_dict[msg.topic()]}\n Error: {e}"
                 )
-            
+
 
 except KeyboardInterrupt:
     pass
