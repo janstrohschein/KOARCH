@@ -2,6 +2,7 @@ import sys
 import yaml
 
 from confluent_kafka import Producer, Consumer
+from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka.serialization import (
     SerializationContext,
     MessageField,
@@ -27,6 +28,8 @@ class KafkaPC:
         self.read_config(config_path, config_section)
         self.connect_schema_registry()
         self.read_topics()
+        self.create_topics_on_broker()
+        self.register_schemas_in_registry()
         self.create_serializer()
         self.create_deserializer()
         self.create_consumer()
@@ -39,6 +42,34 @@ class KafkaPC:
             self.schema_registry = SchemaRegistryClient(sr_conf)
         else:
             raise ValueError("Need KAFKA_SCHEMA_REGISTRY_URL")
+
+    def register_schemas_in_registry(self, suffix="-value"):
+
+        for topic, schema in self.out_schema.items():
+            subject = topic + suffix
+            try:
+                self.schema_registry.register_schema(subject_name=subject, schema=schema)
+                print(f"Registered schema for topic {topic} in registry")
+            except Exception as e:
+                print(f"Could not register schema for topic {topic} in registry: {repr(e)}")
+
+    def create_topics_on_broker(self):
+        a = AdminClient({'bootstrap.servers': self.config["KAFKA_BROKER_URL"]})
+        new_topics = [NewTopic(topic, num_partitions=1, replication_factor=1) for topic in self.out_topic]
+        # Call create_topics to asynchronously create topics, a dict
+        # of <topic,future> is returned.
+        fs = a.create_topics(new_topics)
+
+        # Wait for operation to finish.
+        # Timeouts are preferably controlled by passing request_timeout=15.0
+        # to the create_topics() call.
+        # All futures will finish at the same time.
+        for topic, f in fs.items():
+            try:
+                f.result()  # The result itself is None
+                print(f"Topic {topic} created on Kafka broker")
+            except Exception as e:
+                print(f"Failed to create topic {topic}: {repr(e)}")
 
     def get_schema_from_registry(self, topic, suffix="-value"):
         response = None
