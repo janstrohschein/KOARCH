@@ -16,7 +16,13 @@ env_vars = {'config_path': os.getenv('config_path'),
 
 new_pc = KafkaPC(**env_vars)
 
-for row in data:
-    print(row)
-    new_pc.send_msg(row)
-    sleep(0.1)
+max_iteration = 5
+iteration = 0
+message_count = 0
+while iteration < max_iteration:
+    iteration += 1
+    for row in data:
+        message_count += 1
+        print(f"Iteration {iteration}, Message {message_count}")
+        new_pc.send_msg(row)
+        sleep(0.02)
