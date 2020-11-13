@@ -1,0 +1,16 @@
+General:
+  KAFKA_BROKER_URL: kafka:9093
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
+  KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+
+0_p_send_data:
+  OUT_TOPIC:
+    # AB_monitoring: ./schema/monitoring.avsc
+    # AB_model_evaluation: ./schema/new_x.avsc
+    # AB_model_application: ./schema/model_appl.avsc
+    AB_plot_data: ./schema/plot.avsc
+
+2_c_plot_data:
+  IN_TOPIC:
+    AB_plot_data: ./schema/plot.avsc
+      

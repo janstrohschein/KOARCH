@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  0_p_send_data:
+    container_name: 0_P_Send_Data
+    build: 
+      context: ./src
+      dockerfile: Dockerfile_0_P_Send_Data
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 0_p_send_data
+
+  2_c_plot_data:
+    container_name: 2_C_Plot_Data
+    build: 
+      context: ./src
+      dockerfile: Dockerfile_2_Plot_Data
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: 2_c_plot_data
+    expose: 
+    - "8000"
+    ports:
+    - "8003:8000"
+
+networks:
+  default:
+    external:
+      name: caai
