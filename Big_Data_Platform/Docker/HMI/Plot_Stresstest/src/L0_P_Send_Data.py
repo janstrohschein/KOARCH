@@ -16,7 +16,7 @@ env_vars = {'config_path': os.getenv('config_path'),
 
 new_pc = KafkaPC(**env_vars)
 
-max_iteration = 5
+max_iteration = 100
 iteration = 0
 message_count = 0
 while iteration < max_iteration:

@@ -2,6 +2,8 @@
 import sys
 import json
 import numbers
+import requests
+
 # Using plotly.express
 import plotly.graph_objects as go
 from datetime import datetime
@@ -10,11 +12,10 @@ from datetime import datetime
 
 try:
     # get data from sys.argv[1] and convert them into python dictionary
-    userData = json.loads(sys.argv[1])
+    userData = json.loads(requests.get(url='http://localhost:8000/' + sys.argv[1]).content)
 except IndexError:
     sys.stderr.write("No data available")
     exit(1)
-
 except json.JSONDecodeError:
     sys.stderr.write("Data is not a JSON-String")
     exit(2)
