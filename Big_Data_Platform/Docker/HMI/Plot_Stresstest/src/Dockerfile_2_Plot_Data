@@ -3,9 +3,10 @@ FROM node:12
 COPY ./configurations/package*.json ./
 RUN npm install
 
+COPY ./configurations/requirements_plot.txt /
 RUN apt-get update
 RUN apt-get install -y python-pip
-RUN pip install plotly==4.10.0
+RUN pip install -r requirements_plot.txt
 
 COPY . /src
 WORKDIR /src

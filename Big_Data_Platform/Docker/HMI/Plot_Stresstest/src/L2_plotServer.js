@@ -70,7 +70,7 @@ app.get('/plotData', (req, res) => {
 	
 	var dataToSend = '';
 	// change the last parameter to name of given xaxis key
-	const python = spawn('python', ['L2_plotData.py', JSON.stringify(data)]);
+	const python = spawn('python', ['L2_plotData.py', 'singleData']);
 	python.stdout.on('data', function(data) {
 		dataToSend += data.toString();
 	});
@@ -89,7 +89,7 @@ app.get('/plotMultipleData', (req, res) => {
 
 	var dataToSend = '';
 	// change 3rd parameter to name of given xaxiskey nad 4th parameter to key of user
-	const python = spawn('python', ['L2_plotData.py', JSON.stringify(dataMultiple)]);
+	const python = spawn('python', ['L2_plotData.py', 'multiData']);
 	python.stdout.on('data', function(data) {
 		dataToSend += data.toString();
 	});
@@ -103,6 +103,21 @@ app.get('/plotMultipleData', (req, res) => {
 		console.log(err.toString());
 	});
 });
+
+app.get('/singleData', (req, res) => {
+
+	res.send(data);
+
+});
+
+app.get('/multiData', (req, res) => {
+
+
+	res.send(dataMultiple);
+
+});
+
+
 
 http.listen(8000);
 
