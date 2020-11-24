@@ -6,9 +6,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "kafka-node": "^5.0.0",
-    "avsc": "^5.4.22",
     "socket.io": "^2.3.0",
-    "avro-schema-registry": "^2.1.2"
+    "avro-schema-registry": "^2.1.2",
+    "avsc": "^5.5.3"
   },
   "devDependencies": {},
   "scripts": {

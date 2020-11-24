@@ -6,3 +6,9 @@ scipy==1.2.2
 scikit-learn==0.22.1
 requests
 pyyaml
+fastapi
+uvicorn
+python-multipart
+aiofiles
+pydash
+plotly==4.10.0
