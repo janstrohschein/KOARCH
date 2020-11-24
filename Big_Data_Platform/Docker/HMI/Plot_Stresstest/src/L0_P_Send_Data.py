@@ -25,4 +25,4 @@ while iteration < max_iteration:
         message_count += 1
         print(f"Iteration {iteration}, Message {message_count}")
         new_pc.send_msg(row)
-        sleep(0.02)
+        sleep(0.1)
