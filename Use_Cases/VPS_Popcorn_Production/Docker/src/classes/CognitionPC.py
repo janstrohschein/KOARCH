@@ -45,7 +45,7 @@ class CognitionPC(KafkaPC):
 
         self.df = pd.DataFrame(columns=df_columns)
         self.current_data_point = 0
-        self.initialize_objective_function()
+        # self.initialize_objective_function()
         self.generate_initial_design()
         self.generate_test_function()
         # maps topics and functions, which process the incoming data
