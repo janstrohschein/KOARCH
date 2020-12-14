@@ -2,7 +2,7 @@
 This section describes extended experiments using data-driven simulations to perform benchmark of optimization algorithms and choose
 promising algorithms to solve the VPS problem.
 
-The R-scripts in this section can be used to reproduce the results of the publication "Cognitive Capabilities for the CAAI in Cyber-Physical Production Systems": [our pre-print](https://arxiv.org/abs/2012.01823).
+The R-scripts in this section can be used to reproduce the results of the publication "Cognitive Capabilities for the CAAI in Cyber-Physical Production Systems", see [our pre-print](https://arxiv.org/abs/2012.01823).
 
 ## main01.R
 This script contains the configuration and runs the experiments.
@@ -16,6 +16,6 @@ The plot script produce the figures presented in the publication as PDF files.
 It takes the result data.frame produced by the main script and stores the PDF figures in the 'result' subdirectory.
 
 See, e.g., cpu, memory, and achieved objective function y:
-![Cpu consumption](results/2020.14.12_cpu.pdf)
-![Memory consumption](results/2020.14.12_mem.pdf)
-![Achieved objective](results/2020.14.12_y.pdf)
+![Cpu consumption](results/2020.12.14_cpu.pdf)
+![Memory consumption](results/2020.12.14_mem.pdf)
+![Achieved objective](results/2020-12-14_y.pdf)
