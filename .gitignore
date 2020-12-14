@@ -10,3 +10,4 @@ __pycache__/
 .ipynb_checkpoints
 .vscode
 .pytest_cache
+Use_Cases/VPS_Popcorn_Production/Kubernetes/experiments/.Rhistory
