@@ -16,6 +16,6 @@ The plot script produce the figures presented in the publication as PDF files.
 It takes the result data.frame produced by the main script and stores the PDF figures in the 'result' subdirectory.
 
 See, e.g., cpu, memory, and achieved objective function y:
-![Cpu consumption](results/2020.12.14_cpu.pdf)
-![Memory consumption](results/2020.12.14_mem.pdf)
-![Achieved objective](results/2020-12-14_y.pdf)
+![Cpu consumption](https://github.com/janstrohschein/KOARCH/blob/master/Use_Cases/VPS_Popcorn_Production/Kubernetes/experiments/results/2020-12-14_cpu.pdf)
+![Memory consumption](https://github.com/janstrohschein/KOARCH/blob/master/Use_Cases/VPS_Popcorn_Production/Kubernetes/experiments/results/2020-12-14_mem.pdf)
+![Achieved objective](https://github.com/janstrohschein/KOARCH/blob/master/Use_Cases/VPS_Popcorn_Production/Kubernetes/experiments/results/2020-12-14_y.pdf)
