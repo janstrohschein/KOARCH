@@ -1,4 +1,4 @@
-
+# Plot module
 # Preparation
 Please install Docker and docker-compose to run the containers.
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).

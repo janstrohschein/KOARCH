@@ -1,4 +1,4 @@
-# VPS Popcorn Production
+# VPS Popcorn Production (Docker)
 We use the versatile production system (VPS), which is located in the SmartFactoryOWL, for evaluation of the cognitive component.
 The VPS is a modular production system, which processes corn to produce popcorn which is used as packaging material.
 Due to its modularity, it can be adapted to the current order easily.
