@@ -35,10 +35,10 @@ Before we start the Kafka broker we create a network, for easier communication b
 Now you can launch the Kafka broker with the following command:\
 `docker-compose -f docker-compose_kafka.yml up`
 
-!!TODO Kubernetes Setup!!
+#TODO Kubernetes Setup
 
 # Run the experiment
-!!TODO Describe experiment!!
+#TODO Describe experiment
 <!---
 Open another terminal to start the experiment:\
 `docker-compose up`
@@ -91,7 +91,7 @@ Execute both commands to remove the containers:\
 
 -->
 # Technical details
-!!TODO Describe technical details!!
+#TODO: Describe technical details
 <!---
 A lot of things happened in the background to make this work:
 + Docker-compose builds the Containers from the Dockerfiles in `src`.
