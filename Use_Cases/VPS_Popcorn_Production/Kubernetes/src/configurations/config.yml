@@ -1,0 +1,102 @@
+General:
+  KAFKA_BROKER_URL: kafka:9093
+  # KAFKA_BROKER_URL: localhost:9092
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
+
+Initial_Design:
+  N_INITIAL_DESIGN: 5
+  MAX_PRODUCTION_CYCLES: 50
+  X_MIN: 4000.0
+  X_MAX: 10100.0 
+
+Objective_Function:
+  data_path: ./data/vpsFeatures.csv
+  # data_path: ./data/vpsFeatures_It2_AlterMais.csv
+  # data_path: ./data/vpsFeatures_It2_Premium.csv
+  x_columns:
+    conveyorRuntimeMean: float
+  y_columns:
+    yAgg: float
+
+0_pc_cpps:
+  OUT_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  API_URL: http://0_API_CPPS_Controller:8000
+
+1_pc_monitoring:
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  IN_GROUP: 'monitoring'
+  OUT_TOPIC:
+    AB_monitoring: ./schema/monitoring.avsc
+
+1_pc_model_learning_rf:
+  MODEL_ALGORITHM: Random Forest
+  MODEL_PARAMETERS:
+    n_estimators: 3
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  IN_GROUP: RF
+  OUT_TOPIC:
+    AB_model_data: ./schema/model.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+1_pc_model_learning_kriging:
+  MODEL_ALGORITHM: Kriging
+  MODEL_PARAMETERS:
+    kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
+    n_restarts_optimizer: 5
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  IN_GROUP: Kriging
+  OUT_TOPIC:
+    AB_model_data: ./schema/model.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+2_pc_model_appl_opt:
+  IN_TOPIC:
+    AB_model_data: ./schema/model.avsc
+  IN_GROUP: model_appl
+  OUT_TOPIC:
+    AB_model_application: ./schema/model_appl.avsc
+
+3_pc_evaluation:
+  IN_TOPIC:
+    AB_model_application: ./schema/model_appl.avsc
+    AB_monitoring: ./schema/monitoring.avsc
+  IN_GROUP: evaluation
+  OUT_TOPIC:
+    AB_model_evaluation: ./schema/new_x.avsc
+  USER_WEIGHTS:
+    QUALITY: 0.95
+    RESOURCES: 0.05
+
+4_pc_adaption:
+  IN_TOPIC:
+    AB_model_evaluation: ./schema/new_x.avsc
+  IN_GROUP: adaption
+  API_URL: http://0_API_CPPS_Controller:8000
+
+4_c_reporting:
+  IN_TOPIC:
+    AB_model_evaluation: ./schema/new_x.avsc
+    AB_monitoring: ./schema/monitoring.avsc
+    AB_model_application: ./schema/model_appl.avsc
+  IN_GROUP: reporting
+  OUT_TOPIC:
+    AB_plot_data: ./schema/plot.avsc
+  PLOT_TOPIC:
+    AB_model_evaluation: plot_data_multi
+    AB_monitoring: plot_monitoring
+    AB_model_application : plot_model_application
+  API_OUT:
+    AB_model_evaluation: forward_topic 
+    AB_monitoring: forward_topic
+    AB_model_application: forward_topic
+  API_URL: http://5_API_HMI:8000
+  API_ENDPOINT: /topic/
+
+4_plot_data:
+  IN_TOPIC:
+    AB_plot_data: ./schema/plot.avsc
+      

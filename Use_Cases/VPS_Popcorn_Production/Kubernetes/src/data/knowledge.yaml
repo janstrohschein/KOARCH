@@ -1,0 +1,61 @@
+Optimization:
+  minimize:
+    minimum:
+      algorithms:
+        Random Forest:
+          parameter: 
+            n_estimators:  
+              type: int
+              default: 3
+              min: 1
+              max: 100
+          metadata: 
+            Class: Surrogate
+            RAM usage initial: -1
+            RAM usage slope: -1
+            CPU usage initial: -1
+            CPU usage slope: -1
+            Quality: -1
+            Efficiency: -1
+            Min training data: 5  
+          input: preprocessed data
+        Kriging:
+          parameter: 
+            kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
+            n_restarts_optimizer:
+              type: int
+              default: 5
+              min: 0
+              max: 15
+          metadata: 
+            Class: Surrogate
+            RAM usage initial: -1
+            RAM usage slope: -1
+            CPU usage initial: -1
+            CPU usage slope: -1
+            Quality: -1
+            Efficiency: -1
+            Min training data: 5  
+          input: preprocessed data
+      preprocessed data:
+        handleMissingValues:
+          parameter: 
+          metadata: 
+            Class: MissingValueHandling
+            RAM usage initial: -1
+            RAM usage slope: -1
+            CPU usage initial: -1
+            CPU usage slope: -1
+            Quality: -1
+            Efficiency: -1
+            Min training data: 1  
+          input: raw_data
+  maximize:
+    minimum:
+      # fill
+Anomaly Detection:
+  # fill
+Condition Monitoring:
+  # fill
+Predictive Maintenance:
+  # fill
