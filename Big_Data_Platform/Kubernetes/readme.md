@@ -85,12 +85,16 @@ Show additional cluster information:
 
 ## Deploy an example application
 Deploy an nginx example application to test the cluster accessibility.
-Kubernetes can receive instructions either directly via the command line or via `.yml` file for more complex cases. 
-Create a nginx Deployment, which instructs the Kubernetes scheduler to create a nginx pod and observes its availability. In case of pod failure, the Deployment will create new pods.
-- `kubectl create deployment nginx --image=nginx`
-Create a Service to map the service port 80 to the application port 80.
-- `kubectl create service clusterip nginx --tcp=80:80`
-Create an Ingress via `.yml` file to make the application available via the loadbalancer for outside access.
+Kubernetes can receive instructions either directly via the command line or via `.yml` file for more complex cases.  
+
+Create a nginx Deployment, which instructs the Kubernetes scheduler to create a nginx pod and observes its availability. 
+In case of pod failure, the Deployment will create new pods.  
+- `kubectl create deployment nginx --image=nginx`  
+
+Create a Service to map the service port 80 to the application port 80.  
+- `kubectl create service clusterip nginx --tcp=80:80`  
+
+Create an Ingress via `.yml` file to make the application available via the loadbalancer for outside access:  
 - `kubectl apply -f https://raw.githubusercontent.com/janstrohschein/KOARCH/master/Big_Data_Platform/Kubernetes/example_ingress.yml`
 
 Display the Kubernetes objects with the following commands:
