@@ -107,7 +107,6 @@ The nginx application is now accessible via the webbrowser at `localhost:8080/te
 
 Remove the application and associated Kubernets objects with the following commands:
 - `kubectl delete -f https://raw.githubusercontent.com/janstrohschein/KOARCH/master/Big_Data_Platform/Kubernetes/example_ingress.yml`
-- `kubectl delete ingress nginx`
 - `kubectl delete service nginx`
 - `kubectl delete deployment nginx`
 
