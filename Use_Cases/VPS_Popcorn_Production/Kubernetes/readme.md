@@ -26,19 +26,7 @@ Next we would like to present the implementation of our CAAI architecture for th
 All modules are implemented as Docker Containers and communicate via Kafka.
 
 # Preparation
-Please install Docker and docker-compose to run the containers.
-Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
-
-<!---
-Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
-`docker network create caai`
-
-Now you can launch the Kafka broker with the following command:\
-`docker-compose -f docker-compose_kafka.yml up`
-
--->
-
-#TODO Kubernetes Setup
+Please follow our instructions [here](../../../Big_Data_Platform/Kubernetes/readme.md) to install the Kubernetes cluster and the required tools.
 
 # Run the experiment
 #TODO Describe experiment
