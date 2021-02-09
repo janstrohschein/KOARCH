@@ -29,11 +29,14 @@ All modules are implemented as Docker Containers and communicate via Kafka.
 Please install Docker and docker-compose to run the containers.
 Instructions can be found [here](https://github.com/janstrohschein/KOARCH/tree/master/Big_Data_Platform/Docker).
 
+<!---
 Before we start the Kafka broker we create a network, for easier communication between containers, by running this command in a terminal:
 `docker network create caai`
 
 Now you can launch the Kafka broker with the following command:\
 `docker-compose -f docker-compose_kafka.yml up`
+
+-->
 
 #TODO Kubernetes Setup
 
@@ -90,6 +93,9 @@ Execute both commands to remove the containers:\
 `docker-compose -f docker-compose_kafka.yml down`
 
 -->
+# Experiment results
+The detailed results for the experiment can be found [here](experiments/readme.md). 
+
 # Technical details
 #TODO: Describe technical details
 <!---
@@ -102,5 +108,3 @@ This sets the environment for the container, e.g. the URL for the Kafka broker, 
 Messages that do not comply to the specified schema raise an error and can´t be send.
 + The reporting module and the HMI can be configured via `./src/configurations/config.yml`. The reporting module specifies all the API endpoints it wants to use under `API_OUT`. The HMI module defines to read the configuration section of the reporting module in the `docker-compose.yml` and creates the necessary endpoints. This allows to dynamically collect and combine data from several modules in one API.
 -->
-# Experiment results
-The detailed results for the experiment can be [here](experiments/readme.md). 

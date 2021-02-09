@@ -1,4 +1,4 @@
-# VPS Popcorn Production
+# VPS Popcorn Production Experiment Results
 This section describes extended experiments using data-driven simulations to perform benchmark of optimization algorithms and choose promising algorithms to solve the VPS problem.
 
 The R-scripts in this section can be used to reproduce the results of the publication "Cognitive Capabilities for the CAAI in Cyber-Physical Production Systems", see [our pre-print](https://arxiv.org/abs/2012.01823).
