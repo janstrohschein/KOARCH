@@ -11,10 +11,10 @@ spec:
   rules:
   - http:
       paths:
-          - path: /test
-            pathType: Exact
-            backend:
-              service:
-                name: nginx
-                port:
-                  number: 80
+      - path: /test
+        pathType: Exact
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 80
