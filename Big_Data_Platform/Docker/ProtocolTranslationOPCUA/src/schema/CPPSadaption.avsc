@@ -1,0 +1,11 @@
+{"namespace": "caai.example.kafka",
+ "type": "record",
+ "name": "Adaption",
+ "fields": [
+    {"name": "paramter", "type": {
+       "type": "map",
+       "values": ["float", "int", "boolean"]
+       }
+    }
+    ]
+}
