@@ -1,0 +1,11 @@
+{"namespace": "schema",
+ "type": "record",
+ "name": "RawData",
+ "fields": [
+ {"name": "Signals", "type": {
+      "type": "map", 
+      "values": ["int", "long", "boolean", "float", "double", "string"]}
+ }
+    ]
+    }
+

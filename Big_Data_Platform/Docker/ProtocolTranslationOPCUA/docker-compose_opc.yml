@@ -1,0 +1,13 @@
+version: '2'
+
+services:
+  opcgateway:
+    container_name: opcgateway
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+networks:
+  default:
+    external:
+      name: caai
