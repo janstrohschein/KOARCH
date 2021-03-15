@@ -9,7 +9,7 @@ Then install Zookeeper to manage the Kafka Cluster state ([see](https://github.c
 - `kubectl apply -f zookeeper.yaml`
 
 Install the Kafka operator with the following steps:
-- change the directory:
+- change the directory:  
 	`cd kafka-operator`
 - use Helm to install the Kafka operator with customized parameters:
 	```
@@ -26,8 +26,7 @@ Karapace is a drop-in replacement for the Confluent Schema Registry [Website](ht
 
 
 Install via:  
-- `cd /home/ubuntu/kubernetes/karapace`  
-- `kubectl apply -f karapace.yml`
+- `kubectl apply -f https://raw.githubusercontent.com/janstrohschein/KOARCH/master/Big_Data_Platform/Kubernetes/Karapace/karapace.yaml`
 
 Verify successful installation via: 
 
@@ -36,4 +35,6 @@ Verify successful installation via:
 - `curl -X GET karapace-registry-service:80`
 
 The resulting `{}` indicates an empty registry.
+
+
 
