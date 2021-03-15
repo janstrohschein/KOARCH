@@ -1,7 +1,6 @@
 # Confluent Kafka Python Client
 
 
-
 ## Embed yaml files in ConfigMaps
 - create ConfigMaps from files on host:  
 	- `kubectl create configmap general --from-file=general_config.yml`  
