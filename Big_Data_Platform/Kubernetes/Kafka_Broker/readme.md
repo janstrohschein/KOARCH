@@ -62,7 +62,7 @@ Verify successful installation by calling the API from your Browser:
 
 The resulting `{}` indicates an empty registry.
 
-Now we can use the Kafka Broker to send and receive messages in Kubernetes. Please find an example [here](../Kafka_Client/Confluent_Kafka_Python/readme.md).
+Now we can use the Kafka Broker to send and receive messages in Kubernetes. Please find an example [here](/Big_Data_Platform/Kubernetes/Kafka_Client/Confluent_Kafka_Python/readme.md).
 
 
 
