@@ -1,0 +1,3 @@
+1p_count_up:
+  OUT_TOPIC:
+    count: ./schema/count.avsc

@@ -1,0 +1,3 @@
+1p_multiples:
+  OUT_TOPIC:
+    multiples: ./schema/multiples.avsc

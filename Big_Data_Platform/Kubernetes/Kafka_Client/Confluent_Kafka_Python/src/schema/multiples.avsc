@@ -1,0 +1,6 @@
+{"namespace": "caai.example.kafka",
+ "type": "record",
+ "name": "Multiples",
+ "fields": [{"name": "multiple", "type": ["int"]}
+    ]
+    }
