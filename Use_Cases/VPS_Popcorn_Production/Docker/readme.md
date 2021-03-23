@@ -77,7 +77,7 @@ To access the HMI please visit: `127.0.0.1:8001/docs`
 
 + Knowledge API\
 The knowledge module provides the use case information as well as the algorithm knowledge.
-To access the HMI please visit: `127.0.0.2:8002/docs`
+To access the HMI please visit: `127.0.0.1:8002/docs`
 
 ## Stop the Experiment
 Please press `Ctrl + C` in each terminal, to stop the experiment as well as the Kafka broker.
