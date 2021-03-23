@@ -1,0 +1,33 @@
+General:
+  KAFKA_BROKER_URL: kafka:9093
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
+  KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+
+0p_opc:
+  opcServer: opc.tcp://docker.for.win.localhost:48020
+  opcConfig:
+    node:
+    - Demo.Dynamic.Scalar.Boolean
+    - Demo.Dynamic.Scalar.String
+    - Demo.Dynamic.Scalar.Double
+    - Demo.Dynamic.Scalar.Float
+    - Demo.Dynamic.Scalar.Int32
+    interval: 1000
+
+1p_count_up:
+  OUT_TOPIC:
+    count: ./schema/count.avsc
+
+1p_multiples:
+  OUT_TOPIC:
+    multiples: ./schema/multiples.avsc
+
+2c_print:
+  IN_TOPIC:
+    count: ./schema/count.avsc
+    multiples: ./schema/multiples.avsc
+    CPPSdata: ./schema/CPPSdata.avsc
+    CPPSdata1: ./schema/CPPSdataTest.avsc
+    CPPSdata2: ./schema/CPPSdataGeneric.avsc
+    CPPSadaption: ./schema/CPPSadaption1.avsc
+  IN_GROUP: count

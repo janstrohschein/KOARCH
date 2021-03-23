@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: karapace-registry
+  labels:
+    app: karapace-registry
+spec:
+  containers:
+  - name: karapace-registry
+    image: koarch/karapace-registry:latest
+    ports:
+        - containerPort: 8081
+    env:
+    - name: KARAPACE_REGISTRY_BOOTSTRAP_URI
+      value: "kafka-all-broker:29092"
+    - name: KARAPACE_REGISTRY_PORT
+      value: "8081"
+    - name: KARAPACE_REGISTRY_ADVERTISED_HOSTNAME
+      value: "localhost"
+    - name: KARAPACE_REGISTRY_CLIENT_ID
+      value: "sr-1"
+    - name: KARAPACE_REGISTRY_COMPATIBILITY
+      value: "FULL"
+    - name: KARAPACE_REGISTRY_GROUP_ID
+      value: "schema-registry"
+    - name: KARAPACE_REGISTRY_HOST
+      value: "0.0.0.0"
+    - name: KARAPACE_REGISTRY_LOG_LEVEL
+      value: "DEBUG"
+    - name: KARAPACE_REGISTRY_MASTER_ELIGIBILITY
+      value: "true"
+    - name: KARAPACE_REGISTRY_REPLICATION_FACTOR
+      value: "1"
+    - name: KARAPACE_REGISTRY_SECURITY_PROTOCOL
+      value: "PLAINTEXT"
+    - name: KARAPACE_REGISTRY_SSL_CAFILE
+      value: null
+    - name: KARAPACE_REGISTRY_SSL_CERTFILE
+      value: null
+    - name: KARAPACE_REGISTRY_SSL_KEYFILE
+      value: null
+    - name: KARAPACE_REGISTRY_TOPIC_NAME
+      value: "_schemas"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: karapace-registry-service
+spec:
+  selector:
+    app: karapace-registry
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8081
+      name: karapace-registry
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: karapace-registry-ingress
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/rule-type: "PathPrefixStrip"
+    traefik.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /karapace
+        pathType: Exact
+        backend:
+          service:
+            name: karapace-registry-service
+            port:
+              number: 80

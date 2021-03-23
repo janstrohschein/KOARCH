@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: 1p-count-up
+spec:
+  containers:
+    - name: 1p-count-up
+      image: koarch/1p_count_up_example:latest
+      env:
+      - name: config_path
+        value: "/etc/config/"
+      volumeMounts:
+      - name: general
+        mountPath: /etc/config/general.yml
+        subPath: general.yml
+      - name: 1p-count-up
+        mountPath: /etc/config/1p-count-up.yml
+        subPath: 1p-count-up.yml
+  volumes:
+    - name: general
+      configMap:
+        name: general
+        items:
+          - key: general_config.yml
+            path: general.yml
+    - name: 1p-count-up
+      configMap:
+        name: 1p-count-up
+        items:
+          - key: 1p_count_up_config.yml
+            path: 1p-count-up.yml
+  restartPolicy: Never
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: 1p-multiples
+spec:
+  containers:
+    - name: 1p-multiples
+      image: koarch/1p_multiples_example:latest
+      env:
+      - name: config_path
+        value: "/etc/config/"
+      volumeMounts:
+      - name: general
+        mountPath: /etc/config/general.yml
+        subPath: general.yml
+      - name: 1p-multiples
+        mountPath: /etc/config/1p-multiples.yml
+        subPath: 1p-multiples.yml
+  volumes:
+    - name: general
+      configMap:
+        name: general
+        items:
+          - key: general_config.yml
+            path: general.yml
+    - name: 1p-multiples
+      configMap:
+        name: 1p-multiples
+        items:
+          - key: 1p_multiples_config.yml
+            path: 1p-multiples.yml
+  restartPolicy: Never
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: 2c-print
+spec:
+  containers:
+    - name: 2c-print
+      image: koarch/2c_print_example:latest
+      env:
+      - name: config_path
+        value: "/etc/config/"
+      volumeMounts:
+      - name: general
+        mountPath: /etc/config/general.yml
+        subPath: general.yml
+      - name: 2c-print
+        mountPath: /etc/config/2c-print.yml
+        subPath: 2c-print.yml
+  volumes:
+    - name: general
+      configMap:
+        name: general
+        items:
+          - key: general_config.yml
+            path: general.yml
+    - name: 2c-print
+      configMap:
+        name: 2c-print
+        items:
+          - key: 2c_print_config.yml
+            path: 2c-print.yml
+  restartPolicy: Never

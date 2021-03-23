@@ -1,0 +1,5 @@
+2c_print:
+  IN_TOPIC:
+    count: ./schema/count.avsc
+    multiples: ./schema/multiples.avsc
+  IN_GROUP: count

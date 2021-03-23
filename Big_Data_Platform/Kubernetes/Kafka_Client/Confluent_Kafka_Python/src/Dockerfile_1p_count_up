@@ -1,0 +1,6 @@
+FROM koarch/confluent_kafka_python:1.6.0
+
+COPY . /src
+WORKDIR /src
+
+CMD ["python", "-u", "1p_count_up.py"]

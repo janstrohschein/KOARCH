@@ -1,0 +1,9 @@
+apiVersion: "zookeeper.pravega.io/v1beta1"
+kind: "ZookeeperCluster"
+metadata:
+  name: "zookeeper"
+spec:
+  image:
+    repository: koarch/zookeeper
+    tag: 0.2.7
+  replicas: 1
