@@ -3,44 +3,138 @@ Optimization:
     minimum:
       algorithms:
         Random Forest:
-          parameter: 
-            n_estimators:  
+          parameter:
+            n_estimators:
               type: int
               default: 3
               min: 1
               max: 100
-          metadata: 
+          metadata:
             Class: Surrogate
-            RAM usage initial: -1
-            RAM usage slope: -1
-            CPU usage initial: -1
-            CPU usage slope: -1
-            Quality: -1
-            Efficiency: -1
-            Min training data: 5  
+            Performance: -1
+            Computational Effort: -1
+            RAM usage: -1
+            Use multithreads: false
+            Min training data: 5
+            Prefer usage: true
+            Avoid usage: false
           input: preprocessed data
         Kriging:
-          parameter: 
+          parameter:
             kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
             n_restarts_optimizer:
               type: int
               default: 5
               min: 0
               max: 15
-          metadata: 
+          metadata:
             Class: Surrogate
-            RAM usage initial: -1
-            RAM usage slope: -1
-            CPU usage initial: -1
-            CPU usage slope: -1
-            Quality: -1
-            Efficiency: -1
-            Min training data: 5  
+            Performance: -1
+            Computational Effort: -1
+            RAM usage: -1
+            Use multithreads: false
+            Min training data: 5
+            Prefer usage: true
+            Avoid usage: false
           input: preprocessed data
+        Differential evolution:
+          parameter:
+            popsize: 
+              type: int
+              default: 5
+              min: 5
+              max: 100
+            strategy: 
+              type: int
+              default: 2
+              min: 1
+              max: 5
+            F: 
+              type: double
+              default: 0.8
+              min: 0.0
+              max: 2.0
+            CR: 
+              type: double
+              default: 0.5
+              min: 0.0
+              max: 1.0
+            c: 
+              type: double
+              default: 0.5
+              min: 0.0
+              max: 1.0
+          metadata:
+            Class: Population
+            Performance: -1
+            Computational Effort: -1
+            RAM usage: -1
+            Use multithreads: false
+            Min training data: 5
+            Prefer usage: true
+            Avoid usage: false
+          input: preprocessed data  
+        Generalized SA:
+          parameter:
+            temp: 
+              type: int
+              default: 100
+              min: 0
+              max: 10000
+            qv: 
+              type: double
+              default: 2.5
+              min: -10000
+              max: 10000
+            qa: 
+              type: double
+              default: -1
+              min: -10000
+              max: 10000
+          metadata:
+            Class: Trajectory
+            Performance: -1
+            Computational Effort: -1
+            RAM usage: -1
+            Use multithreads: false
+            Min training data: 5
+            Prefer usage: true
+            Avoid usage: false
+          input: preprocessed data
+        L-BFGS-B:
+          parameter:
+            lmm: 
+              type: int
+              default: 5
+              min: 1
+              max: 100
+          metadata:
+            Class: Hill-climber
+            Performance: -1
+            Computational Effort: -1
+            RAM usage: -1
+            Use multithreads: false
+            Min training data: 5
+            Prefer usage: true
+            Avoid usage: false
+          input: preprocessed data
+        Uniform RS:
+          parameter:
+            
+          metadata:
+            Class: Baseline
+            Performance: -1
+            Computational Effort: -1
+            RAM usage: -1
+            Use multithreads: false
+            Min training data: 1
+            Prefer usage: true
+            Avoid usage: false
+          input: preprocessed data                  
       preprocessed data:
         handleMissingValues:
-          parameter: 
-          metadata: 
+          parameter:
+          metadata:
             Class: MissingValueHandling
             RAM usage initial: -1
             RAM usage slope: -1
@@ -48,7 +142,7 @@ Optimization:
             CPU usage slope: -1
             Quality: -1
             Efficiency: -1
-            Min training data: 1  
+            Min training data: 1
           input: raw_data
   maximize:
     minimum:
@@ -59,3 +153,5 @@ Condition Monitoring:
   # fill
 Predictive Maintenance:
   # fill
+
+   
