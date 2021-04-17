@@ -12,3 +12,4 @@ __pycache__/
 .pytest_cache
 Use_Cases/VPS_Popcorn_Production/Kubernetes/experiments/.Rhistory
 Use_Cases/VPS_Popcorn_Production/Kubernetes/src/workspace.code-workspace
+Use_Cases/VPS_Popcorn_Production/Kubernetes/src/data/*_simulations.png
