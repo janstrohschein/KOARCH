@@ -105,6 +105,8 @@ class DataWindow:
 
         return self.data[0].id_x
 
+    def to_df(self):
+        return pd.DataFrame(self.data)
 
 def get_cv_scores(model, X, y):
     """ Leave-one-out cross-validation, calculates and returns RMSE, MAE and R2 """

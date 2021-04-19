@@ -1,0 +1,8 @@
+{"type": "record",
+ "name": "Simulation",
+ "fields": [
+    {"name": "id", "type": ["int"]},
+    {"name": "simulation", "type": ["bytes"]}
+    
+    ]
+    }

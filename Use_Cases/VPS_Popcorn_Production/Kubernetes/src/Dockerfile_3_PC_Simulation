@@ -1,0 +1,24 @@
+FROM python:3.7-slim-buster
+
+RUN apt-get update && apt-get install -y --no-install-recommends r-base r-base-dev build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
+
+# standard python libs
+COPY ./configurations/requirements.txt /
+RUN pip install -r requirements.txt
+
+# special rpy2 related libs to integrate R within python
+COPY ./configurations/requirements_simulation.txt /
+RUN pip install -r requirements_simulation.txt
+
+# install r packages via provided R script
+COPY ./configurations/installDevtools.R /
+RUN Rscript installDevtools.R
+
+COPY ./configurations/requirements.R /
+RUN Rscript requirements.R
+# RUN R -e "devtools::install_github('martinzaefferer/COBBS', upgrade='never')"
+
+COPY . /src
+WORKDIR /src
+
+CMD ["python", "-u", "L3_PC_Simulation.py"]

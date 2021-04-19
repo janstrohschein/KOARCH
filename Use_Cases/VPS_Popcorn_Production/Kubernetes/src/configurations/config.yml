@@ -7,7 +7,7 @@ Initial_Design:
   N_INITIAL_DESIGN: 5
   MAX_PRODUCTION_CYCLES: 50
   X_MIN: 4000.0
-  X_MAX: 10100.0 
+  X_MAX: 10100.0
 
 Objective_Function:
   data_path: ./data/vpsFeatures.csv
@@ -71,6 +71,14 @@ Objective_Function:
     QUALITY: 0.95
     RESOURCES: 0.05
 
+3_pc_simulation:
+  N_INSTANCES: 5
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  IN_GROUP: simulation
+  OUT_TOPIC:
+    AB_simulation_data: ./schema/simulation.avsc
+
 4_pc_adaption:
   IN_TOPIC:
     AB_model_evaluation: ./schema/new_x.avsc
@@ -90,7 +98,7 @@ Objective_Function:
     AB_monitoring: plot_monitoring
     AB_model_application : plot_model_application
   API_OUT:
-    AB_model_evaluation: forward_topic 
+    AB_model_evaluation: forward_topic
     AB_monitoring: forward_topic
     AB_model_application: forward_topic
   API_URL: http://5_API_HMI:8000
@@ -99,4 +107,3 @@ Objective_Function:
 4_plot_data:
   IN_TOPIC:
     AB_plot_data: ./schema/plot.avsc
-      
