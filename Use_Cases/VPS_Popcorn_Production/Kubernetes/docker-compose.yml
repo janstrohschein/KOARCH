@@ -83,6 +83,15 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, 3_pc_simulation
 
+  3_pc_opt_simulation:
+    container_name: L3_PC_Opt_Simulation
+    build:
+      context: ./src
+      dockerfile: Dockerfile_3_PC_Opt_simulation
+    environment:
+      config_path: ./configurations/config.yml
+      config_section: General, 3_pc_opt_simulation
+
   4_pc_adaption:
     container_name: 4_PC_Adaption
     build:

@@ -4,6 +4,11 @@ from math import ceil
 import pickle
 import numpy as np
 
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.conversion import localconverter
+
+
 from classes.KafkaPC import KafkaPC
 
 
@@ -36,43 +41,29 @@ X_MAX = 10100
 
 bounds = [(X_MIN, X_MAX)]
 
-
-def evaluate_diff_evo(x):
-    X = np.array(x).reshape(-1, 1)
-    res = model.predict(X)
-
-    return res[0].item()
-
 new_pc = KafkaPC(**env_vars)
+
+print("INIT: Optimization of Simulations module")
 
 for msg in new_pc.consumer:
     """
-    "name": "Model",
+    "name": "Simulation",
     "fields": [
-        {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
-        {"name": "model_name", "type": ["string"]},
-        {"name": "n_data_points", "type": ["int"]},
-        {"name": "id_start_x", "type": ["int"]},
-        {"name": "model", "type": ["bytes"]},
-        {"name": "model_size", "type": ["int"]},
-        {"name": "rmse", "type": ["null", "float"]},
-        {"name": "mae", "type": ["null", "float"]},
-        {"name": "rsquared", "type": ["null", "float"]},
-        {"name": "CPU_ms", "type": ["int"]},
-        {"name": "RAM", "type": ["int"]}
+        {"name": "id", "type": ["int"]},
+        {"name": "simulation", "type": ["byte"]},
+
         ]
     """
 
-    new_model = new_pc.decode_avro_msg(msg)
+    new_sim = new_pc.decode_avro_msg(msg)
 
-    model = pickle.loads(new_model['model'])
-    result = differential_evolution(evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE)
+    objFunction = pickle.loads(new_sim['simulation'])
+    result = differential_evolution(objFunction, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE)
+    best_x = result.x[0]
+    best_y = result.fun
 
-    surrogate_x = result.x[0]
-    surrogate_y = result.fun
-
-    print(f"The {new_model['model_name']} optimization suggests "
-          f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
+    print(f"The optimization suggests "
+          f"x={round(best_x, 3)}, y={round(best_y, 3)}")
 
     """
     "name": "Model_Application",
@@ -92,19 +83,19 @@ for msg in new_pc.consumer:
         {"name": "RAM", "type": ["float"]}
         ]
     """
-    model_appl_data = {'phase': new_model['phase'],
-                       'model_name': new_model['model_name'],
-                       'id': new_model['id'],
-                       'n_data_points': new_model['n_data_points'],
-                       'id_start_x': new_model['id_start_x'],
-                       'model_size': new_model['model_size'],
-                       'x': surrogate_x,
-                       'pred_y': surrogate_y,
-                       'rmse': new_model['rmse'],
-                       'mae': new_model['mae'],
-                       'rsquared': new_model['rsquared'],
-                       'CPU_ms': new_model['CPU_ms'],
-                       'RAM': new_model['RAM']
-                       }
+    # model_appl_data = {'phase': new_model['phase'],
+    #                    'model_name': new_model['model_name'],
+    #                    'id': new_model['id'],
+    #                    'n_data_points': new_model['n_data_points'],
+    #                    'id_start_x': new_model['id_start_x'],
+    #                    'model_size': new_model['model_size'],
+    #                    'x': surrogate_x,
+    #                    'pred_y': surrogate_y,
+    #                    'rmse': new_model['rmse'],
+    #                    'mae': new_model['mae'],
+    #                    'rsquared': new_model['rsquared'],
+    #                    'CPU_ms': new_model['CPU_ms'],
+    #                    'RAM': new_model['RAM']
+    #                    }
 
-    new_pc.send_msg(model_appl_data)
+    # new_pc.send_msg(model_appl_data)
