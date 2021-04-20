@@ -36,7 +36,7 @@ Objective_Function:
     n_estimators: 3
   IN_TOPIC:
     DB_raw_data: ./schema/data.avsc
-    AB_simulation_data: ./schema/simulation.avsc
+    AB_test_function: ./schema/simulation.avsc
   IN_GROUP: RF
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
@@ -49,7 +49,7 @@ Objective_Function:
     n_restarts_optimizer: 5
   IN_TOPIC:
     DB_raw_data: ./schema/data.avsc
-    AB_simulation_data: ./schema/simulation.avsc
+    AB_test_function: ./schema/simulation.avsc
   IN_GROUP: Kriging
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
@@ -58,17 +58,30 @@ Objective_Function:
 2_pc_model_appl_opt:
   IN_TOPIC:
     AB_model_data: ./schema/model.avsc
+    AB_simulation:model_data: .schema/model.avsc # korrekt?
   IN_GROUP: model_appl
   OUT_TOPIC:
-    AB_model_application: ./schema/model_appl.avsc
+    AB_model_application: ./schema/model_appl.avsc # umbenennen?
+    AB_simulation_results: ./schema/ # TODO schema? oder gleich wie model_appl.avsc?
+
+2_pc_optimizer:
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+    AB_test_function: ./schema/simulation.avsc
+  IN_GROUP: optimizer
+  OUT_TOPIC:
+    AB_application_results: ./schema/model_appl.avsc # umbenennen?
+    AB_simulation_results: ./schema/ # TODO schema? oder gleich wie model_appl.avsc?
 
 3_pc_evaluation:
   IN_TOPIC:
     AB_model_application: ./schema/model_appl.avsc
     AB_monitoring: ./schema/monitoring.avsc
+    AB_simulation_results:  ./schema/ # TODO schema? oder gleich wie model_appl.avsc?
   IN_GROUP: evaluation
   OUT_TOPIC:
     AB_model_evaluation: ./schema/new_x.avsc
+    AB_simulation_input: ./schema/data.avsc
   USER_WEIGHTS:
     QUALITY: 0.95
     RESOURCES: 0.05
@@ -76,21 +89,21 @@ Objective_Function:
 3_pc_simulation:
   N_INSTANCES: 5
   IN_TOPIC:
-    DB_raw_data: ./schema/data.avsc
+    AB_simulation_input: ./schema/data.avsc
   IN_GROUP: simulation
   OUT_TOPIC:
-    AB_simulation_data: ./schema/simulation.avsc
+    AB_test_function: ./schema/simulation.avsc
 
 3_pc_opt_simulation:
   IN_TOPIC:
-    AB_simulation_data: ./schema/simulation.avsc
+    AB_test_function: ./schema/simulation.avsc
   IN_GROUP: simulation_opt
   OUT_TOPIC:
-    AB_model_application: ./schema/model_appl.avsc
+    AB_model_application: ./schema/model_appl.avsc # bleibt das model_appl oder nennen wir das um?
 
 4_pc_adaption:
   IN_TOPIC:
-    AB_model_evaluation: ./schema/new_x.avsc
+    AB_new_x: ./schema/new_x.avsc
   IN_GROUP: adaption
   API_URL: http://0_API_CPPS_Controller:8000
 
