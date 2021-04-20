@@ -51,6 +51,14 @@ class Learner(KafkaPC):
         return MODEL_PARAMETERS
 
     def process_test_function(self, msg):
+        """
+        "name": "Simulation",
+        "fields": [
+            {"name": "id", "type": ["int"]},
+            {"name": "simulation", "type": ["byte"]},
+            ]
+        """
+
         pass
 
     def process_raw_data(self, msg):
@@ -62,94 +70,79 @@ class Learner(KafkaPC):
             {"name": "x", "type": ["float"]},
             {"name": "y", "type": ["float"]}
             ]
-
-            or(?)
-
-        "name": "Simulation",
-        "fields": [
-            {"name": "id", "type": ["int"]},
-            {"name": "simulation", "type": ["byte"]},
-
-            ]
         """
         new_data = self.decode_avro_msg(msg)
 
-        # read schema
-        schema = self.get_schema(msg)
-        if(schema['name'] == 'Simulation'):
-            print("Simulation it is!")
+        new_data_point = new_window.Data_Point(new_data['id'], new_data['x'], new_data['y'])
+        new_window.append_and_check(new_data_point)
+
+        if len(new_window.data) < MIN_DATA_POINTS:
+            print(f"Collecting training data for {MODEL_ALGORITHM} "
+                f"({len(new_window.data)}/{MIN_DATA_POINTS})")
         else:
+            # performance tracking
+            tracemalloc.start()
+            start = time.perf_counter()
+            start_process = time.process_time()
 
-            new_data_point = new_window.Data_Point(new_data['id'], new_data['x'], new_data['y'])
-            new_window.append_and_check(new_data_point)
+            ML = ModelLearner(MODEL_ALGORITHM, MODEL_PARAMETERS)
 
-            if len(new_window.data) < MIN_DATA_POINTS:
-                print(f"Collecting training data for {MODEL_ALGORITHM} "
-                    f"({len(new_window.data)}/{MIN_DATA_POINTS})")
-            else:
-                # performance tracking
-                tracemalloc.start()
-                start = time.perf_counter()
-                start_process = time.process_time()
+            X, y = new_window.get_arrays(reshape_x=ML.reshape_x, reshape_y=ML.reshape_y)
+            id_start_x = new_window.get_id_start_x()
+            ML.model.fit(X, y)
 
-                ML = ModelLearner(MODEL_ALGORITHM, MODEL_PARAMETERS)
+            # print(f'n = {len(X)}')
+            rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
+            print(f"Update model with (x={round(new_data['x'], 3)}, y={round(new_data['y'], 3)}) -> "
+                f"RMSE: {round(rmse_score, 3)}")
 
-                X, y = new_window.get_arrays(reshape_x=ML.reshape_x, reshape_y=ML.reshape_y)
-                id_start_x = new_window.get_id_start_x()
-                ML.model.fit(X, y)
+            real_time = round(time.perf_counter() - start, 4)
+            process_time = round(time.process_time() - start_process, 4)
 
-                # print(f'n = {len(X)}')
-                rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
-                print(f"Update model with (x={round(new_data['x'], 3)}, y={round(new_data['y'], 3)}) -> "
-                    f"RMSE: {round(rmse_score, 3)}")
+            # print(f'Found result in {real_time}s')
+            # print(f'CPU time is {process_time}s')
 
-                real_time = round(time.perf_counter() - start, 4)
-                process_time = round(time.process_time() - start_process, 4)
+            current, peak = tracemalloc.get_traced_memory()
+            current_mb = current / 10 ** 6
+            peak_mb = peak / 10 ** 6
 
-                # print(f'Found result in {real_time}s')
-                # print(f'CPU time is {process_time}s')
+            # print(f"Current memory usage is {current_mb}MB; Peak was {peak_mb}MB")
+            tracemalloc.stop()
 
-                current, peak = tracemalloc.get_traced_memory()
-                current_mb = current / 10 ** 6
-                peak_mb = peak / 10 ** 6
+            model_pickle = pickle.dumps(ML.model)
 
-                # print(f"Current memory usage is {current_mb}MB; Peak was {peak_mb}MB")
-                tracemalloc.stop()
+            """
+            "name": "Model",
+            "fields": [
+                {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
+                {"name": "model_name", "type": ["string"]},
+                {"name": "n_data_points", "type": ["int"]},
+                {"name": "id_start_x", "type": ["int"]},
+                {"name": "model", "type": ["bytes"]},
+                {"name": "model_size", "type": ["int"]},
+                {"name": "rmse", "type": ["null, float"]},
+                {"name": "mae", "type": ["null, float"]},
+                {"name": "rsquared", "type": ["null, float"]},
+                {"name": "CPU_ms", "type": ["float"]},
+                {"name": "RAM", "type": ["float"]}
+                ]
+            """
 
-                model_pickle = pickle.dumps(ML.model)
+            model_data = {'phase': new_data['phase'],
+                            'model_name': MODEL_ALGORITHM,
+                            'id': new_data['id'],
+                            'n_data_points': len(X),
+                            'id_start_x': id_start_x,
+                            'model': model_pickle,
+                            'model_size': getsizeof(model_pickle),
+                            'rmse': rmse_score,
+                            'mae': mae_score,
+                            'rsquared': r2_score,
+                            'CPU_ms': real_time,
+                            'RAM': peak_mb
+                            }
 
-                """
-                "name": "Model",
-                "fields": [
-                    {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
-                    {"name": "model_name", "type": ["string"]},
-                    {"name": "n_data_points", "type": ["int"]},
-                    {"name": "id_start_x", "type": ["int"]},
-                    {"name": "model", "type": ["bytes"]},
-                    {"name": "model_size", "type": ["int"]},
-                    {"name": "rmse", "type": ["null, float"]},
-                    {"name": "mae", "type": ["null, float"]},
-                    {"name": "rsquared", "type": ["null, float"]},
-                    {"name": "CPU_ms", "type": ["float"]},
-                    {"name": "RAM", "type": ["float"]}
-                    ]
-                """
-
-                model_data = {'phase': new_data['phase'],
-                              'model_name': MODEL_ALGORITHM,
-                              'id': new_data['id'],
-                              'n_data_points': len(X),
-                              'id_start_x': id_start_x,
-                              'model': model_pickle,
-                              'model_size': getsizeof(model_pickle),
-                              'rmse': rmse_score,
-                              'mae': mae_score,
-                              'rsquared': r2_score,
-                              'CPU_ms': real_time,
-                              'RAM': peak_mb
-                              }
-
-                self.send_msg(model_data)
+            self.send_msg(model_data)
 
 
 env_vars = {'config_path': os.getenv('config_path'),
