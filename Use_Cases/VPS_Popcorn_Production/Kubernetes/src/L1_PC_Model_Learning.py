@@ -20,8 +20,8 @@ class Learner(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
 
-        self.func_dict = {"AB_test_function": process_test_function,
-                          "DB_raw_data": process_raw_data}
+        self.func_dict = {"AB_test_function": self.process_test_function,
+                          "DB_raw_data": self.process_raw_data}
 
     def get_model_parameters(self, API_URL):
 
