@@ -1,54 +1,42 @@
----
-version: '3'
+version: '2'
+
 services:
+
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.0.0
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+    container_name: zookeeper
+    image: wurstmeister/zookeeper:3.4.6
+    expose:
+    - "2181"
 
   kafka:
-    image: confluentinc/cp-server:6.0.0
+    container_name: kafka
+    hostname: kafka
+    image: wurstmeister/kafka:2.11-2.0.0
     depends_on:
-      - zookeeper
+    - zookeeper
     ports:
-      - "9101:9101"  # JMX
-      - "9092:9092"  # Kafka
+    - "9092:9092"
+    expose:
+    - "9093"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      # Listeners:
-      # PLAINTEXT_HOST -> Expose kafka to the host network
-      # PLAINTEXT -> Used by kafka for inter broker communication / containers
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://karapace-registry:8081
-      # Metrics:
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: localhost
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:29092
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-      CONFLUENT_METRICS_ENABLE: 'true'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      JVM_OPTS: "-Xms32M -Xmx64M"
 
   karapace-registry:
-    image: karapace-registry
+    container_name: schema-registry
+    hostname: schema-registry
+    image: koarch/karapace-registry:2.0.1-amd64
     depends_on:
       - kafka
     ports:
       - "8081:8081"
     environment:
-      KARAPACE_REGISTRY_ADVERTISED_HOSTNAME: karapace-registry
-      KARAPACE_REGISTRY_BOOTSTRAP_URI: kafka:29092
+      KARAPACE_REGISTRY_ADVERTISED_HOSTNAME: schema-registry
+      KARAPACE_REGISTRY_BOOTSTRAP_URI: kafka:9093
       KARAPACE_REGISTRY_PORT: 8081
       KARAPACE_REGISTRY_HOST: 0.0.0.0
       KARAPACE_REGISTRY_CLIENT_ID: karapace
@@ -56,17 +44,7 @@ services:
       KARAPACE_REGISTRY_MASTER_ELIGIBITY: "true"
       KARAPACE_REGISTRY_TOPIC_NAME: _schemas
 
-  karapace-rest:
-    image: karapace-rest
-    depends_on:
-      - kafka
-      - karapace-registry
-    ports:
-      - "8082:8082"
-    environment:
-      KARAPACE_REST_PORT: 8082
-      KARAPACE_REST_HOST: 0.0.0.0
-      KARAPACE_REST_ADVERTISED_HOSTNAME: karapace-rest
-      KARAPACE_REST_BOOTSTRAP_URI: kafka:29092
-      KARAPACE_REST_REGISTRY_HOST: karapace-registry
-      KARAPACE_REST_REGISTRY_PORT: 8081
+networks:
+  default:
+    external:
+      name: caai
