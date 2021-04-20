@@ -31,9 +31,9 @@ class Learner(KafkaPC):
         use_case_info = json.loads(api_request.content)
 
         payload = {"use_case": use_case_info['use_case'],
-                "goal": use_case_info['goal'],
-                "feature": use_case_info['feature'],
-                "algorithm": MODEL_ALGORITHM}
+                   "goal": use_case_info['goal'],
+                   "feature": use_case_info['feature'],
+                   "algorithm": MODEL_ALGORITHM}
 
         ENDPOINT_KNOWLEDGE = "/knowledge/algorithm/"
         URL = API_URL + ENDPOINT_KNOWLEDGE
@@ -136,18 +136,18 @@ class Learner(KafkaPC):
                 """
 
                 model_data = {'phase': new_data['phase'],
-                            'model_name': MODEL_ALGORITHM,
-                            'id': new_data['id'],
-                            'n_data_points': len(X),
-                            'id_start_x': id_start_x,
-                            'model': model_pickle,
-                            'model_size': getsizeof(model_pickle),
-                            'rmse': rmse_score,
-                            'mae': mae_score,
-                            'rsquared': r2_score,
-                            'CPU_ms': real_time,
-                            'RAM': peak_mb
-                            }
+                              'model_name': MODEL_ALGORITHM,
+                              'id': new_data['id'],
+                              'n_data_points': len(X),
+                              'id_start_x': id_start_x,
+                              'model': model_pickle,
+                              'model_size': getsizeof(model_pickle),
+                              'rmse': rmse_score,
+                              'mae': mae_score,
+                              'rsquared': r2_score,
+                              'CPU_ms': real_time,
+                              'RAM': peak_mb
+                              }
 
                 self.send_msg(model_data)
 
