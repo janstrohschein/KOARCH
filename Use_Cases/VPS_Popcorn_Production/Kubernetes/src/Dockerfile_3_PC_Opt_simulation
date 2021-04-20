@@ -3,9 +3,6 @@ FROM python:3.7-slim-buster
 COPY ./configurations/requirements.txt /
 RUN pip install -r requirements.txt
 
-COPY ./configurations/requirements_simulation.txt /
-RUN pip install -r requirements_simulation.txt
-
 COPY . /src
 WORKDIR /src
 

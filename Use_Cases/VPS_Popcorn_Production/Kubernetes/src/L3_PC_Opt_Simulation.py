@@ -11,7 +11,6 @@ from rpy2.robjects.conversion import localconverter
 
 from classes.KafkaPC import KafkaPC
 
-
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 """
@@ -62,7 +61,7 @@ for msg in new_pc.consumer:
     best_x = result.x[0]
     best_y = result.fun
 
-    print(f"The optimization suggests "
+    print(f"The optimization of a simulation instance suggests "
           f"x={round(best_x, 3)}, y={round(best_y, 3)}")
 
     """
