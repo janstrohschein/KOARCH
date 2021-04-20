@@ -84,6 +84,10 @@ class KafkaPC():
 
         return raw_bytes
 
+    def get_schema(self, msg):
+        topic = msg.topic
+        return self.in_schema[topic]
+
     def send_msg(self, data, key=0, topic=None):
 
         # if no topic is provided, the first topic in the list is used as default

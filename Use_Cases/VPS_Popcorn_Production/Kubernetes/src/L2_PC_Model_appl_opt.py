@@ -43,7 +43,6 @@ def evaluate_diff_evo(x):
 
     return res[0].item()
 
-
 new_pc = KafkaPC(**env_vars)
 
 for msg in new_pc.consumer:

@@ -29,15 +29,15 @@ new_pc = KafkaPC(**env_vars)
 n_instances = new_pc.config['N_INSTANCES']
 print("Simulation: N_INSTANCES to simulate: " +  str(n_instances))
 
+new_window = DataWindow()
+MIN_DATA_POINTS = 5
+
 # rpy2 r objects access
 r = robjects.r
 # source R file of cognition implementation
 r.source('L3_PC_Simulation.R')
 # r data.frame to pandas conversion 
 pandas2ri.activate()
-
-new_window = DataWindow()
-MIN_DATA_POINTS = 5
 
 for msg in new_pc.consumer:
 
@@ -50,23 +50,16 @@ for msg in new_pc.consumer:
               f"({len(new_window.data)}/{MIN_DATA_POINTS})")
     else:
         # take x/y to instantiate R simulator with nr_instances
-
-        #ML = ModelLearner(MODEL_ALGORITHM, MODEL_PARAMETERS)
-
-        #X, y = new_window.get_arrays(reshape_x=ML.reshape_x, reshape_y=ML.reshape_y)
-        #id_start_x = new_window.get_id_start_x()
-        #ML.model.fit(X, y)
-
         generateTestFunctions = robjects.r["generateTestFunctions"]
 
+        df = new_window.to_df()
 
-        testSet = generateTestFunctions(new_window.get_arrays())
-
+        testSet = generateTestFunctions(df, n_instances)
 
         objective_pickle = pickle.dumps(testSet)
 
         simulation_data = {'id': new_data['id'],
-                      'objective': objective_pickle
+                      'simulation': objective_pickle
                       }
 
         new_pc.send_msg(simulation_data)

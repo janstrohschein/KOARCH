@@ -1,5 +1,5 @@
+install.packages("devtools", dependecies=TRUE)
 library(devtools)
-
 install_version("CEGO", version = "2.4.0", repos = "http://cran.us.r-project.org")
 install_version("data.table", version = "1.13.0", repos = "http://cran.us.r-project.org")
 install_version("nloptr", version = "1.2.2.0", repos = "http://cran.us.r-project.org")

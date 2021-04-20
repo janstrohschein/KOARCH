@@ -189,16 +189,16 @@ user_input = {'use_case': 'Optimization',
 # os.path.dirname(os.path.abspath(__file__))
 
 # user_input = get_goal()
-knowledge = load_knowledge('data/knowledge.json')
+#knowledge = load_knowledge('data/knowledge.yaml')
 
 # make search_base and algorithm selection dynamic
 search_base = f'{user_input["use_case"]}.{user_input["goal"]}.{user_input["feature"]}'
 algorithm_selection = 'algorithms'
 
 #recursively builds pipelines from knowledge, stops at "raw_data"
-pipelines = get_pipelines(knowledge, search_base, algorithm_selection)
+#pipelines = get_pipelines(knowledge, search_base, algorithm_selection)
 
-print_pipelines(pipelines)
+#print_pipelines(pipelines)
     
 ########## call cognition stuff from r scripts starts here ############
 def getHistoricalData(name):
@@ -218,6 +218,7 @@ def getHistoricalData(name):
 r = robjects.r
 # source R file of cognition implementation
 r.source('cognition.R')
+
 # r data.frame to pandas conversion 
 # pandas2ri.activate()
 pandas2ri.activate()

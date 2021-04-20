@@ -36,6 +36,7 @@ Objective_Function:
     n_estimators: 3
   IN_TOPIC:
     DB_raw_data: ./schema/data.avsc
+    AB_simulation_data: ./schema/simulation.avsc
   IN_GROUP: RF
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
@@ -48,6 +49,7 @@ Objective_Function:
     n_restarts_optimizer: 5
   IN_TOPIC:
     DB_raw_data: ./schema/data.avsc
+    AB_simulation_data: ./schema/simulation.avsc
   IN_GROUP: Kriging
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
@@ -78,6 +80,13 @@ Objective_Function:
   IN_GROUP: simulation
   OUT_TOPIC:
     AB_simulation_data: ./schema/simulation.avsc
+
+3_pc_opt_simulation:
+  IN_TOPIC:
+    AB_simulation_data: ./schema/simulation.avsc
+  IN_GROUP: simulation_opt
+  OUT_TOPIC:
+    AB_model_application: ./schema/model_appl.avsc
 
 4_pc_adaption:
   IN_TOPIC:
