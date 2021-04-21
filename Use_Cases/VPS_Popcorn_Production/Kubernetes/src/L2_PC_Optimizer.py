@@ -88,7 +88,7 @@ class Optimizer(KafkaPC):
 
         self.send_msg(topic="AB_simulation_results", data=simulation_results)
 
-    def process_production_data(self):
+    def process_production_data(self, msg):
 
         new_production_data = self.decode_avro_msg(msg)
 

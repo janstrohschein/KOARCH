@@ -27,11 +27,11 @@ sleep(3)
 
 print(f"Creating initial design of the system by applying {new_cog.N_INITIAL_DESIGN} equally distributed\n"
       f"values x over the whole working area of the CPPS."
-      f"\nSend x={new_cog.X[new_cog.current_data_point]} to Adaption."
+      f"\nSend x={new_cog.X[new_cog.nr_of_iterations]} to Adaption."
       )
 
 new_cog.send_point_from_initial_design()
-new_cog.current_data_point += 1
+new_cog.nr_of_iterations += 1
 
 for msg in new_cog.consumer:
     new_cog.func_dict[msg.topic](msg)
