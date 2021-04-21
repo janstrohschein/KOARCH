@@ -44,14 +44,17 @@ class CognitionPC(KafkaPC):
         ]
 
         self.df = pd.DataFrame(columns=df_columns)
-        self.current_data_point = 0
+        self.nr_of_iterations = 0
+        self.theta = 10
+        self.zeta = 1
         # self.initialize_objective_function()
         self.generate_initial_design()
-        self.generate_test_function()
+        # self.generate_test_function()
         # maps topics and functions, which process the incoming data
         self.func_dict = {
-            "AB_model_application": self.process_model_application,
+            "AB_application_results": self.process_application_results,
             "AB_monitoring": self.process_monitoring,
+            "AB_simulation_results": self.process_simulation_results
         }
 
     def initialize_objective_function(self):
@@ -62,10 +65,10 @@ class CognitionPC(KafkaPC):
                                      y_columns=self.config['y_columns'])
         self.new_objective.fit_model()
 
-    def generate_test_function(self):
-        """ insert description """
-        # comments
-        pass
+    # def generate_test_function(self):
+    #     """ insert description """
+    #     # comments
+    #     pass
 
     def generate_initial_design(self):
         """ number n_initial_design equally spaced X between X_MIN, X_MAX """
@@ -171,7 +174,7 @@ class CognitionPC(KafkaPC):
 
     def send_point_from_initial_design(self):
         """ Sends the next point from the initial design as message """
-        id = self.current_data_point
+        id = self.nr_of_iterations
         phase = "init"
         algorithm = "initial design"
         self.send_new_x(id=id, x=self.X[id], phase=phase, algorithm=algorithm)
@@ -204,7 +207,23 @@ class CognitionPC(KafkaPC):
             self.df.loc[self.df['x'] == x, 'y'] = y
             self.df['y_delta'] = self.df.apply(self.calc_y_delta, axis=1)
 
-    def process_model_application(self, msg):
+    def process_application_results(self, msg):
+
+        new_appl_result = self.decode_avro_msg(msg)
+        # send data for adaption
+        phase = "observation"
+        algorithm = "Still Necessary?"
+        adaption_data = {"id": new_appl_result['id'],
+                         "phase": phase,
+                         "algorithm": algorithm,
+                         "new_x": new_appl_result['x']
+                         }
+
+        self.send_msg(topic="AB_new_x", data=adaption_data)
+
+
+
+
         """ Processes incoming messages from the model application and normalizes the values
             to predict model quality and rate resource consumption.
 
@@ -226,7 +245,7 @@ class CognitionPC(KafkaPC):
             {"name": "RAM", "type": ["int"]}
         ]
         """
-
+        """
         new_model_appl = self.decode_avro_msg(msg)
         new_model_appl["timestamp"] = datetime.now()
 
@@ -240,17 +259,12 @@ class CognitionPC(KafkaPC):
                                                                            row['rmse_norm'])), axis=1)
 
         self.df['resources'] = self.df.apply(lambda row: self.calc_avg((row['CPU_norm'], row['RAM_norm'])), axis=1)
+        """
 
     def process_monitoring(self, msg):
         """ Processes incoming messages from the production monitoring tool and
-            selects the parameter for the next production cycle.
-
-        Steps:
-        - use production information to assign the real y-value to the algorithm
-        - calculate the real quality for an algorithm
-        - selects the best algorithm and the according x-value for the next cycle
-        - sends message to the adaption module
-
+            sends data + instructions to the simulation module.
+            
         Incoming Avro Message:
         "name": "Data",
         "fields": [
@@ -261,37 +275,59 @@ class CognitionPC(KafkaPC):
             ]
 
         Outgoing Avro Message:
-        "name": "New_X",
+        {"type": "record",
+        "name": "Simulation_Data",
         "fields": [
             {"name": "id", "type": ["int"]},
-            {"name": "phase", "type": ["string"]},
-            {"name": "algorithm", "type": ["string"]},
-            {"name": "new_x", "type": ["float"]}
+            {"name": "new_simulation", "type": ["bool"]},
+            {"name": "x", "type": ["float"]},
+            {"name": "y", "type": ["float"]}
             ]
+            }
         """
 
         new_monitoring = self.decode_avro_msg(msg)
 
         # send initial design first
-        if self.current_data_point < self.N_INITIAL_DESIGN:
+        if self.nr_of_iterations < self.N_INITIAL_DESIGN:
 
             self.send_point_from_initial_design()
-            print(f'Sent next point from initial design x={self.X[self.current_data_point]} to Adaption.')
+            print(f'Sent next point from initial design x={self.X[self.nr_of_iterations]} to Adaption.')
 
-        # then send new data points
-        else:
-            phase = "observation"
-            # select best value, otherwise CPPS will use last value from controller
-            if self.df.empty is False:
-                self.assign_real_y(new_monitoring['x'], new_monitoring['y'])
-                self.normalize_values('y', 'y_norm')
-                self.normalize_values('y_delta', 'y_delta_norm')
-                self.df['real_quality'] = self.df.apply(lambda row: self.calc_avg((row['y_norm'], row['y_delta_norm'],
-                                                                                   row['rmse_norm'])), axis=1)
+        # then send new data points to simulation
 
-                selected_algo_id, selected_algo, selected_x = self.get_best_x()
-                algorithm = f"{selected_algo}({selected_algo_id})"
-                if selected_algo_id is not None:
-                    self.send_new_x(id=self.current_data_point, x=selected_x, phase=phase, algorithm=algorithm)
+        # \If{(nrIterations $\%\, \theta = 0 \vee \zeta = 1$)}
+        new_simulation = False
+        if self.nr_of_iterations % self.theta == 0 or self.zeta == 1:
+            self.zeta = 0
+            new_simulation = True
 
-        self.current_data_point += 1
+        # send all data to simulation
+        simulation_data = {"id": self.nr_of_iterations,
+                           "new_simulation": new_simulation,
+                           "x": new_monitoring['x'],
+                           "y": new_monitoring['y']}
+
+        self.send_msg(topic="AB_simulation_input", data=simulation_data)
+
+        self.nr_of_iterations += 1
+
+    def process_simulation_results(self):
+        """ Cognition selects best algorithm from simulation results
+        """
+        pass
+
+        """ earlier selection process
+        # select best value, otherwise CPPS will use last value from controller
+        if self.df.empty is False:
+            self.assign_real_y(new_monitoring['x'], new_monitoring['y'])
+            self.normalize_values('y', 'y_norm')
+            self.normalize_values('y_delta', 'y_delta_norm')
+            self.df['real_quality'] = self.df.apply(lambda row: self.calc_avg((row['y_norm'], row['y_delta_norm'],
+                                                                                row['rmse_norm'])), axis=1)
+
+            selected_algo_id, selected_algo, selected_x = self.get_best_x()
+            algorithm = f"{selected_algo}({selected_algo_id})"
+            if selected_algo_id is not None:
+                self.send_new_x(id=self.current_data_point, x=selected_x, phase=phase, algorithm=algorithm)
+        """

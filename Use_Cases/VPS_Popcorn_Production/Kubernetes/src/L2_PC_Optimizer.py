@@ -7,6 +7,7 @@ import numpy as np
 from classes.KafkaPC import KafkaPC
 # from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes import KafkaPC
 
+
 class Optimizer(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
@@ -51,7 +52,7 @@ class Optimizer(KafkaPC):
         self.send_msg(topic="AB_simulation_results", data=simulation_results)
 
     def process_production_data(self):
-        
+
         new_production_data = self.decode_avro_msg(msg)
 
         # get x from production data
@@ -60,6 +61,13 @@ class Optimizer(KafkaPC):
                                         self.bounds,
                                         maxiter=self.N_MAX_ITER,
                                         popsize=self.N_POP_SIZE)
+
+        # fill dictionary with required result fields
+        application_results = {"field_name1": 3,
+                               "field_name2": 2}
+
+        self.send_msg(topic="AB_application_results", data=application_results)
+
         
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}

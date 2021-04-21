@@ -75,13 +75,13 @@ Objective_Function:
 
 3_pc_evaluation:
   IN_TOPIC:
-    AB_model_application: ./schema/model_appl.avsc
+    AB_application_results: ./schema/model_appl.avsc
     AB_monitoring: ./schema/monitoring.avsc
     AB_simulation_results:  ./schema/ # TODO schema? oder gleich wie model_appl.avsc?
   IN_GROUP: evaluation
   OUT_TOPIC:
-    AB_model_evaluation: ./schema/new_x.avsc
-    AB_simulation_input: ./schema/data.avsc
+    AB_new_x: ./schema/new_x.avsc
+    AB_simulation_input: ./schema/simulation_data.avsc
   USER_WEIGHTS:
     QUALITY: 0.95
     RESOURCES: 0.05
@@ -89,7 +89,7 @@ Objective_Function:
 3_pc_simulation:
   N_INSTANCES: 5
   IN_TOPIC:
-    AB_simulation_input: ./schema/data.avsc
+    AB_simulation_input: ./schema/simulation_data.avsc
   IN_GROUP: simulation
   OUT_TOPIC:
     AB_test_function: ./schema/simulation.avsc

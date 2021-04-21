@@ -41,6 +41,18 @@ pandas2ri.activate()
 
 for msg in new_pc.consumer:
 
+    """
+    Incoming AVRO Message:
+    {"type": "record",
+    "name": "Simulation_Data",
+    "fields": [
+        {"name": "id", "type": ["int"]},
+        {"name": "new_simulation", "type": ["bool"]},
+        {"name": "x", "type": ["float"]},
+        {"name": "y", "type": ["float"]}
+        ]
+        }
+    """
     new_data = new_pc.decode_avro_msg(msg)
     new_data_point = new_window.Data_Point(new_data['id'], new_data['x'], new_data['y'])
     new_window.append_and_check(new_data_point)
