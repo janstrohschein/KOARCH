@@ -45,7 +45,7 @@ class CognitionPC(KafkaPC):
 
         self.df = pd.DataFrame(columns=df_columns)
         self.nr_of_iterations = 0
-        self.theta = 10
+        self.theta = 25
         self.zeta = 1
         # self.initialize_objective_function()
         self.generate_initial_design()
@@ -229,17 +229,28 @@ class CognitionPC(KafkaPC):
         ]
 
         """
+        print("Processing application results from Optimizer on AB_application_results")
         new_appl_result = self.decode_avro_msg(msg)
+        
         # send data for adaption
         phase = "observation"
         algorithm = "Still Necessary?"
+
+        """ commented for optimizer test
         adaption_data = {"id": new_appl_result['id'],
                          "phase": phase,
                          "algorithm": algorithm,
                          "new_x": new_appl_result['x']
                          }
+        """
+        adaption_data = {"id": new_appl_result['id'],
+                         "phase": phase,
+                         "algorithm": algorithm,
+                         "new_x": new_appl_result['new_x']
+                         }
 
         self.send_msg(topic="AB_new_x", data=adaption_data)
+        print(f"Sent application results to Adaption: x={new_appl_result['new_x']}")
 
         """ Processes incoming messages from the model application and normalizes the values
             to predict model quality and rate resource consumption.
@@ -285,7 +296,7 @@ class CognitionPC(KafkaPC):
             ]
             }
         """
-
+        print("Processing monitoring data from Monitoring on AB_monitoring")
         new_monitoring = self.decode_avro_msg(msg)
 
         # send initial design first
@@ -301,6 +312,7 @@ class CognitionPC(KafkaPC):
         if self.nr_of_iterations % self.theta == 0 or self.zeta == 1:
             self.zeta = 0
             new_simulation = True
+            print("Setting new_simulation=True")
 
         # send all data to simulation
         simulation_data = {"id": self.nr_of_iterations,
@@ -315,7 +327,7 @@ class CognitionPC(KafkaPC):
     def process_simulation_results(self):
         """ Cognition selects best algorithm from simulation results
         """
-        pass
+        print("Processing simulation results from Optimizer on AB_simulation_results")
 
         """ earlier selection process
         # select best value, otherwise CPPS will use last value from controller

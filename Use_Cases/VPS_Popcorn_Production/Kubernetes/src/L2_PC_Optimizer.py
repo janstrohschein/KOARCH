@@ -47,6 +47,7 @@ class Optimizer(KafkaPC):
             {"name": "RAM", "type": ["int"]}
         ]
         """
+        """
         appl_result = {"phase": "observation",
                        "model_name": "test",
                        "id_x": 123,
@@ -60,6 +61,11 @@ class Optimizer(KafkaPC):
                        "rsquared": None,
                        "CPU_ms": 1,
                        "RAM": 2}
+        """
+        appl_result = {"id": 1,
+                       "phase": "observation",
+                       "algorithm": "test",
+                       "new_x": x[0]}
 
         print(f"sending from apply_to_cpps() with x={x[0]}")
         self.send_msg(topic="AB_application_results", data=appl_result)
@@ -69,7 +75,7 @@ class Optimizer(KafkaPC):
             print(new_msg)
 
             # get y from returning message
-            y = "something"
+            y = 1
             return y
 
     def objective_function(self, x):
@@ -92,9 +98,10 @@ class Optimizer(KafkaPC):
         self.send_msg(topic="AB_simulation_results", data=simulation_results)
 
     def process_production_data(self, msg):
-
+        print("Process production data from Monitoring on DB_raw_data")
         new_production_data = self.decode_avro_msg(msg)
         if new_production_data['phase'] == 'init':
+            print("Production still in init phase")
             return
 
         # get x,y from production data
