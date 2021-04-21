@@ -93,36 +93,20 @@ class ModelOptimizer(KafkaPC):
             f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
 
         """
-        "name": "Model_Application",
+        "name": "Application_Result",
         "fields": [
-            {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
-            {"name": "model_name", "type": ["string"]},
-            {"name": "id_x", "type": ["int"]},
-            {"name": "n_data_points", "type": ["int"]},
-            {"name": "id_start_x", "type": ["int"]},
-            {"name": "model_size", "type": ["int"]},
+            {"name": "phase", "type": ["string"]},
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "id", "type": ["int"]},
             {"name": "x", "type": ["float"]},
-            {"name": "pred_y", "type": ["float"]},
-            {"name": "rmse", "type": ["null, float"]},
-            {"name": "mae", "type": ["null, float"]},
-            {"name": "rsquared", "type": ["null, float"]},
-            {"name": "CPU_ms", "type": ["float"]},
-            {"name": "RAM", "type": ["float"]}
+            {"name": "y", "type": ["float"]}
             ]
         """
         model_appl_data = {'phase': new_model['phase'],
-                        'model_name': new_model['model_name'],
+                        'algorithm': new_model['model_name'],
                         'id': new_model['id'],
-                        'n_data_points': new_model['n_data_points'],
-                        'id_start_x': new_model['id_start_x'],
-                        'model_size': new_model['model_size'],
                         'x': surrogate_x,
-                        'pred_y': surrogate_y,
-                        'rmse': new_model['rmse'],
-                        'mae': new_model['mae'],
-                        'rsquared': new_model['rsquared'],
-                        'CPU_ms': new_model['CPU_ms'],
-                        'RAM': new_model['RAM']
+                        'y': surrogate_y
                         }
 
         new_pc.send_msg(topic='AB_application_results', data=model_appl_data)

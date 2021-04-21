@@ -52,6 +52,7 @@ class CognitionPC(KafkaPC):
         # self.generate_test_function()
         # maps topics and functions, which process the incoming data
         self.func_dict = {
+            "AB_apply_on_cpps": self.apply_on_cpps,
             "AB_application_results": self.process_application_results,
             "AB_monitoring": self.process_monitoring,
             "AB_simulation_results": self.process_simulation_results
@@ -175,17 +176,7 @@ class CognitionPC(KafkaPC):
     def send_point_from_initial_design(self):
         """ Sends the next point from the initial design as message """
         id = self.nr_of_iterations
-        phase = "init"
-        algorithm = "initial design"
-        self.send_new_x(id=id, x=self.X[id], phase=phase, algorithm=algorithm)
-
-    def send_new_x(self, id, x, phase, algorithm):
-        new_x = {"id": id,
-                 "new_x": x,
-                 "phase": phase,
-                 "algorithm": algorithm
-                 }
-        self.send_msg(new_x)
+        self.send_msg(topic='AB_new_x', data={'new_x':self.X[id]})
 
     def calc_y_delta(self, row):
         return abs(row['y'] - row['pred_y'])
@@ -232,25 +223,11 @@ class CognitionPC(KafkaPC):
         print("Processing application results from Optimizer on AB_application_results")
         new_appl_result = self.decode_avro_msg(msg)
         
-        # send data for adaption
-        phase = "observation"
-        algorithm = "Still Necessary?"
-
-        """ commented for optimizer test
-        adaption_data = {"id": new_appl_result['id'],
-                         "phase": phase,
-                         "algorithm": algorithm,
-                         "new_x": new_appl_result['x']
-                         }
-        """
-        adaption_data = {"id": new_appl_result['id'],
-                         "phase": phase,
-                         "algorithm": algorithm,
-                         "new_x": new_appl_result['new_x']
-                         }
+        adaption_data = {"new_x": new_appl_result['x']
+                        }
 
         self.send_msg(topic="AB_new_x", data=adaption_data)
-        print(f"Sent application results to Adaption: x={new_appl_result['new_x']}")
+        print(f"Sent application results to Adaption: x={new_appl_result['x']}")
 
         """ Processes incoming messages from the model application and normalizes the values
             to predict model quality and rate resource consumption.
@@ -324,10 +301,17 @@ class CognitionPC(KafkaPC):
 
         self.nr_of_iterations += 1
 
-    def process_simulation_results(self):
+    def process_simulation_results(self, msg):
         """ Cognition selects best algorithm from simulation results
         """
         print("Processing simulation results from Optimizer on AB_simulation_results")
+        new_sim_results = self.decode_avro_msg(msg)
+
+        # append to df 
+
+        # aggregate and judge 
+
+        # send winner
 
         """ earlier selection process
         # select best value, otherwise CPPS will use last value from controller
@@ -343,3 +327,12 @@ class CognitionPC(KafkaPC):
             if selected_algo_id is not None:
                 self.send_new_x(id=self.current_data_point, x=selected_x, phase=phase, algorithm=algorithm)
         """
+
+    def apply_on_cpps(self, msg):
+        new_appl_result = self.decode_avro_msg(msg)
+        
+        adaption_data = {"new_x": new_appl_result['new_x']
+                         }
+
+        self.send_msg(topic="AB_new_x", data=adaption_data)
+        print(f"Sent application results to Adaption: x={new_appl_result['x']}") 

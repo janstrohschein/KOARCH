@@ -71,6 +71,8 @@ class Learner(KafkaPC):
         # extract objective 
         objFunction = pickle.loads(new_sim['simulation'])
 
+        pandas2ri.activate()
+        
         # performance tracking
         tracemalloc.start()
         start = time.perf_counter()
@@ -83,6 +85,12 @@ class Learner(KafkaPC):
         y = objFunction(X)
         # fit model
         ML = ModelLearner(MODEL_ALGORITHM, MODEL_PARAMETERS)
+
+        if ML.reshape_x:
+            X = X.reshape(-1, 1)
+        
+        if ML.reshape_y:
+            y = y.reshape(-1, 1)
         ML.model.fit(X, y)
 
         rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)

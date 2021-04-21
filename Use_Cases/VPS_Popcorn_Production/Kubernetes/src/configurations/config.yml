@@ -40,7 +40,7 @@ Objective_Function:
   IN_GROUP: RF
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
-    AB_simulation_model_data: ./schema/model.avsc
+    AB_simulation_model_data: ./schema/simulation_model.avsc
   API_URL: http://5_API_Knowledge:8000
 
 1_pc_model_learning_kriging:
@@ -54,7 +54,7 @@ Objective_Function:
   IN_GROUP: Kriging
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
-    AB_simulation_model_data: ./schema/model.avsc
+    AB_simulation_model_data: ./schema/simulation_model.avsc
   API_URL: http://5_API_Knowledge:8000
 
 2_pc_model_appl_opt:
@@ -72,11 +72,13 @@ Objective_Function:
     AB_test_function: ./schema/simulation.avsc
   IN_GROUP: optimizer
   OUT_TOPIC:
-    AB_application_results: ./schema/application_result.avsc # umbenennen?
+    AB_apply_on_cpps: ./schema/new_x.avsc
+    AB_application_results: ./schema/application_result.avsc 
     AB_simulation_results: ./schema/simulation_result.avsc
 
 3_pc_evaluation:
   IN_TOPIC:
+    AB_apply_on_cpps: ./schema/new_x.avsc
     AB_application_results: ./schema/application_result.avsc
     AB_monitoring: ./schema/monitoring.avsc
     AB_simulation_results:  ./schema/simulation_result.avsc

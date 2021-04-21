@@ -16,6 +16,8 @@ class Optimizer(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
 
+        self.raw_data_dict = {}
+        self.last_raw_id = None
         self.func_dict = {
             "AB_test_function": self.process_test_function,
             "DB_raw_data": self.process_production_data,
@@ -33,47 +35,15 @@ class Optimizer(KafkaPC):
 
     def apply_on_cpps(self, x):
         """
-        Outgoing Avro Message:
-        "name": "Model_Application",
+        "name": "New_X",
         "fields": [
-            {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
-            {"name": "model_name", "type": ["string"]},
-            {"name": "id_x", "type": ["int"]},
-            {"name": "n_data_points", "type": ["int"]},
-            {"name": "id_start_x", "type": ["int"]},
-            {"name": "model_size", "type": ["int"]},
-            {"name": "x", "type": ["float"]},
-            {"name": "pred_y", "type": ["float"]},
-            {"name": "rmse", "type": ["null, float"]},
-            {"name": "mae", "type": ["null, float"]},
-            {"name": "rsquared", "type": ["null, float"]},
-            {"name": "CPU_ms", "type": ["int"]},
-            {"name": "RAM", "type": ["int"]}
-        ]
+            {"name": "new_x", "type": ["float"]}
+            ]
         """
-        """
-        appl_result = {"phase": "observation",
-                       "model_name": "test",
-                       "id_x": 123,
-                       "n_data_points": 123,
-                       "id_start_x": 9,
-                       "model_size": 12,
-                       "x": x[0],
-                       "pred_y": 2.3,
-                       "rmse": None,
-                       "mae": None,
-                       "rsquared": None,
-                       "CPU_ms": 1,
-                       "RAM": 2}
-        """
-        # TODO 
-        appl_result = {"id": 1,
-                       "phase": "observation",
-                       "algorithm": "test",
-                       "new_x": x[0]}
+        apply_on_cpps_dict = {'new_x': x[0] }
 
         print(f"sending from apply_to_cpps() with x={x[0]}")
-        self.send_msg(topic="AB_application_results", data=appl_result)
+        self.send_msg(topic="AB_apply_on_cpps", data=apply_on_cpps_dict)
         for msg in self.consumer:
             new_msg = self.decode_avro_msg(msg)
             print("Result arrived in apply_to_cpps")
@@ -111,6 +81,19 @@ class Optimizer(KafkaPC):
         CPU_ms = 0.35
         RAM = 23.6
 
+        """
+         "name": "Simulation_Result",
+        "fields": [
+            {"name": "selection_phase", "type": ["int"]},
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "repetition", "type": ["int"]},
+            {"name": "budget", "type": ["int"]},
+            {"name": "x", "type": ["float"]},
+            {"name": "y", "type": ["float"]},
+            {"name": "CPU_ms", "type": ["float"]},
+            {"name": "RAM", "type": ["float"]}
+            ]
+        """
         # fill dictionary with required result fields
         simulation_result = {"algorithm": algorithm,
                               "selection_phase": selection_phase,
@@ -127,9 +110,20 @@ class Optimizer(KafkaPC):
     def process_production_data(self, msg):
         print("Process production data from Monitoring on DB_raw_data")
         new_production_data = self.decode_avro_msg(msg)
+        id = new_production_data['id']
+        self.last_raw_id = id
+        self.raw_data_dict[id] = {
+            'id': new_production_data['id'],
+            'phase': new_production_data['phase'],
+            'algorithm': OPTIMIZER_NAME,
+            'x': new_production_data['x'],
+#            'y': new_production_data['y']
+        }
         if new_production_data['phase'] == 'init':
             print("Production still in init phase")
             return
+        
+        
 
         # get x,y from production data
         # TODO instantiate different optimizers
@@ -137,10 +131,26 @@ class Optimizer(KafkaPC):
                                         self.bounds,
                                         maxiter=self.N_MAX_ITER,
                                         popsize=self.N_POP_SIZE)
+        x = result.x[0]
+        y = result.fun
 
+        """
+        "name": "Application_Result",
+        "fields": [
+            {"name": "phase", "type": ["string"]},
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "id", "type": ["int"]},
+            {"name": "x", "type": ["float"]},
+            {"name": "y", "type": ["float"]}
+            ]
+        """
         # fill dictionary with required result fields
-        application_results = {"field_name1": 3,
-                               "field_name2": 2}
+        application_results = {'phase': new_production_data['phase'],
+                        'algorithm': OPTIMIZER_NAME,
+                        'id': new_production_data['id'],
+                        'x': x,
+                        'y': y
+                        }
 
         self.send_msg(topic="AB_application_results", data=application_results)
 
@@ -148,6 +158,8 @@ class Optimizer(KafkaPC):
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
+
+OPTIMIZER_NAME = "Differential Evolution"
 
 """
 def evaluate_diff_evo(x):
