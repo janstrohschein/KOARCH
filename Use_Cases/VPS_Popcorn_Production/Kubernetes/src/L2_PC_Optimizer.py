@@ -78,24 +78,36 @@ class Optimizer(KafkaPC):
             y = 1
             return y
 
-    def objective_function(self, x):
-        pass
-        # TODO implement objective function
-
     def process_test_function(self, msg):
         new_test_function = self.decode_avro_msg(msg)
+        objFunction = pickle.loads(new_test_function['simulation'])
 
         # TODO instantiate different optimizers
-        result = differential_evolution(self.objective_function,
+        result = differential_evolution(objFunction,
                                         self.bounds,
                                         maxiter=self.N_MAX_ITER,
                                         popsize=self.N_POP_SIZE)
+        best_x = result.x[0]
+        best_y = result.fun
+        algorithm = "lazy fool"
+        repetition = 1
+        selection_phase = 1
+        budget = (self.N_MAX_ITER * self.N_POP_SIZE) + self.N_POP_SIZE
+        CPU_ms = 0.35
+        RAM = 23.6
 
         # fill dictionary with required result fields
-        simulation_results = {"field_name1": 3,
-                              "field_name2": 2}
+        simulation_result = {"algorithm": algorithm,
+                              "selection_phase": selection_phase,
+                              "repetition": repetition,
+                              "budget": budget,  
+                              "CPU_ms": CPU_ms,
+                              "RAM": RAM, 
+                              "x": best_x,
+                              "y": best_y                            
+                              }
 
-        self.send_msg(topic="AB_simulation_results", data=simulation_results)
+        self.send_msg(topic="AB_simulation_results", data=simulation_result)
 
     def process_production_data(self, msg):
         print("Process production data from Monitoring on DB_raw_data")
