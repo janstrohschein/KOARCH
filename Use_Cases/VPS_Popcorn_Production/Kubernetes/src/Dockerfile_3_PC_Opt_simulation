@@ -1,7 +1,14 @@
 FROM python:3.7-slim-buster
 
+RUN apt-get update && apt-get install -y --no-install-recommends r-base r-base-dev build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
+
+# standard python libs
 COPY ./configurations/requirements.txt /
 RUN pip install -r requirements.txt
+
+# install r packages
+COPY ./configurations/requirements.R /
+RUN Rscript requirements.R
 
 COPY . /src
 WORKDIR /src

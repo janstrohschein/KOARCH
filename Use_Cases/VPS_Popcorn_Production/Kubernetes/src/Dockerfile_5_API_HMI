@@ -1,9 +1,16 @@
 FROM python:3.7-slim-buster
 
-COPY ./configurations/requirements_API.txt /
-RUN pip install -r requirements_API.txt
+RUN apt-get update && apt-get install -y --no-install-recommends r-base r-base-dev build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
 
-COPY . /src/
+# standard python libs
+COPY ./configurations/requirements.txt /
+RUN pip install -r requirements.txt
+
+# install r packages
+COPY ./configurations/requirements.R /
+RUN Rscript requirements.R
+
+COPY . /src
 WORKDIR /src
 
 CMD ["uvicorn", "L5_API_HMI:results_api", "--host", "0.0.0.0", "--log-level", "warning"]
