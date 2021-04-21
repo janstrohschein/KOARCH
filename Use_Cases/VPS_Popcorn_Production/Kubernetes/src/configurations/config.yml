@@ -62,7 +62,7 @@ Objective_Function:
   IN_GROUP: model_appl
   OUT_TOPIC:
     AB_model_application: ./schema/model_appl.avsc # umbenennen?
-    AB_simulation_results: ./schema/ # TODO schema? oder gleich wie model_appl.avsc?
+    AB_simulation_results: ./schema/simulation_results.avsc # TODO schema? oder gleich wie model_appl.avsc?
 
 2_pc_optimizer:
   IN_TOPIC:
@@ -71,13 +71,13 @@ Objective_Function:
   IN_GROUP: optimizer
   OUT_TOPIC:
     AB_application_results: ./schema/model_appl.avsc # umbenennen?
-    AB_simulation_results: ./schema/ # TODO schema? oder gleich wie model_appl.avsc?
+    AB_simulation_results: ./schema/simulation_results.avsc # TODO schema? oder gleich wie model_appl.avsc?
 
 3_pc_evaluation:
   IN_TOPIC:
     AB_application_results: ./schema/model_appl.avsc
     AB_monitoring: ./schema/monitoring.avsc
-    AB_simulation_results:  ./schema/ # TODO schema? oder gleich wie model_appl.avsc?
+    AB_simulation_results:  ./schema/simulation_results.avsc # TODO schema? oder gleich wie model_appl.avsc?
   IN_GROUP: evaluation
   OUT_TOPIC:
     AB_new_x: ./schema/new_x.avsc
