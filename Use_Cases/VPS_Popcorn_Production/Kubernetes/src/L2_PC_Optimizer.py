@@ -53,12 +53,15 @@ class Optimizer(KafkaPC):
                        "n_data_points": 123,
                        "id_start_x": 9,
                        "model_size": 12,
-                       "x": x,
+                       "x": x[0],
                        "pred_y": 2.3,
+                       "rmse": None,
+                       "mae": None,
+                       "rsquared": None,
                        "CPU_ms": 1,
                        "RAM": 2}
 
-        print(f"sending from apply_to_cpps() with x={x}")
+        print(f"sending from apply_to_cpps() with x={x[0]}")
         self.send_msg(topic="AB_application_results", data=appl_result)
         for msg in self.consumer:
             new_msg = self.decode_avro_msg(msg)
@@ -67,7 +70,7 @@ class Optimizer(KafkaPC):
 
             # get y from returning message
             y = "something"
-        return y
+            return y
 
     def objective_function(self, x):
         pass
@@ -91,8 +94,10 @@ class Optimizer(KafkaPC):
     def process_production_data(self, msg):
 
         new_production_data = self.decode_avro_msg(msg)
+        if new_production_data['phase'] == 'init':
+            return
 
-        # get x from production data
+        # get x,y from production data
         # TODO instantiate different optimizers
         result = differential_evolution(self.apply_on_cpps,
                                         self.bounds,
