@@ -58,7 +58,7 @@ Objective_Function:
 2_pc_model_appl_opt:
   IN_TOPIC:
     AB_model_data: ./schema/model.avsc
-    AB_simulation:model_data: .schema/model.avsc # korrekt?
+    AB_simulation_model_data: .schema/model.avsc # korrekt?
   IN_GROUP: model_appl
   OUT_TOPIC:
     AB_model_application: ./schema/model_appl.avsc # umbenennen?

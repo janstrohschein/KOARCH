@@ -208,7 +208,8 @@ class CognitionPC(KafkaPC):
             self.df['y_delta'] = self.df.apply(self.calc_y_delta, axis=1)
 
     def process_application_results(self, msg):
-
+        """Sends the new value for x to the adaption
+        """
         new_appl_result = self.decode_avro_msg(msg)
         # send data for adaption
         phase = "observation"
@@ -264,7 +265,7 @@ class CognitionPC(KafkaPC):
     def process_monitoring(self, msg):
         """ Processes incoming messages from the production monitoring tool and
             sends data + instructions to the simulation module.
-            
+
         Incoming Avro Message:
         "name": "Data",
         "fields": [

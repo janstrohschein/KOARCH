@@ -23,14 +23,14 @@ services:
     depends_on:
       - 3_pc_evaluation
 
-  # 1_pc_monitoring:
-  #   container_name: 1_PC_Monitoring
-  #   build:
-  #     context: ./src
-  #     dockerfile: Dockerfile_1_PC_Monitoring
-  #   environment:
-  #     config_path: ./configurations/config.yml
-  #     config_section: General, 1_pc_monitoring
+  1_pc_monitoring:
+    container_name: 1_PC_Monitoring
+    build:
+      context: ./src
+      dockerfile: Dockerfile_1_PC_Monitoring
+    environment:
+      config_path: ./configurations/config.yml
+      config_section: General, 1_pc_monitoring
 
   1_pc_model_learning_rf:
     container_name: 1_PC_Model_Learning_RF
