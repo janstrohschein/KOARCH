@@ -209,24 +209,6 @@ class CognitionPC(KafkaPC):
 
     def process_application_results(self, msg):
         """Sends the new value for x to the adaption
-        """
-        new_appl_result = self.decode_avro_msg(msg)
-        # send data for adaption
-        phase = "observation"
-        algorithm = "Still Necessary?"
-        adaption_data = {"id": new_appl_result['id'],
-                         "phase": phase,
-                         "algorithm": algorithm,
-                         "new_x": new_appl_result['x']
-                         }
-
-        self.send_msg(topic="AB_new_x", data=adaption_data)
-
-
-
-
-        """ Processes incoming messages from the model application and normalizes the values
-            to predict model quality and rate resource consumption.
 
         Incoming Avro Message:
         "name": "Model_Application",
@@ -245,6 +227,23 @@ class CognitionPC(KafkaPC):
             {"name": "CPU_ms", "type": ["int"]},
             {"name": "RAM", "type": ["int"]}
         ]
+
+        """
+        new_appl_result = self.decode_avro_msg(msg)
+        # send data for adaption
+        phase = "observation"
+        algorithm = "Still Necessary?"
+        adaption_data = {"id": new_appl_result['id'],
+                         "phase": phase,
+                         "algorithm": algorithm,
+                         "new_x": new_appl_result['x']
+                         }
+
+        self.send_msg(topic="AB_new_x", data=adaption_data)
+
+        """ Processes incoming messages from the model application and normalizes the values
+            to predict model quality and rate resource consumption.
+
         """
         """
         new_model_appl = self.decode_avro_msg(msg)

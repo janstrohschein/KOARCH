@@ -28,13 +28,50 @@ class Optimizer(KafkaPC):
         self.bounds = [(self.X_MIN, self.X_MAX)]
 
     def apply_on_cpps(self, x):
-        pass
-        # self.send_msg()
-        # 
+        """
+        Outgoing Avro Message:
+        "name": "Model_Application",
+        "fields": [
+            {"name": "phase", "type": ["enum"], "symbols": ["init", "observation"]},
+            {"name": "model_name", "type": ["string"]},
+            {"name": "id_x", "type": ["int"]},
+            {"name": "n_data_points", "type": ["int"]},
+            {"name": "id_start_x", "type": ["int"]},
+            {"name": "model_size", "type": ["int"]},
+            {"name": "x", "type": ["float"]},
+            {"name": "pred_y", "type": ["float"]},
+            {"name": "rmse", "type": ["null, float"]},
+            {"name": "mae", "type": ["null, float"]},
+            {"name": "rsquared", "type": ["null, float"]},
+            {"name": "CPU_ms", "type": ["int"]},
+            {"name": "RAM", "type": ["int"]}
+        ]
+        """
+        appl_result = {"phase": "observation",
+                       "model_name": "test",
+                       "id_x": 123,
+                       "n_data_points": 123,
+                       "id_start_x": 9,
+                       "model_size": 12,
+                       "x": x,
+                       "pred_y": 2.3,
+                       "CPU_ms": 1,
+                       "RAM": 2}
+
+        print(f"sending from apply_to_cpps() with x={x}")
+        self.send_msg(topic="AB_application_results", data=appl_result)
+        for msg in self.consumer:
+            new_msg = self.decode_avro_msg(msg)
+            print("Result arrived in apply_to_cpps")
+            print(new_msg)
+
+            # get y from returning message
+            y = "something"
+        return y
 
     def objective_function(self, x):
         pass
-        # implement objective function
+        # TODO implement objective function
 
     def process_test_function(self, msg):
         new_test_function = self.decode_avro_msg(msg)
@@ -68,7 +105,7 @@ class Optimizer(KafkaPC):
 
         self.send_msg(topic="AB_application_results", data=application_results)
 
-        
+
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
