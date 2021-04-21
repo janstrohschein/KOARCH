@@ -63,6 +63,15 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, 2_pc_model_appl_opt
 
+  2_pc_optimizer:
+    container_name: 2_PC_Optimizer
+    build:
+      context: ./src
+      dockerfile: Dockerfile_2_PC_Optimizer
+    environment: 
+      config_path: ./configurations/config.yml
+      config_section: General, 2_pc_optimizer
+
   3_pc_evaluation:
     container_name: 3_PC_Evaluation
     build:
