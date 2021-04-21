@@ -6,6 +6,12 @@ import pickle
 import json
 import requests
 
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.conversion import localconverter
+
+import numpy as np
+
 from classes.KafkaPC import KafkaPC
 from classes.caai_util import ModelLearner, DataWindow, get_cv_scores
 import sys
@@ -15,6 +21,9 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
 
+X_MIN = 4000
+X_MAX = 10100
+N_INITIAL_DESIGN = 5
 
 class Learner(KafkaPC):
     def __init__(self, config_path, config_section):
@@ -58,8 +67,68 @@ class Learner(KafkaPC):
             {"name": "simulation", "type": ["byte"]},
             ]
         """
+        new_sim = self.decode_avro_msg(msg)
+        # extract objective 
+        objFunction = pickle.loads(new_sim['simulation'])
 
-        pass
+        # performance tracking
+        tracemalloc.start()
+        start = time.perf_counter()
+        start_process = time.process_time()
+
+        budget = 40
+        # initdesign to sample obj for initial model training
+        X = np.linspace(X_MIN, X_MAX, num=budget)
+        # evaluate design
+        y = objFunction(X)
+        # fit model
+        ML = ModelLearner(MODEL_ALGORITHM, MODEL_PARAMETERS)
+        ML.model.fit(X, y)
+
+        rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
+        print(f"Fitted model of test instance with  -> "
+            f"RMSE: {round(rmse_score, 3)}")
+
+        real_time = round(time.perf_counter() - start, 4)
+        process_time = round(time.process_time() - start_process, 4)
+
+        # print(f'Found result in {real_time}s')
+        # print(f'CPU time is {process_time}s')
+
+        current, peak = tracemalloc.get_traced_memory()
+        current_mb = current / 10 ** 6
+        peak_mb = peak / 10 ** 6
+
+        # print(f"Current memory usage is {current_mb}MB; Peak was {peak_mb}MB")
+        tracemalloc.stop()
+        
+        # pickle model and send to optimizer
+        model_pickle = pickle.dumps(ML.model)
+
+        """
+        "name": "Simulation_Model",
+        "fields": [
+            {"name": "selection_phase", "type": ["int"]},
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "repetition", "type": ["int"]},
+            {"name": "budget", "type": ["int"]},
+            {"name": "model", "type": ["bytes"]},
+            {"name": "CPU_ms", "type": ["float"]},
+            {"name": "RAM", "type": ["float"]}
+            ]
+        """
+
+        simulation_model_data = {'selection_phase': 1,
+                        'algorithm': MODEL_ALGORITHM,
+                        'repetition': 1,
+                        'budget': budget,
+                        'model': model_pickle,
+                        'CPU_ms': real_time,
+                        'RAM': peak_mb
+                        }
+
+        self.send_msg(topic='AB_simulation_model_data', data=simulation_model_data)
+
 
     def process_raw_data(self, msg):
         """
@@ -142,7 +211,7 @@ class Learner(KafkaPC):
                             'RAM': peak_mb
                             }
 
-            self.send_msg(model_data)
+            self.send_msg(topic='AB_model_data', data=model_data)
 
 
 env_vars = {'config_path': os.getenv('config_path'),

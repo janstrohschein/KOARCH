@@ -4,6 +4,10 @@ from math import ceil
 import pickle
 import numpy as np
 
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
+from rpy2.robjects.conversion import localconverter
+
 from classes.KafkaPC import KafkaPC
 # from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes import KafkaPC
 
@@ -62,6 +66,7 @@ class Optimizer(KafkaPC):
                        "CPU_ms": 1,
                        "RAM": 2}
         """
+        # TODO 
         appl_result = {"id": 1,
                        "phase": "observation",
                        "algorithm": "test",
@@ -75,12 +80,21 @@ class Optimizer(KafkaPC):
             print(new_msg)
 
             # get y from returning message
-            y = 1
-            return y
+            return new_msg['y']
 
     def process_test_function(self, msg):
+        print("Process test instance from Simulation on AB_test_function")
+        """
+        "name": "Simulation",
+        "fields": [
+            {"name": "id", "type": ["int"]},
+            {"name": "simulation", "type": ["byte"]},
+            ]
+        """
         new_test_function = self.decode_avro_msg(msg)
         objFunction = pickle.loads(new_test_function['simulation'])
+
+        pandas2ri.activate()
 
         # TODO instantiate different optimizers
         result = differential_evolution(objFunction,
@@ -93,6 +107,7 @@ class Optimizer(KafkaPC):
         repetition = 1
         selection_phase = 1
         budget = (self.N_MAX_ITER * self.N_POP_SIZE) + self.N_POP_SIZE
+        # TODO 
         CPU_ms = 0.35
         RAM = 23.6
 

@@ -61,6 +61,7 @@ for msg in new_pc.consumer:
         print(f"Collecting training data for Test function generator "
               f"({len(new_window.data)}/{MIN_DATA_POINTS})")
     else:
+        # TODO consider theta, etha, count iteration
         # take x/y to instantiate R simulator with nr_instances
         generateTestFunctions = robjects.r["generateTestFunctions"]
 
