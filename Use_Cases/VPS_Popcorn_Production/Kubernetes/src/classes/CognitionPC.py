@@ -329,8 +329,6 @@ class CognitionPC(KafkaPC):
     def process_simulation_results(self, msg):
         """ Cognition selects best algorithm from simulation results
         """
-        print("Processing simulation results from Optimizer on AB_simulation_results")
-
         """
          "name": "Simulation_Result",
         "fields": [
@@ -346,12 +344,21 @@ class CognitionPC(KafkaPC):
         """
         new_sim_results = self.decode_avro_msg(msg)
 
+        print(f"Processing simulation results from {new_sim_results['algorithm']} on AB_simulation_results")
+
         # append to df_sim
         self.df_sim.append(new_sim_results, ignore_index=True)
 
+        print("df_sim:")
+        print(self.df_sim)
+
         # compute rel performance, if baseline exists
         is_baseline = self.df_sim['algorithm'] == 'baseline'
-        row = self.df_sim[is_baseline][-1:]
+        row = self.df_sim[is_baseline].tail(1)# [-1:]
+        print("Simulation results processed baseline: ")
+        print(row)
+        print("for new Simulation results: ")
+        print(new_sim_results)
         if len(row) > 0:
             self.df_sim['rel_y'] = self.df_sim['y'] / row['y']
             self.df_sim['rel_CPU_ms'] = self.df_sim['CPU_ms'] / row['CPU_ms']
@@ -369,6 +376,8 @@ class CognitionPC(KafkaPC):
             print("Best performing algorithm: " + self.best_algorithm['algorithm'])
 
             # TODO send current best algorithm
+            new_x_data = {"x":0, 'algorithm': self.best_algorithm['algorithm']}
+            self.send_msg(topic="AB_new_x", data=new_x_data)
 
         """ earlier selection process
         # select best value, otherwise CPPS will use last value from controller

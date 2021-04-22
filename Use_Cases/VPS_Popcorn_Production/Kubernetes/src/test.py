@@ -2,6 +2,8 @@
 import numpy as np
 import pandas as pd
 
+from scipy.optimize import differential_evolution
+
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.gaussian_process import kernels
@@ -39,6 +41,31 @@ pandas2ri.activate()
 generateTestFunctions = robjects.r["generateTestFunctions"]
 # test instance according to VPS data 
 testInstance = generateTestFunctions(df, 5)
+bounds = [(X_MIN, X_MAX)]
+
+result = differential_evolution(testInstance,
+                                bounds,
+                                maxiter=5,
+                                popsize=5)
+
+typeOfResult = type(result.fun)
+print(typeOfResult == np.float64)
+checkAtom = isinstance(result.fun, np.float64)
+checkArray = isinstance(result.fun, np.ndarray)
+print(checkAtom)
+print(checkArray)
+
+print(typeOfResult)
+best_x = result.x[0]
+best_y = None
+if isinstance(result.fun, np.float64):
+    best_y = result.fun
+else:
+    best_y = result.fun[0]
+
+print(best_y)
+
+
 BUDGET = 40
 samples = np.random.uniform(low=X_MIN, high=X_MAX, size=BUDGET)
 # Vector?

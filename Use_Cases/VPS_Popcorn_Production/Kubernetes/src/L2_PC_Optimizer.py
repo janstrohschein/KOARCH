@@ -70,7 +70,11 @@ class Optimizer(KafkaPC):
                                         maxiter=self.N_MAX_ITER,
                                         popsize=self.N_POP_SIZE)
         best_x = result.x[0]
-        best_y = result.fun
+        best_y = None
+        if isinstance(result.fun, np.float64):
+            best_y = result.fun
+        else:
+            best_y = result.fun[0]
         algorithm = self.optimizer_name
         repetition = 1
         selection_phase = 1
@@ -106,9 +110,9 @@ class Optimizer(KafkaPC):
         self.send_msg(topic="AB_simulation_results", data=simulation_result)
 
     def process_production_data(self, msg):
-        print("Process production data from Monitoring on DB_raw_data")
         new_production_data = self.decode_avro_msg(msg)
         if(new_production_data['algorithm'] == OPTIMIZER_NAME):
+            print("Process production data from Monitoring on DB_raw_data")
             id = new_production_data['id']
             self.last_raw_id = id
             self.raw_data_dict[id] = {

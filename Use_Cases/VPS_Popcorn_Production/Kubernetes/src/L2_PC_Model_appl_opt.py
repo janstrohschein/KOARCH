@@ -32,8 +32,12 @@ class ModelOptimizer(KafkaPC):
         result = differential_evolution(self.evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE)
 
         surrogate_x = result.x[0]
-        surrogate_y = result.fun
-
+        surrogate_y = None
+        if isinstance(result.fun, (np.float, np.float64)):
+            surrogate_y = result.fun
+        else:
+            surrogate_y = result.fun[0]
+        
         print(f"The {new_model['algorithm']} optimization suggests "
             f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
 

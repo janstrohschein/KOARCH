@@ -34,6 +34,7 @@ BUDGET = 40
 N_INSTANCES = new_pc.config['N_INSTANCES']
 print("Simulation: N_INSTANCES to simulate: " +  str(N_INSTANCES))
 
+generate_new = False
 
 # rpy2 r objects access
 r = robjects.r
@@ -60,10 +61,15 @@ for msg in new_pc.consumer:
     new_data_point = new_window.Data_Point(new_data['id'], new_data['x'], new_data['y'])
     new_window.append_and_check(new_data_point)
 
-    if len(new_window.data) < MIN_DATA_POINTS or new_data['new_simulation'] == False:
+    #print(new_data)
+    if new_data['new_simulation'] == True:
+        generate_new = True
+    if len(new_window.data) < MIN_DATA_POINTS:
         print(f"Collecting training data for Test function generator "
               f"({len(new_window.data)}/{MIN_DATA_POINTS})")
-    else:
+    elif generate_new == True:
+        # reset generation request
+        generate_new = False
         # TODO consider theta, etha, count iteration
         # take x/y to instantiate R simulator with nr_instances
         generateTestFunctions = robjects.r["generateTestFunctions"]
