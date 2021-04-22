@@ -11,6 +11,7 @@ from rpy2.robjects.conversion import localconverter
 from classes.KafkaPC import KafkaPC
 # from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes import KafkaPC
 
+pandas2ri.activate()
 
 class Optimizer(KafkaPC):
     def __init__(self, config_path, config_section):
@@ -63,8 +64,6 @@ class Optimizer(KafkaPC):
         """
         new_test_function = self.decode_avro_msg(msg)
         objFunction = pickle.loads(new_test_function['simulation'])
-
-        pandas2ri.activate()
 
         # TODO instantiate different optimizers
         result = differential_evolution(objFunction,

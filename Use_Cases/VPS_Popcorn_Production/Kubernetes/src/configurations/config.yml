@@ -97,6 +97,7 @@ Objective_Function:
   IN_GROUP: simulation
   OUT_TOPIC:
     AB_test_function: ./schema/simulation.avsc
+    AB_simulation_results:  ./schema/simulation_result.avsc
 
 4_pc_adaption:
   IN_TOPIC:

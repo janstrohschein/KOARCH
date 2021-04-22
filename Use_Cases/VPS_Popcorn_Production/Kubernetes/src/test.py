@@ -39,6 +39,13 @@ pandas2ri.activate()
 generateTestFunctions = robjects.r["generateTestFunctions"]
 # test instance according to VPS data 
 testInstance = generateTestFunctions(df, 5)
+BUDGET = 40
+samples = np.random.uniform(low=X_MIN, high=X_MAX, size=BUDGET)
+# Vector?
+y = testInstance(samples)
+best_y = min(y)
+best_id = np.argmin(y)
+best_x = samples[best_id]
 
 # get x/y from testInstance
 # sample test instance: equidistant, 10 points

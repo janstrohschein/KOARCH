@@ -14,7 +14,17 @@ pd.options.display.float_format = "{:.3f}".format
 class CognitionPC(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
-
+        df_sim_columns = [
+            "selection_phase",
+            "algorithm",
+            "repetition",
+            "budget",
+            "x",
+            "y",
+            "CPU_ms",
+            "RAM"
+        ]
+    
         df_columns = [
             "phase",
             "model_name",
@@ -42,7 +52,7 @@ class CognitionPC(KafkaPC):
             "resources",
             "timestamp",
         ]
-
+        self.df_sim = pd.DataFrame(columns=df_sim_columns)
         self.df = pd.DataFrame(columns=df_columns)
         self.nr_of_iterations = 0
         self.theta = 25
@@ -52,7 +62,7 @@ class CognitionPC(KafkaPC):
         # self.generate_test_function()
         # maps topics and functions, which process the incoming data
         self.func_dict = {
-            "AB_apply_on_cpps": self.apply_on_cpps,
+            "AB_apply_on_cpps": self.process_apply_on_cpps,
             "AB_application_results": self.process_application_results,
             "AB_monitoring": self.process_monitoring,
             "AB_simulation_results": self.process_simulation_results
@@ -305,9 +315,24 @@ class CognitionPC(KafkaPC):
         """ Cognition selects best algorithm from simulation results
         """
         print("Processing simulation results from Optimizer on AB_simulation_results")
+
+        """
+         "name": "Simulation_Result",
+        "fields": [
+            {"name": "selection_phase", "type": ["int"]},
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "repetition", "type": ["int"]},
+            {"name": "budget", "type": ["int"]},
+            {"name": "x", "type": ["float"]},
+            {"name": "y", "type": ["float"]},
+            {"name": "CPU_ms", "type": ["float"]},
+            {"name": "RAM", "type": ["float"]}
+            ]
+        """
         new_sim_results = self.decode_avro_msg(msg)
 
-        # append to df 
+        # append to df_sim
+        df_sim.append(new_sim_results, ignore_index=True)
 
         # aggregate and judge 
 
@@ -328,7 +353,7 @@ class CognitionPC(KafkaPC):
                 self.send_new_x(id=self.current_data_point, x=selected_x, phase=phase, algorithm=algorithm)
         """
 
-    def apply_on_cpps(self, msg):
+    def process_apply_on_cpps(self, msg):
         new_appl_result = self.decode_avro_msg(msg)
         
         adaption_data = {"new_x": new_appl_result['new_x']

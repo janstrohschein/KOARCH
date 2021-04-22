@@ -25,6 +25,7 @@ X_MIN = 4000
 X_MAX = 10100
 N_INITIAL_DESIGN = 5
 
+pandas2ri.activate()
 class Learner(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
@@ -70,8 +71,6 @@ class Learner(KafkaPC):
         new_sim = self.decode_avro_msg(msg)
         # extract objective 
         objFunction = pickle.loads(new_sim['simulation'])
-
-        pandas2ri.activate()
         
         # performance tracking
         tracemalloc.start()
