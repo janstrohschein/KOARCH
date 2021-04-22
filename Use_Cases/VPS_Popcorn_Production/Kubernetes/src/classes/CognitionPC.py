@@ -347,7 +347,7 @@ class CognitionPC(KafkaPC):
         print(f"Processing simulation results from {new_sim_results['algorithm']} on AB_simulation_results")
 
         # append to df_sim
-        self.df_sim.append(new_sim_results, ignore_index=True)
+        self.df_sim = self.df_sim.append(new_sim_results, ignore_index=True)
 
         print("df_sim:")
         print(self.df_sim)
@@ -376,7 +376,7 @@ class CognitionPC(KafkaPC):
             print("Best performing algorithm: " + self.best_algorithm['algorithm'])
 
             # TODO send current best algorithm
-            new_x_data = {"x":0, 'algorithm': self.best_algorithm['algorithm']}
+            new_x_data = {"new_x":0, 'algorithm': self.best_algorithm['algorithm']}
             self.send_msg(topic="AB_new_x", data=new_x_data)
 
         """ earlier selection process

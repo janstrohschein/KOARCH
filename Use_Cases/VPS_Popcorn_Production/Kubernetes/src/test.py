@@ -16,6 +16,37 @@ N_INITIAL_DESIGN = 5
 X_MIN = 4000.0
 X_MAX = 10100.0
 
+## dataframe append test 
+df_sim_columns = [
+    "selection_phase",
+    "algorithm",
+    "repetition",
+    "budget",
+    "x",
+    "y",
+    "CPU_ms",
+    "RAM"
+    #,
+    #"rel_y",
+    #"rel_CPU_ms",
+    #"rel_RAM"
+]
+
+df_sim = pd.DataFrame(columns=df_sim_columns)
+
+new_sim_results = {
+            "selection_phase": 1,
+            "algorithm": "der beste",
+            "repetition": 1,
+            "budget": 40,
+            "x": 5000,
+            "y": 0.2,
+            "CPU_ms": 0.45,
+            "RAM": 100
+}
+df_sim = df_sim.append(new_sim_results, ignore_index=True)
+
+
 # get groundthrouth data 
 seperator=";"
 decimal_sign=","
