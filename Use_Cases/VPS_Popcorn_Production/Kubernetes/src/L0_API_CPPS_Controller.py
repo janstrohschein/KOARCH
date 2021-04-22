@@ -1,18 +1,26 @@
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 CPPS_Controller = FastAPI()
 
-production_parameters = {
-    "x": 4000.0,
-}
+class Parameters(BaseModel):
+    algorithm: str
+    x: float
+
+production_parameters = Parameters(x=4000.0, algorithm="init")
 
 
-@CPPS_Controller.get("/production_parameters/")
+@CPPS_Controller.get("/production_parameters/", response_model=Parameters)
 async def get_items():
-    return JSONResponse(production_parameters, status_code=200)
+    return production_parameters
 
+@CPPS_Controller.put("/production_parameters/", response_model=Parameters)
+async def update_items(parameters: Parameters):
+    production_parameters.x = parameters.x
+    production_parameters.algorithm = parameters.algorithm
+    return production_parameters
 
 @CPPS_Controller.get("/production_parameter/{parameter}")
 async def get_item(parameter: str):

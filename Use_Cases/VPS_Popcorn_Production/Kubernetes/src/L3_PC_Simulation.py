@@ -105,11 +105,12 @@ for msg in new_pc.consumer:
             "CPU_ms": CPU_ms,
             "RAM": RAM,
         }
+        print("Sending Baseline to Cognition")
         new_pc.send_msg(topic='AB_simulation_results', data=simulation_result_data)
 
         objective_pickle = pickle.dumps(testInstance)
         simulation_data = {'id': new_data['id'],
                       'simulation': objective_pickle
                       }
-
+        print("Sending Test function")
         new_pc.send_msg(topic='AB_test_function', data=simulation_data)

@@ -32,17 +32,19 @@ while current_data_point < MAX_PRODUCTION_CYCLES:
 
     # API_URL = "http://127.0.0.1:8000"
     API_URL = new_pc.config['API_URL']
-    ENDPOINT = "/production_parameter/x"
+    ENDPOINT = "/production_parameters/"
     URL = API_URL + ENDPOINT
 
     print(f"\nProduction cycle {current_data_point}")
     print("Load the current x from the CPPS Controller")
     api_request = requests.get(url=URL)
-    new_x = json.loads(api_request.content)
+    req_json = json.loads(api_request.content)
+    new_x = req_json['x']
     new_y = new_objective.get_objective(new_x)
 
     new_data_point = {'id': current_data_point,
                       'phase': phase,
+                      'algorithm': req_json['algorithm'],
                       'x': new_x,
                       'y': new_y}
 

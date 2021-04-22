@@ -8,7 +8,7 @@ env_vars = {'config_path': os.getenv('config_path'),
 new_pc = KafkaPC(**env_vars)
 
 API_URL = new_pc.config['API_URL']
-ENDPOINT = "/production_parameter/x"
+ENDPOINT = "/production_parameters/"
 URL = API_URL + ENDPOINT
 
 
@@ -24,8 +24,9 @@ for msg in new_pc.consumer:
     new_message = new_pc.decode_avro_msg(msg)
 
     # defining a params dict for the parameters to be sent to the API
-    params = {"value": new_message['new_x']}
+    params = {"x": new_message['new_x'],
+              "algorithm": new_message['algorithm']}
 
     # sending get request and saving the response as response object
     print(f"Send x={round(new_message['new_x'], 3)} to the CPPS Controller")
-    r = requests.put(url=URL, params=params)
+    r = requests.put(url=URL, json=params)
