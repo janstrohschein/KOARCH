@@ -16,7 +16,7 @@ pandas2ri.activate()
 class Optimizer(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
-
+        self.optimizer_name = 'Differential evolution'
         self.raw_data_dict = {}
         self.last_raw_id = None
         self.func_dict = {
@@ -41,17 +41,16 @@ class Optimizer(KafkaPC):
             {"name": "new_x", "type": ["float"]}
             ]
         """
-        apply_on_cpps_dict = {'new_x': x[0] }
+        apply_on_cpps_dict = {'algorithm': self.optimizer_name, 'new_x': x[0] }
 
         print(f"sending from apply_to_cpps() with x={x[0]}")
         self.send_msg(topic="AB_apply_on_cpps", data=apply_on_cpps_dict)
         for msg in self.consumer:
-            new_msg = self.decode_avro_msg(msg)
-            print("Result arrived in apply_to_cpps")
-            print(new_msg)
-
-            # get y from returning message
-            return new_msg['y']
+            print(f"Arrived on topic: {msg.topic} ")
+            if msg.topic == 'AB_raw_data':
+                new_msg = self.decode_avro_msg(msg)
+                # get y from returning message
+                return new_msg['y']
 
     def process_test_function(self, msg):
         print("Process test instance from Simulation on AB_test_function")
@@ -72,7 +71,7 @@ class Optimizer(KafkaPC):
                                         popsize=self.N_POP_SIZE)
         best_x = result.x[0]
         best_y = result.fun
-        algorithm = "lazy fool"
+        algorithm = self.optimizer_name
         repetition = 1
         selection_phase = 1
         budget = (self.N_MAX_ITER * self.N_POP_SIZE) + self.N_POP_SIZE
@@ -109,49 +108,50 @@ class Optimizer(KafkaPC):
     def process_production_data(self, msg):
         print("Process production data from Monitoring on DB_raw_data")
         new_production_data = self.decode_avro_msg(msg)
-        id = new_production_data['id']
-        self.last_raw_id = id
-        self.raw_data_dict[id] = {
-            'id': new_production_data['id'],
-            'phase': new_production_data['phase'],
-            'algorithm': OPTIMIZER_NAME,
-            'x': new_production_data['x'],
-#            'y': new_production_data['y']
-        }
-        if new_production_data['phase'] == 'init':
-            print("Production still in init phase")
-            return
-        
-        
+        if(new_production_data['algorithm'] == OPTIMIZER_NAME):
+            id = new_production_data['id']
+            self.last_raw_id = id
+            self.raw_data_dict[id] = {
+                'id': new_production_data['id'],
+                'phase': new_production_data['phase'],
+                'algorithm': OPTIMIZER_NAME,
+                'x': new_production_data['x'],
+    #            'y': new_production_data['y']
+            }
+            if new_production_data['phase'] == 'init':
+                print("Production still in init phase")
+                return
+            
+            
 
-        # get x,y from production data
-        # TODO instantiate different optimizers
-        result = differential_evolution(self.apply_on_cpps,
-                                        self.bounds,
-                                        maxiter=self.N_MAX_ITER,
-                                        popsize=self.N_POP_SIZE)
-        x = result.x[0]
-        y = result.fun
+            # get x,y from production data
+            # TODO instantiate different optimizers
+            result = differential_evolution(self.apply_on_cpps,
+                                            self.bounds,
+                                            maxiter=self.N_MAX_ITER,
+                                            popsize=self.N_POP_SIZE)
+            x = result.x[0]
+            y = result.fun
 
-        """
-        "name": "Application_Result",
-        "fields": [
-            {"name": "phase", "type": ["string"]},
-            {"name": "algorithm", "type": ["string"]},
-            {"name": "id", "type": ["int"]},
-            {"name": "x", "type": ["float"]},
-            {"name": "y", "type": ["float"]}
-            ]
-        """
-        # fill dictionary with required result fields
-        application_results = {'phase': new_production_data['phase'],
-                        'algorithm': OPTIMIZER_NAME,
-                        'id': new_production_data['id'],
-                        'x': x,
-                        'y': y
-                        }
+            """
+            "name": "Application_Result",
+            "fields": [
+                {"name": "phase", "type": ["string"]},
+                {"name": "algorithm", "type": ["string"]},
+                {"name": "id", "type": ["int"]},
+                {"name": "x", "type": ["float"]},
+                {"name": "y", "type": ["float"]}
+                ]
+            """
+            # fill dictionary with required result fields
+            application_results = {'phase': new_production_data['phase'],
+                            'algorithm': OPTIMIZER_NAME,
+                            'id': new_production_data['id'],
+                            'x': x,
+                            'y': y
+                            }
 
-        self.send_msg(topic="AB_application_results", data=application_results)
+            self.send_msg(topic="AB_application_results", data=application_results)
 
 
 env_vars = {'config_path': os.getenv('config_path'),

@@ -142,6 +142,7 @@ class Learner(KafkaPC):
         "name": "Data",
         "fields": [
             {"name": "phase", "type": ["string"]},
+            {"name": "algorithm", "type": ["string"]},
             {"name": "id_x", "type": ["int"]},
             {"name": "x", "type": ["float"]},
             {"name": "y", "type": ["float"]}
@@ -155,7 +156,7 @@ class Learner(KafkaPC):
         if len(new_window.data) < MIN_DATA_POINTS:
             print(f"Collecting training data for {MODEL_ALGORITHM} "
                 f"({len(new_window.data)}/{MIN_DATA_POINTS})")
-        else:
+        elif new_data['algorithm'] == MODEL_ALGORITHM:
             # performance tracking
             tracemalloc.start()
             start = time.perf_counter()

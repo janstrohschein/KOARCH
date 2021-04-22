@@ -60,7 +60,7 @@ for msg in new_pc.consumer:
     new_data_point = new_window.Data_Point(new_data['id'], new_data['x'], new_data['y'])
     new_window.append_and_check(new_data_point)
 
-    if len(new_window.data) < MIN_DATA_POINTS:
+    if len(new_window.data) < MIN_DATA_POINTS or new_data['new_simulation'] == False:
         print(f"Collecting training data for Test function generator "
               f"({len(new_window.data)}/{MIN_DATA_POINTS})")
     else:
@@ -71,7 +71,7 @@ for msg in new_pc.consumer:
         df = new_window.to_df()
 
         testInstance = generateTestFunctions(df, N_INSTANCES)
-        # TODO compute baseline performance results and send to cognition?
+        # compute baseline performance results and send to cognition
         selection_phase = 1
         repetition = 1
         CPU_ms = 0.1

@@ -16,6 +16,7 @@ for msg in new_pc.consumer:
     """
     "name": "New X",
     "fields": [
+        {"name": "algorithm", "type": ["string"]},
         {"name": "new_x", "type": ["float"]}
         ]
     """

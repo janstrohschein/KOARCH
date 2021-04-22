@@ -2,6 +2,7 @@
  "name": "Data",
  "fields": [
     {"name": "id", "type": ["int"]},
+    {"name": "algorithm", "type": ["string"]},
     {"name": "phase", "type": ["string"]},
     {"name": "x", "type": ["float"]},
     {"name": "y", "type": ["float"]}

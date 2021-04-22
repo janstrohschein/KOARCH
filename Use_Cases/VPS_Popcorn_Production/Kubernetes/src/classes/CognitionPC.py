@@ -22,7 +22,10 @@ class CognitionPC(KafkaPC):
             "x",
             "y",
             "CPU_ms",
-            "RAM"
+            "RAM",
+            "rel_y",
+            "rel_CPU_ms",
+            "rel_RAM"
         ]
     
         df_columns = [
@@ -57,6 +60,7 @@ class CognitionPC(KafkaPC):
         self.nr_of_iterations = 0
         self.theta = 25
         self.zeta = 1
+        self.best_algorithm = 'baseline' # TODO default?
         # self.initialize_objective_function()
         self.generate_initial_design()
         # self.generate_test_function()
@@ -67,6 +71,13 @@ class CognitionPC(KafkaPC):
             "AB_monitoring": self.process_monitoring,
             "AB_simulation_results": self.process_simulation_results
         }
+
+    def aggregatePerformance(self, cpu, memory, y):
+        # compute weighted aggregation
+        weightY = self.config['USER_WEIGHTS']['QUALITY']
+        weightC = self.config['USER_WEIGHTS']['RESOURCES']/2
+        weightM = self.config['USER_WEIGHTS']['RESOURCES']/2
+        return (weightY * y) + (weightC * cpu) + (weightM * memory)
 
     def initialize_objective_function(self):
         """initialize objective function and fit the model on the historic data"""
@@ -186,7 +197,7 @@ class CognitionPC(KafkaPC):
     def send_point_from_initial_design(self):
         """ Sends the next point from the initial design as message """
         id = self.nr_of_iterations
-        self.send_msg(topic='AB_new_x', data={'new_x':self.X[id]})
+        self.send_msg(topic='AB_new_x', data={'algorithm':'Initial design', 'new_x':self.X[id]})
 
     def calc_y_delta(self, row):
         return abs(row['y'] - row['pred_y'])
@@ -199,9 +210,13 @@ class CognitionPC(KafkaPC):
 
         return result
 
-    def normalize_values(self, norm_source, norm_dest):
-        self.df[norm_dest] = (self.df[norm_source] - self.df[norm_source].min()) /\
-                (self.df[norm_source].max()-self.df[norm_source].min())
+    def normalize_values(self, norm_source, norm_dest, invert):
+        if invert:
+            self.df_sim[norm_dest] = 1-((self.df_sim[norm_source] - self.df_sim[norm_source].min()) /\
+                (self.df_sim[norm_source].max()-self.df_sim[norm_source].min()))
+        else: 
+            self.df_sim[norm_dest] = (self.df_sim[norm_source] - self.df_sim[norm_source].min()) /\
+                (self.df_sim[norm_source].max()-self.df_sim[norm_source].min())
 
     def assign_real_y(self, x, y):
         if self.df.empty is False:
@@ -233,7 +248,7 @@ class CognitionPC(KafkaPC):
         print("Processing application results from Optimizer on AB_application_results")
         new_appl_result = self.decode_avro_msg(msg)
         
-        adaption_data = {"new_x": new_appl_result['x']
+        adaption_data = {"algorithm": self.best_algorithm['algorithm'], "new_x": new_appl_result['x']
                         }
 
         self.send_msg(topic="AB_new_x", data=adaption_data)
@@ -332,11 +347,28 @@ class CognitionPC(KafkaPC):
         new_sim_results = self.decode_avro_msg(msg)
 
         # append to df_sim
-        df_sim.append(new_sim_results, ignore_index=True)
+        self.df_sim.append(new_sim_results, ignore_index=True)
 
-        # aggregate and judge 
+        # compute rel performance, if baseline exists
+        is_baseline = self.df_sim['algorithm'] == 'baseline'
+        row = self.df_sim[is_baseline][-1:]
+        if len(row) > 0:
+            self.df_sim['rel_y'] = self.df_sim['y'] / row['y']
+            self.df_sim['rel_CPU_ms'] = self.df_sim['CPU_ms'] / row['CPU_ms']
+            self.df_sim['rel_RAM'] = self.df_sim['RAM'] / row['RAM']
 
-        # send winner
+            # normalize performance
+            self.normalize_values('rel_y', 'norm_y', False)
+            self.normalize_values('rel_CPU_ms', 'norm_CPU_ms', True)
+            self.normalize_values('rel_RAM', 'norm_RAM', True)
+
+            # aggregate  
+            self.df_sim['y_agg'] = np.vectorize(self.aggregatePerformance)(cpu = self.df_sim['rel_CPU_ms'], memory = self.df_sim['rel_RAM'], y = self.df_sim['rel_y'])
+            # take max performance y_agg
+            self.best_algorithm = self.df_sim.loc[self.df_sim['y_agg'].idxmax()]
+            print("Best performing algorithm: " + self.best_algorithm['algorithm'])
+
+            # TODO send current best algorithm
 
         """ earlier selection process
         # select best value, otherwise CPPS will use last value from controller
@@ -356,8 +388,8 @@ class CognitionPC(KafkaPC):
     def process_apply_on_cpps(self, msg):
         new_appl_result = self.decode_avro_msg(msg)
         
-        adaption_data = {"new_x": new_appl_result['new_x']
+        adaption_data = {"algorithm": new_appl_result['algorithm'], "new_x": new_appl_result['new_x']
                          }
 
         self.send_msg(topic="AB_new_x", data=adaption_data)
-        print(f"Sent application results to Adaption: x={new_appl_result['x']}") 
+        print(f"Sent application results to Adaption: x={new_appl_result['new_x']}") 

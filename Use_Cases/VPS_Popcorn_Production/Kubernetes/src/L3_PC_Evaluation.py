@@ -19,6 +19,7 @@ new_cog = CognitionPC(**env_vars)
 """
 "name": "New X",
 "fields": [
+    {"name": "algorithm", "type": ["string"]},
      {"name": "new_x", "type": ["float"]}
  ]
 """
