@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -6,8 +7,8 @@ from pydantic import BaseModel
 CPPS_Controller = FastAPI()
 
 class Parameters(BaseModel):
-    algorithm: str
-    x: float
+    algorithm: Optional[str] = None
+    x: Optional[float] = -1
 
 production_parameters = Parameters(x=4000.0, algorithm="init")
 
@@ -22,17 +23,32 @@ async def update_items(parameters: Parameters):
     production_parameters.algorithm = parameters.algorithm
     return production_parameters
 
-@CPPS_Controller.get("/production_parameter/{parameter}")
+@CPPS_Controller.get("/production_parameter/{parameter}", response_model=Parameters)
 async def get_item(parameter: str):
+    result = ""
+    status_code = 400
+    
+    if parameter == 'x':
+        status_code = 200
+        result = production_parameters.x
+    elif parameter == 'algorithm':
+        status_code = 200
+        result = production_parameters.algorithm
+    else:
+        result = 'Key does not exist'
 
-    parameter = production_parameters.get(parameter, "Key does not exist")
-    status_code = 400 if parameter == "Key does not exist" else 200
+    # parameter = production_parameters.fields.get(parameter, "Key does not exist")
+    # status_code = 400 if parameter == "Key does not exist" else 200
 
-    return JSONResponse(parameter, status_code=status_code)
+    return JSONResponse(result, status_code=status_code)
 
 
-@CPPS_Controller.put("/production_parameter/{parameter}")
-async def update_item(parameter: str, value: float):
-    update_item_encoded = jsonable_encoder(value)
-    production_parameters[parameter] = update_item_encoded
-    return JSONResponse(update_item_encoded, status_code=200)
+@CPPS_Controller.patch("/production_parameter/{parameter}", response_model=Parameters)
+async def update_item(parameter: str, value):
+    
+    if parameter == 'x':
+        production_parameters.x = value
+    elif parameter == 'algorithm':
+        production_parameters.algorithm = value
+
+    return production_parameters

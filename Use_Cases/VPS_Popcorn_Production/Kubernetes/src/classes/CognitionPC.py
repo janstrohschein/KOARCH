@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Tuple
+import requests
 
 import pandas as pd
 import numpy as np
@@ -57,6 +58,9 @@ class CognitionPC(KafkaPC):
         ]
         self.df_sim = pd.DataFrame(columns=df_sim_columns)
         self.df = pd.DataFrame(columns=df_columns)
+        API_URL = self.config['API_URL']
+        ENDPOINT = "/production_parameter/algorithm"
+        self.URL = API_URL + ENDPOINT
         self.nr_of_iterations = 0
         self.theta = 25
         self.zeta = 1
@@ -376,8 +380,10 @@ class CognitionPC(KafkaPC):
             print("Best performing algorithm: " + self.best_algorithm['algorithm'])
 
             # TODO send current best algorithm
-            new_x_data = {"new_x":0, 'algorithm': self.best_algorithm['algorithm']}
-            self.send_msg(topic="AB_new_x", data=new_x_data)
+            # new_x_data = {"new_x":0, 'algorithm': self.best_algorithm['algorithm']}
+
+            r = requests.patch(url=self.URL, params={"value": self.best_algorithm['algorithm']})
+            # self.send_msg(topic="AB_new_x", data=new_x_data)
 
         """ earlier selection process
         # select best value, otherwise CPPS will use last value from controller
