@@ -1,12 +1,17 @@
 import os
-from scipy.optimize import differential_evolution
+#from scipy.optimize import differential_evolution
+#from scipy.optimize import minimize
 from math import ceil
 import pickle
 import numpy as np
+import json
+import requests
 
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
+
+from classes.caai_util import OptAlgorithm
 
 from classes.KafkaPC import KafkaPC
 # from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes import KafkaPC
@@ -16,23 +21,41 @@ pandas2ri.activate()
 class Optimizer(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
-        self.optimizer_name = 'Differential evolution'
+        self.X_MIN = 4000
+        self.X_MAX = 10100
+        self.bounds = [(self.X_MIN, self.X_MAX)]
         self.raw_data_dict = {}
         self.last_raw_id = None
         self.func_dict = {
             "AB_test_function": self.process_test_function,
             "DB_raw_data": self.process_production_data,
         }
-        # configuration constants
-        self.N_INITIAL_DESIGN = 5
-        self.N_OPTIMIZATION_BUDGET = 200
-        self.N_POP_SIZE = 20
-        self.N_MAX_ITER = ceil(self.N_OPTIMIZATION_BUDGET / self.N_POP_SIZE)
 
-        self.X_MIN = 4000
-        self.X_MAX = 10100
+    def get_optimizer_parameters(self, API_URL):
+        ENDPOINT_USE_CASE = "/use_case/"
+        URL = API_URL + ENDPOINT_USE_CASE
+        api_request = requests.get(url=URL)
+        use_case_info = json.loads(api_request.content)
 
-        self.bounds = [(self.X_MIN, self.X_MAX)]
+        payload = {"use_case": use_case_info['use_case'],
+                   "goal": use_case_info['goal'],
+                   "feature": use_case_info['feature'],
+                   "algorithm": OPTIMIZER_NAME}
+
+        ENDPOINT_KNOWLEDGE = "/knowledge/algorithm/"
+        URL = API_URL + ENDPOINT_KNOWLEDGE
+        api_request = requests.get(url=URL, params=payload)
+        algo_info = json.loads(api_request.content)
+
+        OPTIMIZER_PARAMETERS = {}
+
+        for key, value in algo_info["parameter"].items():
+            if type(value) is str:
+                OPTIMIZER_PARAMETERS[key] = value
+            elif type(value) is dict:
+                OPTIMIZER_PARAMETERS[key] = value['default']
+
+        return OPTIMIZER_PARAMETERS
 
     def apply_on_cpps(self, x):
         """
@@ -41,7 +64,7 @@ class Optimizer(KafkaPC):
             {"name": "new_x", "type": ["float"]}
             ]
         """
-        apply_on_cpps_dict = {'algorithm': self.optimizer_name, 'new_x': x[0] }
+        apply_on_cpps_dict = {'algorithm': OPTIMIZER_NAME, 'new_x': x[0] }
 
         print(f"sending from apply_to_cpps() with x={x[0]}")
         self.send_msg(topic="AB_apply_on_cpps", data=apply_on_cpps_dict)
@@ -54,6 +77,7 @@ class Optimizer(KafkaPC):
 
     def process_test_function(self, msg):
         print("Process test instance from Simulation on AB_test_function")
+        print("Optimizer: " + OPTIMIZER_NAME)
         """
         "name": "Simulation",
         "fields": [
@@ -64,22 +88,21 @@ class Optimizer(KafkaPC):
         new_test_function = self.decode_avro_msg(msg)
         objFunction = pickle.loads(new_test_function['simulation'])
 
-        # TODO instantiate different optimizers
-        result = differential_evolution(objFunction,
-                                        self.bounds,
-                                        maxiter=self.N_MAX_ITER,
-                                        popsize=self.N_POP_SIZE)
+        # instantiate optimizer
+        alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME, OPTIMIZER_PARAMETERS)
+        result = alg.run(objFunction)
         best_x = result.x[0]
         best_y = None
         if isinstance(result.fun, np.float64):
             best_y = result.fun
         else:
             best_y = result.fun[0]
-        algorithm = self.optimizer_name
+        algorithm = OPTIMIZER_NAME
+
+        budget = result.nfev
+        # TODO 
         repetition = 1
         selection_phase = 1
-        budget = (self.N_MAX_ITER * self.N_POP_SIZE) + self.N_POP_SIZE
-        # TODO 
         CPU_ms = 0.35
         RAM = 23.6
 
@@ -126,16 +149,15 @@ class Optimizer(KafkaPC):
                 print("Production still in init phase")
                 return
             
-            
-
-            # get x,y from production data
-            # TODO instantiate different optimizers
-            result = differential_evolution(self.apply_on_cpps,
-                                            self.bounds,
-                                            maxiter=self.N_MAX_ITER,
-                                            popsize=self.N_POP_SIZE)
+            # instantiate optimizer
+            alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME, OPTIMIZER_PARAMETERS)
+            result = alg.run(self.apply_on_cpps)
             x = result.x[0]
-            y = result.fun
+            y = None
+            if isinstance(result.fun, (np.float, np.float64)):
+                y = result.fun
+            else:
+                y = result.fun[0]
 
             """
             "name": "Application_Result",
@@ -162,8 +184,6 @@ env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
 
-OPTIMIZER_NAME = "Differential Evolution"
-
 """
 def evaluate_diff_evo(x):
     X = np.array(x).reshape(-1, 1)
@@ -171,9 +191,10 @@ def evaluate_diff_evo(x):
 
     return res[0].item()
 """
-
-
 new_pc = Optimizer(**env_vars)
+OPTIMIZER_NAME = new_pc.config['OPTIMIZER_NAME']
 
+API_URL = new_pc.config['API_URL']
+OPTIMIZER_PARAMETERS = new_pc.get_optimizer_parameters(API_URL)
 for msg in new_pc.consumer:
     new_pc.func_dict[msg.topic](msg)
