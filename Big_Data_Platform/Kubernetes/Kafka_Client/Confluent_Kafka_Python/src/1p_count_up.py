@@ -10,7 +10,7 @@ env_vars = {'config_path': os.getenv('config_path')}
 new_p = KafkaPC(**env_vars)
 print("created KafkaPC")
 
-for i in range(10):
+for i in range(new_p.config['NR_OF_MESSAGES']):
 
     message = {"count": i}
     new_p.send_msg(message)

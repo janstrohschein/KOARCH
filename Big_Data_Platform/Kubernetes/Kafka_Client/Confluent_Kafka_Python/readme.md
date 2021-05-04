@@ -1,5 +1,5 @@
 # Confluent Kafka Python Client 
-The base image for the Python Kafka client is used for all containers and can be found on the [KOARCH Docker Hub](https://hub.docker.com/repository/docker/koarch/confluent_kafka_python).
+The base image for the Python Kafka client is used for all containers and can be found on the [KOARCH Docker Hub](https://hub.docker.com/r/koarch/confluent_kafka_python).
 
 The example consists of several steps to send and receive messages on the Kubernetes cluster:
 - create ConfigMaps on the cluster to configure the containers
