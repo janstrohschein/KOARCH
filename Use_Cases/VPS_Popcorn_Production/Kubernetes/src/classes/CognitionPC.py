@@ -26,7 +26,10 @@ class CognitionPC(KafkaPC):
             "RAM",
             "rel_y",
             "rel_CPU_ms",
-            "rel_RAM"
+            "rel_RAM",
+            "norm_y",
+            "norm_CPU_ms",
+            "norm_RAM"
         ]
     
         df_columns = [
@@ -359,31 +362,32 @@ class CognitionPC(KafkaPC):
         # compute rel performance, if baseline exists
         is_baseline = self.df_sim['algorithm'] == 'baseline'
         row = self.df_sim[is_baseline].tail(1)# [-1:]
-        print("Simulation results processed baseline: ")
+        print("Simulation results selects baseline: ")
         print(row)
         print("for new Simulation results: ")
         print(new_sim_results)
         if len(row) > 0:
-            self.df_sim['rel_y'] = self.df_sim['y'] / row['y']
-            self.df_sim['rel_CPU_ms'] = self.df_sim['CPU_ms'] / row['CPU_ms']
-            self.df_sim['rel_RAM'] = self.df_sim['RAM'] / row['RAM']
+            self.df_sim['rel_y'] = self.df_sim['y'] / row['y'][0]
+            self.df_sim['rel_CPU_ms'] = self.df_sim['CPU_ms'] / row['CPU_ms'][0]
+            self.df_sim['rel_RAM'] = self.df_sim['RAM'] / row['RAM'][0]
 
-            # normalize performance
-            self.normalize_values('rel_y', 'norm_y', False)
-            self.normalize_values('rel_CPU_ms', 'norm_CPU_ms', True)
-            self.normalize_values('rel_RAM', 'norm_RAM', True)
+            # normalize performance, if something to normalize exists
+            if len(self.df_sim) > 1:
+                self.normalize_values('rel_y', 'norm_y', False)
+                self.normalize_values('rel_CPU_ms', 'norm_CPU_ms', True)
+                self.normalize_values('rel_RAM', 'norm_RAM', True)
 
-            # aggregate  
-            self.df_sim['y_agg'] = np.vectorize(self.aggregatePerformance)(cpu = self.df_sim['rel_CPU_ms'], memory = self.df_sim['rel_RAM'], y = self.df_sim['rel_y'])
-            # take max performance y_agg
-            self.best_algorithm = self.df_sim.loc[self.df_sim['y_agg'].idxmax()]
-            print("Best performing algorithm: " + self.best_algorithm['algorithm'])
+                # aggregate  
+                self.df_sim['y_agg'] = np.vectorize(self.aggregatePerformance)(cpu = self.df_sim['norm_CPU_ms'], memory = self.df_sim['norm_RAM'], y = self.df_sim['norm_y'])
+                # take max performance y_agg
+                self.best_algorithm = self.df_sim.loc[self.df_sim['y_agg'].idxmax()]
+                print("Best performing algorithm: " + self.best_algorithm['algorithm'])
 
-            # TODO send current best algorithm
-            # new_x_data = {"new_x":0, 'algorithm': self.best_algorithm['algorithm']}
+                # TODO send current best algorithm
+                # new_x_data = {"new_x":0, 'algorithm': self.best_algorithm['algorithm']}
 
-            r = requests.patch(url=self.URL, params={"value": self.best_algorithm['algorithm']})
-            # self.send_msg(topic="AB_new_x", data=new_x_data)
+                r = requests.patch(url=self.URL, params={"value": self.best_algorithm['algorithm']})
+                # self.send_msg(topic="AB_new_x", data=new_x_data)
 
         """ earlier selection process
         # select best value, otherwise CPPS will use last value from controller
