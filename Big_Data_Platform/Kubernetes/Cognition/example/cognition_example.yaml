@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cognition
+spec:
+  containers:
+    - name: cognition
+      image: koarch/cognition_example:amd64
+  restartPolicy: Never
+---

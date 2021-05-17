@@ -1,0 +1,9 @@
+FROM koarch/confluent_kafka_python:1.6.0
+
+COPY ./configurations/requirements.txt /
+RUN pip install -r requirements.txt
+
+COPY . /src
+WORKDIR /src
+
+CMD ["python", "-u", "cognition_create_jobs.py"]
