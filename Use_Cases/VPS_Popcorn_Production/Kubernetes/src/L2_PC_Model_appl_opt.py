@@ -4,14 +4,18 @@ from math import ceil
 import pickle
 import numpy as np
 
-from classes.KafkaPC import KafkaPC
+# from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
+
 
 class ModelOptimizer(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
 
-        self.func_dict = {"AB_simulation_model_data": self.process_test_function,
-                          "AB_model_data": self.process_raw_data}
+        self.func_dict = {
+            "AB_simulation_model_data": self.process_test_function,
+            "AB_model_data": self.process_raw_data,
+        }
 
     def process_test_function(self, msg):
         """
@@ -26,10 +30,12 @@ class ModelOptimizer(KafkaPC):
             {"name": "RAM", "type": ["float"]}
             ]
         """
-        new_model = new_pc.decode_avro_msg(msg)
+        new_model = new_pc.decode_msg(msg)
 
-        self.model = pickle.loads(new_model['model'])
-        result = differential_evolution(self.evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE)
+        self.model = pickle.loads(new_model["model"])
+        result = differential_evolution(
+            self.evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE
+        )
 
         surrogate_x = result.x[0]
         surrogate_y = None
@@ -37,9 +43,11 @@ class ModelOptimizer(KafkaPC):
             surrogate_y = result.fun
         else:
             surrogate_y = result.fun[0]
-        
-        print(f"The {new_model['algorithm']} optimization suggests "
-            f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
+
+        print(
+            f"The {new_model['algorithm']} optimization suggests "
+            f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}"
+        )
 
         """
         "name": "Simulation_Result",
@@ -54,18 +62,19 @@ class ModelOptimizer(KafkaPC):
             {"name": "RAM", "type": ["float"]}
             ]
         """
-        
-        sim_result_data = {'selection_phase': new_model['selection_phase'],
-                        'algorithm': new_model['algorithm'],
-                        'repetition': new_model['repetition'],
-                        'budget': new_model['budget'],
-                        'x': surrogate_x,
-                        'y': surrogate_y,
-                        'CPU_ms': new_model['CPU_ms'],
-                        'RAM': new_model['RAM']
-                        }
 
-        new_pc.send_msg(topic='AB_simulation_results', data=sim_result_data)
+        sim_result_data = {
+            "selection_phase": new_model["selection_phase"],
+            "algorithm": new_model["algorithm"],
+            "repetition": new_model["repetition"],
+            "budget": new_model["budget"],
+            "x": surrogate_x,
+            "y": surrogate_y,
+            "CPU_ms": new_model["CPU_ms"],
+            "RAM": new_model["RAM"],
+        }
+
+        new_pc.send_msg(topic="AB_simulation_results", data=sim_result_data)
 
     def process_raw_data(self, msg):
         """
@@ -85,16 +94,20 @@ class ModelOptimizer(KafkaPC):
             ]
         """
 
-        new_model = new_pc.decode_avro_msg(msg)
+        new_model = new_pc.decode_msg(msg)
 
-        self.model = pickle.loads(new_model['model'])
-        result = differential_evolution(self.evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE)
+        self.model = pickle.loads(new_model["model"])
+        result = differential_evolution(
+            self.evaluate_diff_evo, bounds, maxiter=N_MAX_ITER, popsize=N_POP_SIZE
+        )
 
         surrogate_x = result.x[0]
         surrogate_y = result.fun
 
-        print(f"The {new_model['model_name']} optimization suggests "
-            f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}")
+        print(
+            f"The {new_model['model_name']} optimization suggests "
+            f"x={round(surrogate_x, 3)}, y={round(surrogate_y, 3)}"
+        )
 
         """
         "name": "Application_Result",
@@ -106,23 +119,27 @@ class ModelOptimizer(KafkaPC):
             {"name": "y", "type": ["float"]}
             ]
         """
-        model_appl_data = {'phase': new_model['phase'],
-                        'algorithm': new_model['model_name'],
-                        'id': new_model['id'],
-                        'x': surrogate_x,
-                        'y': surrogate_y
-                        }
+        model_appl_data = {
+            "phase": new_model["phase"],
+            "algorithm": new_model["model_name"],
+            "id": new_model["id"],
+            "x": surrogate_x,
+            "y": surrogate_y,
+        }
 
-        new_pc.send_msg(topic='AB_application_results', data=model_appl_data)
-    
+        new_pc.send_msg(topic="AB_application_results", data=model_appl_data)
+
     def evaluate_diff_evo(self, x):
         X = np.array(x).reshape(-1, 1)
         res = self.model.predict(X)
 
         return res[0].item()
 
-env_vars = {'config_path': os.getenv('config_path'),
-            'config_section': os.getenv('config_section')}
+
+env_vars = {
+    "config_path": os.getenv("config_path"),
+    "config_section": os.getenv("config_section"),
+}
 
 # configuration constants
 N_INITIAL_DESIGN = 5
@@ -137,5 +154,25 @@ bounds = [(X_MIN, X_MAX)]
 
 new_pc = ModelOptimizer(**env_vars)
 
-for msg in new_pc.consumer:
-    new_pc.func_dict[msg.topic](msg)
+try:
+    while True:
+        msg = new_pc.consumer.poll(0.1)
+
+        if msg is None:
+            continue
+
+        elif msg.error() is not None:
+            print(f"Error occured: {str(msg.error())}")
+
+        else:
+            new_pc.func_dict[msg.topic](msg)
+            # new_message = new_pc.decode_msg(msg)
+            # print(f"Received on topic '{msg.topic()}': {new_message}")
+
+except KeyboardInterrupt:
+    pass
+
+finally:
+    new_pc.consumer.close()
+# for msg in new_pc.consumer:
+#     new_pc.func_dict[msg.topic](msg)

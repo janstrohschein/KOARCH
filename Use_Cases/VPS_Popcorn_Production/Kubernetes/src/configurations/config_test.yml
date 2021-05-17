@@ -58,11 +58,11 @@ Objective_Function:
 2_pc_model_appl_opt:
   IN_TOPIC:
     AB_model_data: ./schema/model.avsc
-    AB_simulation_model_data: .schema/model.avsc # korrekt?
+    AB_simulation_model_data: .schema/model.avsc 
   IN_GROUP: model_appl
   OUT_TOPIC:
-    AB_model_application: ./schema/model_appl.avsc # umbenennen?
-    AB_simulation_results: ./schema/simulation_results.avsc # TODO schema? oder gleich wie model_appl.avsc?
+    AB_model_application: ./schema/model_appl.avsc 
+    AB_simulation_results: ./schema/simulation_results.avsc 
 
 2_pc_optimizer:
   IN_TOPIC:
@@ -70,14 +70,14 @@ Objective_Function:
     AB_test_function: ./schema/simulation.avsc
   IN_GROUP: optimizer
   OUT_TOPIC:
-    AB_application_results: ./schema/new_x.avsc # umbenennen?
-    AB_simulation_results: ./schema/simulation_results.avsc # TODO schema? oder gleich wie model_appl.avsc?
+    AB_application_results: ./schema/new_x.avsc 
+    AB_simulation_results: ./schema/simulation_results.avsc 
 
 3_pc_evaluation:
   IN_TOPIC:
     AB_application_results: ./schema/new_x.avsc
     AB_monitoring: ./schema/monitoring.avsc
-    AB_simulation_results:  ./schema/simulation_results.avsc # TODO schema? oder gleich wie model_appl.avsc?
+    AB_simulation_results:  ./schema/simulation_results.avsc 
   IN_GROUP: evaluation
   OUT_TOPIC:
     AB_new_x: ./schema/new_x.avsc
@@ -99,7 +99,7 @@ Objective_Function:
     AB_test_function: ./schema/simulation.avsc
   IN_GROUP: simulation_opt
   OUT_TOPIC:
-    AB_model_application: ./schema/model_appl.avsc # bleibt das model_appl oder nennen wir das um?
+    AB_model_application: ./schema/model_appl.avsc 
 
 4_pc_adaption:
   IN_TOPIC:

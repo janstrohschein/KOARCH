@@ -5,7 +5,8 @@ import requests
 import pandas as pd
 import numpy as np
 
-from classes.KafkaPC import KafkaPC
+# from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
 from classes.caai_util import ObjectiveFunction
 
 pd.set_option("display.max_columns", None)
@@ -29,9 +30,9 @@ class CognitionPC(KafkaPC):
             "rel_RAM",
             "norm_y",
             "norm_CPU_ms",
-            "norm_RAM"
+            "norm_RAM",
         ]
-    
+
         df_columns = [
             "phase",
             "model_name",
@@ -61,13 +62,13 @@ class CognitionPC(KafkaPC):
         ]
         self.df_sim = pd.DataFrame(columns=df_sim_columns)
         self.df = pd.DataFrame(columns=df_columns)
-        API_URL = self.config['API_URL']
+        API_URL = self.config["API_URL"]
         ENDPOINT = "/production_parameter/algorithm"
         self.URL = API_URL + ENDPOINT
         self.nr_of_iterations = 0
         self.theta = 25
         self.zeta = 1
-        self.best_algorithm = 'baseline' # TODO default?
+        self.best_algorithm = "baseline"  # TODO default?
         # self.initialize_objective_function()
         self.generate_initial_design()
         # self.generate_test_function()
@@ -76,35 +77,32 @@ class CognitionPC(KafkaPC):
             "AB_apply_on_cpps": self.process_apply_on_cpps,
             "AB_application_results": self.process_application_results,
             "AB_monitoring": self.process_monitoring,
-            "AB_simulation_results": self.process_simulation_results
+            "AB_simulation_results": self.process_simulation_results,
         }
 
     def aggregatePerformance(self, cpu, memory, y):
         # compute weighted aggregation
-        weightY = self.config['USER_WEIGHTS']['QUALITY']
-        weightC = self.config['USER_WEIGHTS']['RESOURCES']/2
-        weightM = self.config['USER_WEIGHTS']['RESOURCES']/2
+        weightY = self.config["USER_WEIGHTS"]["QUALITY"]
+        weightC = self.config["USER_WEIGHTS"]["RESOURCES"] / 2
+        weightM = self.config["USER_WEIGHTS"]["RESOURCES"] / 2
         return (weightY * y) + (weightC * cpu) + (weightM * memory)
 
     def initialize_objective_function(self):
         """initialize objective function and fit the model on the historic data"""
         self.new_objective = ObjectiveFunction()
-        self.new_objective.load_data(data_path=self.config['data_path'],
-                                     x_columns=self.config['x_columns'],
-                                     y_columns=self.config['y_columns'])
+        self.new_objective.load_data(
+            data_path=self.config["data_path"],
+            x_columns=self.config["x_columns"],
+            y_columns=self.config["y_columns"],
+        )
         self.new_objective.fit_model()
-
-    # def generate_test_function(self):
-    #     """ insert description """
-    #     # comments
-    #     pass
 
     def generate_initial_design(self):
         """ number n_initial_design equally spaced X between X_MIN, X_MAX """
 
-        self.N_INITIAL_DESIGN = self.config['N_INITIAL_DESIGN']
-        self.X_MIN = self.config['X_MIN']
-        self.X_MAX = self.config['X_MAX']
+        self.N_INITIAL_DESIGN = self.config["N_INITIAL_DESIGN"]
+        self.X_MIN = self.config["X_MIN"]
+        self.X_MAX = self.config["X_MAX"]
 
         self.X = np.linspace(self.X_MIN, self.X_MAX, num=self.N_INITIAL_DESIGN)
 
@@ -116,8 +114,8 @@ class CognitionPC(KafkaPC):
         """
         min_best_pred_y = self.df.loc[self.df["pred_y"].idxmin()]
         selected_algo_id = self.df["pred_y"].idxmin()
-        selected_algo = min_best_pred_y['model_name']
-        best_x = min_best_pred_y['x']
+        selected_algo = min_best_pred_y["model_name"]
+        best_x = min_best_pred_y["x"]
 
         return selected_algo_id, selected_algo, best_x
 
@@ -140,41 +138,56 @@ class CognitionPC(KafkaPC):
         df_real_y = self.df[self.df.y.notnull()].copy()
 
         if df_pred_y.empty is False:
-            df_pred_y['pred_quality'] = df_pred_y['pred_quality'] * self.config['USER_WEIGHTS']['QUALITY']
-            df_pred_y['resources'] = df_pred_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
-            df_pred_y['overall_quality'] = df_pred_y.apply(lambda row: self.calc_avg((row['pred_quality'],
-                                                                                      row['resources'])), axis=1)
+            df_pred_y["pred_quality"] = (
+                df_pred_y["pred_quality"] * self.config["USER_WEIGHTS"]["QUALITY"]
+            )
+            df_pred_y["resources"] = (
+                df_pred_y["resources"] * self.config["USER_WEIGHTS"]["RESOURCES"]
+            )
+            df_pred_y["overall_quality"] = df_pred_y.apply(
+                lambda row: self.calc_avg((row["pred_quality"], row["resources"])),
+                axis=1,
+            )
 
         if df_real_y.empty is False:
-            df_real_y['real_quality'] = df_real_y['real_quality'] * self.config['USER_WEIGHTS']['QUALITY']
-            df_real_y['resources'] = df_real_y['resources'] * self.config['USER_WEIGHTS']['RESOURCES']
-            df_real_y['overall_quality'] = df_real_y.apply(lambda row: self.calc_avg((row['real_quality'],
-                                                                                      row['resources'])), axis=1)
+            df_real_y["real_quality"] = (
+                df_real_y["real_quality"] * self.config["USER_WEIGHTS"]["QUALITY"]
+            )
+            df_real_y["resources"] = (
+                df_real_y["resources"] * self.config["USER_WEIGHTS"]["RESOURCES"]
+            )
+            df_real_y["overall_quality"] = df_real_y.apply(
+                lambda row: self.calc_avg((row["real_quality"], row["resources"])),
+                axis=1,
+            )
 
         combined_df = pd.concat([df_pred_y, df_real_y], axis=0, sort=False)
-        if combined_df['overall_quality'].empty is False:
-            best_quality = combined_df.loc[combined_df['overall_quality'].idxmin()]
+        if combined_df["overall_quality"].empty is False:
+            best_quality = combined_df.loc[combined_df["overall_quality"].idxmin()]
 
             selected_algo_id = best_quality.name
-            selected_algo = best_quality['model_name']
-            best_x = best_quality['x']
+            selected_algo = best_quality["model_name"]
+            best_x = best_quality["x"]
 
             print(f"Algorithm selection: {selected_algo}({selected_algo_id})\nDetails:")
 
-            print(best_quality[["model_name",
-                                "x",
-                                "pred_y",
-                                "y",
-                                "rmse",
-                                "CPU_ms",
-                                "RAM",
-                                "pred_quality",
-                                "real_quality",
-                                "resources",
-                                "overall_quality"
-                                ]
-                               ]
-                  )
+            print(
+                best_quality[
+                    [
+                        "model_name",
+                        "x",
+                        "pred_y",
+                        "y",
+                        "rmse",
+                        "CPU_ms",
+                        "RAM",
+                        "pred_quality",
+                        "real_quality",
+                        "resources",
+                        "overall_quality",
+                    ]
+                ]
+            )
 
             print(f"Send x={round(best_x, 3)} to Adaption")
 
@@ -194,8 +207,10 @@ class CognitionPC(KafkaPC):
 
         selected_algo_id = selected_algo = best_x = None
 
-        strategy_dict = {'min_best_pred_y': self.strategy_min_best_pred_y,
-                         'model_quality': self.strategy_model_quality}
+        strategy_dict = {
+            "min_best_pred_y": self.strategy_min_best_pred_y,
+            "model_quality": self.strategy_model_quality,
+        }
 
         selected_algo_id, selected_algo, best_x = strategy_dict[strategy]()
 
@@ -204,10 +219,12 @@ class CognitionPC(KafkaPC):
     def send_point_from_initial_design(self):
         """ Sends the next point from the initial design as message """
         id = self.nr_of_iterations
-        self.send_msg(topic='AB_new_x', data={'algorithm':'Initial design', 'new_x':self.X[id]})
+        self.send_msg(
+            topic="AB_new_x", data={"algorithm": "Initial design", "new_x": self.X[id]}
+        )
 
     def calc_y_delta(self, row):
-        return abs(row['y'] - row['pred_y'])
+        return abs(row["y"] - row["pred_y"])
 
     def calc_avg(self, columns):
         result = 0
@@ -219,16 +236,19 @@ class CognitionPC(KafkaPC):
 
     def normalize_values(self, norm_source, norm_dest, invert):
         if invert:
-            self.df_sim[norm_dest] = 1-((self.df_sim[norm_source] - self.df_sim[norm_source].min()) /\
-                (self.df_sim[norm_source].max()-self.df_sim[norm_source].min()))
-        else: 
-            self.df_sim[norm_dest] = (self.df_sim[norm_source] - self.df_sim[norm_source].min()) /\
-                (self.df_sim[norm_source].max()-self.df_sim[norm_source].min())
+            self.df_sim[norm_dest] = 1 - (
+                (self.df_sim[norm_source] - self.df_sim[norm_source].min())
+                / (self.df_sim[norm_source].max() - self.df_sim[norm_source].min())
+            )
+        else:
+            self.df_sim[norm_dest] = (
+                self.df_sim[norm_source] - self.df_sim[norm_source].min()
+            ) / (self.df_sim[norm_source].max() - self.df_sim[norm_source].min())
 
     def assign_real_y(self, x, y):
         if self.df.empty is False:
-            self.df.loc[self.df['x'] == x, 'y'] = y
-            self.df['y_delta'] = self.df.apply(self.calc_y_delta, axis=1)
+            self.df.loc[self.df["x"] == x, "y"] = y
+            self.df["y_delta"] = self.df.apply(self.calc_y_delta, axis=1)
 
     def process_application_results(self, msg):
         """Sends the new value for x to the adaption
@@ -253,10 +273,12 @@ class CognitionPC(KafkaPC):
 
         """
         print("Processing application results from Optimizer on AB_application_results")
-        new_appl_result = self.decode_avro_msg(msg)
-        
-        adaption_data = {"algorithm": self.best_algorithm['algorithm'], "new_x": new_appl_result['x']
-                        }
+        new_appl_result = self.decode_msg(msg)
+
+        adaption_data = {
+            "algorithm": self.best_algorithm["algorithm"],
+            "new_x": new_appl_result["x"],
+        }
 
         self.send_msg(topic="AB_new_x", data=adaption_data)
         print(f"Sent application results to Adaption: x={new_appl_result['x']}")
@@ -306,13 +328,15 @@ class CognitionPC(KafkaPC):
             }
         """
         print("Processing monitoring data from Monitoring on AB_monitoring")
-        new_monitoring = self.decode_avro_msg(msg)
+        new_monitoring = self.decode_msg(msg)
 
         # send initial design first
         if self.nr_of_iterations < self.N_INITIAL_DESIGN:
 
             self.send_point_from_initial_design()
-            print(f'Sent next point from initial design x={self.X[self.nr_of_iterations]} to Adaption.')
+            print(
+                f"Sent next point from initial design x={self.X[self.nr_of_iterations]} to Adaption."
+            )
 
         # then send new data points to simulation
 
@@ -324,10 +348,12 @@ class CognitionPC(KafkaPC):
             print("Setting new_simulation=True")
 
         # send all data to simulation
-        simulation_data = {"id": self.nr_of_iterations,
-                           "new_simulation": new_simulation,
-                           "x": new_monitoring['x'],
-                           "y": new_monitoring['y']}
+        simulation_data = {
+            "id": self.nr_of_iterations,
+            "new_simulation": new_simulation,
+            "x": new_monitoring["x"],
+            "y": new_monitoring["y"],
+        }
 
         self.send_msg(topic="AB_simulation_input", data=simulation_data)
 
@@ -349,9 +375,11 @@ class CognitionPC(KafkaPC):
             {"name": "RAM", "type": ["float"]}
             ]
         """
-        new_sim_results = self.decode_avro_msg(msg)
+        new_sim_results = self.decode_msg(msg)
 
-        print(f"Processing simulation results from {new_sim_results['algorithm']} on AB_simulation_results")
+        print(
+            f"Processing simulation results from {new_sim_results['algorithm']} on AB_simulation_results"
+        )
 
         # append to df_sim
         self.df_sim = self.df_sim.append(new_sim_results, ignore_index=True)
@@ -360,55 +388,45 @@ class CognitionPC(KafkaPC):
         print(self.df_sim)
 
         # compute rel performance, if baseline exists
-        is_baseline = self.df_sim['algorithm'] == 'baseline'
-        row = self.df_sim[is_baseline].tail(1)# [-1:]
+        is_baseline = self.df_sim["algorithm"] == "baseline"
+        row = self.df_sim[is_baseline].tail(1)  # [-1:]
         print("Simulation results selects baseline: ")
         print(row)
         print("for new Simulation results: ")
         print(new_sim_results)
         if len(row) > 0:
-            self.df_sim['rel_y'] = self.df_sim['y'] / row['y'][0]
-            self.df_sim['rel_CPU_ms'] = self.df_sim['CPU_ms'] / row['CPU_ms'][0]
-            self.df_sim['rel_RAM'] = self.df_sim['RAM'] / row['RAM'][0]
+            self.df_sim["rel_y"] = self.df_sim["y"] / row["y"][0]
+            self.df_sim["rel_CPU_ms"] = self.df_sim["CPU_ms"] / row["CPU_ms"][0]
+            self.df_sim["rel_RAM"] = self.df_sim["RAM"] / row["RAM"][0]
 
             # normalize performance, if something to normalize exists
             if len(self.df_sim) > 1:
-                self.normalize_values('rel_y', 'norm_y', False)
-                self.normalize_values('rel_CPU_ms', 'norm_CPU_ms', True)
-                self.normalize_values('rel_RAM', 'norm_RAM', True)
+                self.normalize_values("rel_y", "norm_y", False)
+                self.normalize_values("rel_CPU_ms", "norm_CPU_ms", True)
+                self.normalize_values("rel_RAM", "norm_RAM", True)
 
-                # aggregate  
-                self.df_sim['y_agg'] = np.vectorize(self.aggregatePerformance)(cpu = self.df_sim['norm_CPU_ms'], memory = self.df_sim['norm_RAM'], y = self.df_sim['norm_y'])
+                # aggregate
+                self.df_sim["y_agg"] = np.vectorize(self.aggregatePerformance)(
+                    cpu=self.df_sim["norm_CPU_ms"],
+                    memory=self.df_sim["norm_RAM"],
+                    y=self.df_sim["norm_y"],
+                )
                 # take max performance y_agg
-                self.best_algorithm = self.df_sim.loc[self.df_sim['y_agg'].idxmax()]
-                print("Best performing algorithm: " + self.best_algorithm['algorithm'])
+                self.best_algorithm = self.df_sim.loc[self.df_sim["y_agg"].idxmax()]
+                print("Best performing algorithm: " + self.best_algorithm["algorithm"])
 
-                # TODO send current best algorithm
-                # new_x_data = {"new_x":0, 'algorithm': self.best_algorithm['algorithm']}
-
-                r = requests.patch(url=self.URL, params={"value": self.best_algorithm['algorithm']})
-                # self.send_msg(topic="AB_new_x", data=new_x_data)
-
-        """ earlier selection process
-        # select best value, otherwise CPPS will use last value from controller
-        if self.df.empty is False:
-            self.assign_real_y(new_monitoring['x'], new_monitoring['y'])
-            self.normalize_values('y', 'y_norm')
-            self.normalize_values('y_delta', 'y_delta_norm')
-            self.df['real_quality'] = self.df.apply(lambda row: self.calc_avg((row['y_norm'], row['y_delta_norm'],
-                                                                                row['rmse_norm'])), axis=1)
-
-            selected_algo_id, selected_algo, selected_x = self.get_best_x()
-            algorithm = f"{selected_algo}({selected_algo_id})"
-            if selected_algo_id is not None:
-                self.send_new_x(id=self.current_data_point, x=selected_x, phase=phase, algorithm=algorithm)
-        """
+                r = requests.patch(
+                    url=self.URL, params={"value": self.best_algorithm["algorithm"]}
+                )
 
     def process_apply_on_cpps(self, msg):
-        new_appl_result = self.decode_avro_msg(msg)
-        
-        adaption_data = {"algorithm": new_appl_result['algorithm'], "new_x": new_appl_result['new_x']
-                         }
+        new_appl_result = self.decode_msg(msg)
+
+        adaption_data = {
+            "algorithm": new_appl_result["algorithm"],
+            "new_x": new_appl_result["new_x"],
+        }
 
         self.send_msg(topic="AB_new_x", data=adaption_data)
-        print(f"Sent application results to Adaption: x={new_appl_result['new_x']}") 
+        print(f"Sent application results to Adaption: x={new_appl_result['new_x']}")
+

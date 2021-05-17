@@ -1,6 +1,7 @@
 import os
-#from scipy.optimize import differential_evolution
-#from scipy.optimize import minimize
+
+# from scipy.optimize import differential_evolution
+# from scipy.optimize import minimize
 from math import ceil
 import pickle
 import numpy as np
@@ -13,10 +14,13 @@ from rpy2.robjects.conversion import localconverter
 
 from classes.caai_util import OptAlgorithm
 
-from classes.KafkaPC import KafkaPC
+# from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
+
 # from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes import KafkaPC
 
 pandas2ri.activate()
+
 
 class Optimizer(KafkaPC):
     def __init__(self, config_path, config_section):
@@ -37,10 +41,12 @@ class Optimizer(KafkaPC):
         api_request = requests.get(url=URL)
         use_case_info = json.loads(api_request.content)
 
-        payload = {"use_case": use_case_info['use_case'],
-                   "goal": use_case_info['goal'],
-                   "feature": use_case_info['feature'],
-                   "algorithm": OPTIMIZER_NAME}
+        payload = {
+            "use_case": use_case_info["use_case"],
+            "goal": use_case_info["goal"],
+            "feature": use_case_info["feature"],
+            "algorithm": OPTIMIZER_NAME,
+        }
 
         ENDPOINT_KNOWLEDGE = "/knowledge/algorithm/"
         URL = API_URL + ENDPOINT_KNOWLEDGE
@@ -53,7 +59,7 @@ class Optimizer(KafkaPC):
             if type(value) is str:
                 OPTIMIZER_PARAMETERS[key] = value
             elif type(value) is dict:
-                OPTIMIZER_PARAMETERS[key] = value['default']
+                OPTIMIZER_PARAMETERS[key] = value["default"]
 
         return OPTIMIZER_PARAMETERS
 
@@ -64,16 +70,16 @@ class Optimizer(KafkaPC):
             {"name": "new_x", "type": ["float"]}
             ]
         """
-        apply_on_cpps_dict = {'algorithm': OPTIMIZER_NAME, 'new_x': x[0] }
+        apply_on_cpps_dict = {"algorithm": OPTIMIZER_NAME, "new_x": x[0]}
 
         print(f"sending from apply_to_cpps() with x={x[0]}")
         self.send_msg(topic="AB_apply_on_cpps", data=apply_on_cpps_dict)
         for msg in self.consumer:
             print(f"Arrived on topic: {msg.topic} ")
-            if msg.topic == 'AB_raw_data':
-                new_msg = self.decode_avro_msg(msg)
+            if msg.topic == "AB_raw_data":
+                new_msg = self.decode_msg(msg)
                 # get y from returning message
-                return new_msg['y']
+                return new_msg["y"]
 
     def process_test_function(self, msg):
         print("Process test instance from Simulation on AB_test_function")
@@ -85,8 +91,8 @@ class Optimizer(KafkaPC):
             {"name": "simulation", "type": ["byte"]},
             ]
         """
-        new_test_function = self.decode_avro_msg(msg)
-        objFunction = pickle.loads(new_test_function['simulation'])
+        new_test_function = self.decode_msg(msg)
+        objFunction = pickle.loads(new_test_function["simulation"])
 
         # instantiate optimizer
         alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME, OPTIMIZER_PARAMETERS)
@@ -100,7 +106,8 @@ class Optimizer(KafkaPC):
         algorithm = OPTIMIZER_NAME
 
         budget = result.nfev
-        # TODO 
+        # QUESTION include real resource consumption in Cognition?
+
         repetition = 1
         selection_phase = 1
         CPU_ms = 0.35
@@ -120,35 +127,36 @@ class Optimizer(KafkaPC):
             ]
         """
         # fill dictionary with required result fields
-        simulation_result = {"algorithm": algorithm,
-                              "selection_phase": selection_phase,
-                              "repetition": repetition,
-                              "budget": budget,  
-                              "CPU_ms": CPU_ms,
-                              "RAM": RAM, 
-                              "x": best_x,
-                              "y": best_y                            
-                              }
+        simulation_result = {
+            "algorithm": algorithm,
+            "selection_phase": selection_phase,
+            "repetition": repetition,
+            "budget": budget,
+            "CPU_ms": CPU_ms,
+            "RAM": RAM,
+            "x": best_x,
+            "y": best_y,
+        }
 
         self.send_msg(topic="AB_simulation_results", data=simulation_result)
 
     def process_production_data(self, msg):
         new_production_data = self.decode_avro_msg(msg)
-        if(new_production_data['algorithm'] == OPTIMIZER_NAME):
+        if new_production_data["algorithm"] == OPTIMIZER_NAME:
             print("Process production data from Monitoring on DB_raw_data")
-            id = new_production_data['id']
+            id = new_production_data["id"]
             self.last_raw_id = id
             self.raw_data_dict[id] = {
-                'id': new_production_data['id'],
-                'phase': new_production_data['phase'],
-                'algorithm': OPTIMIZER_NAME,
-                'x': new_production_data['x'],
-    #            'y': new_production_data['y']
+                "id": new_production_data["id"],
+                "phase": new_production_data["phase"],
+                "algorithm": OPTIMIZER_NAME,
+                "x": new_production_data["x"],
+                #            'y': new_production_data['y']
             }
-            if new_production_data['phase'] == 'init':
+            if new_production_data["phase"] == "init":
                 print("Production still in init phase")
                 return
-            
+
             # instantiate optimizer
             alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME, OPTIMIZER_PARAMETERS)
             result = alg.run(self.apply_on_cpps)
@@ -170,18 +178,21 @@ class Optimizer(KafkaPC):
                 ]
             """
             # fill dictionary with required result fields
-            application_results = {'phase': new_production_data['phase'],
-                            'algorithm': OPTIMIZER_NAME,
-                            'id': new_production_data['id'],
-                            'x': x,
-                            'y': y
-                            }
+            application_results = {
+                "phase": new_production_data["phase"],
+                "algorithm": OPTIMIZER_NAME,
+                "id": new_production_data["id"],
+                "x": x,
+                "y": y,
+            }
 
             self.send_msg(topic="AB_application_results", data=application_results)
 
 
-env_vars = {'config_path': os.getenv('config_path'),
-            'config_section': os.getenv('config_section')}
+env_vars = {
+    "config_path": os.getenv("config_path"),
+    "config_section": os.getenv("config_section"),
+}
 
 
 """
@@ -192,9 +203,32 @@ def evaluate_diff_evo(x):
     return res[0].item()
 """
 new_pc = Optimizer(**env_vars)
-OPTIMIZER_NAME = new_pc.config['OPTIMIZER_NAME']
+OPTIMIZER_NAME = new_pc.config["OPTIMIZER_NAME"]
 
-API_URL = new_pc.config['API_URL']
+API_URL = new_pc.config["API_URL"]
 OPTIMIZER_PARAMETERS = new_pc.get_optimizer_parameters(API_URL)
-for msg in new_pc.consumer:
-    new_pc.func_dict[msg.topic](msg)
+
+
+try:
+    while True:
+        msg = new_pc.consumer.poll(0.1)
+
+        if msg is None:
+            continue
+
+        elif msg.error() is not None:
+            print(f"Error occured: {str(msg.error())}")
+
+        else:
+            new_pc.func_dict[msg.topic](msg)
+            # new_message = new_pc.decode_msg(msg)
+            # print(f"Received on topic '{msg.topic()}': {new_message}")
+
+except KeyboardInterrupt:
+    pass
+
+finally:
+    new_pc.consumer.close()
+
+# for msg in new_pc.consumer:
+#     new_pc.func_dict[msg.topic](msg)

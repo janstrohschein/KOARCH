@@ -12,7 +12,8 @@ from rpy2.robjects.conversion import localconverter
 
 import numpy as np
 
-from classes.KafkaPC import KafkaPC
+# from classes.KafkaPC import KafkaPC
+from classes.CKafkaPC import KafkaPC
 from classes.caai_util import ModelLearner, DataWindow, get_cv_scores
 import sys
 import warnings
@@ -26,12 +27,16 @@ X_MAX = 10100
 N_INITIAL_DESIGN = 5
 
 pandas2ri.activate()
+
+
 class Learner(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
 
-        self.func_dict = {"AB_test_function": self.process_test_function,
-                          "DB_raw_data": self.process_raw_data}
+        self.func_dict = {
+            "AB_test_function": self.process_test_function,
+            "DB_raw_data": self.process_raw_data,
+        }
 
     def get_model_parameters(self, API_URL):
 
@@ -40,10 +45,12 @@ class Learner(KafkaPC):
         api_request = requests.get(url=URL)
         use_case_info = json.loads(api_request.content)
 
-        payload = {"use_case": use_case_info['use_case'],
-                   "goal": use_case_info['goal'],
-                   "feature": use_case_info['feature'],
-                   "algorithm": MODEL_ALGORITHM}
+        payload = {
+            "use_case": use_case_info["use_case"],
+            "goal": use_case_info["goal"],
+            "feature": use_case_info["feature"],
+            "algorithm": MODEL_ALGORITHM,
+        }
 
         ENDPOINT_KNOWLEDGE = "/knowledge/algorithm/"
         URL = API_URL + ENDPOINT_KNOWLEDGE
@@ -56,7 +63,7 @@ class Learner(KafkaPC):
             if type(value) is str:
                 MODEL_PARAMETERS[key] = value
             elif type(value) is dict:
-                MODEL_PARAMETERS[key] = value['default']
+                MODEL_PARAMETERS[key] = value["default"]
 
         return MODEL_PARAMETERS
 
@@ -68,10 +75,11 @@ class Learner(KafkaPC):
             {"name": "simulation", "type": ["byte"]},
             ]
         """
-        new_sim = self.decode_avro_msg(msg)
-        # extract objective 
-        objFunction = pickle.loads(new_sim['simulation'])
-        
+        # new_sim = self.decode_avro_msg(msg)
+        new_sim = self.decode_msg(msg)
+        # extract objective
+        objFunction = pickle.loads(new_sim["simulation"])
+
         # performance tracking
         tracemalloc.start()
         start = time.perf_counter()
@@ -87,14 +95,15 @@ class Learner(KafkaPC):
 
         if ML.reshape_x:
             X = X.reshape(-1, 1)
-        
+
         if ML.reshape_y:
             y = y.reshape(-1, 1)
         ML.model.fit(X, y)
 
         rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
-        print(f"Fitted model of test instance with  -> "
-            f"RMSE: {round(rmse_score, 3)}")
+        print(
+            f"Fitted model of test instance with  -> " f"RMSE: {round(rmse_score, 3)}"
+        )
 
         real_time = round(time.perf_counter() - start, 4)
         process_time = round(time.process_time() - start_process, 4)
@@ -108,7 +117,7 @@ class Learner(KafkaPC):
 
         # print(f"Current memory usage is {current_mb}MB; Peak was {peak_mb}MB")
         tracemalloc.stop()
-        
+
         # pickle model and send to optimizer
         model_pickle = pickle.dumps(ML.model)
 
@@ -125,17 +134,17 @@ class Learner(KafkaPC):
             ]
         """
 
-        simulation_model_data = {'selection_phase': 1,
-                        'algorithm': MODEL_ALGORITHM,
-                        'repetition': 1,
-                        'budget': budget,
-                        'model': model_pickle,
-                        'CPU_ms': real_time,
-                        'RAM': peak_mb
-                        }
+        simulation_model_data = {
+            "selection_phase": 1,
+            "algorithm": MODEL_ALGORITHM,
+            "repetition": 1,
+            "budget": budget,
+            "model": model_pickle,
+            "CPU_ms": real_time,
+            "RAM": peak_mb,
+        }
 
-        self.send_msg(topic='AB_simulation_model_data', data=simulation_model_data)
-
+        self.send_msg(topic="AB_simulation_model_data", data=simulation_model_data)
 
     def process_raw_data(self, msg):
         """
@@ -148,15 +157,19 @@ class Learner(KafkaPC):
             {"name": "y", "type": ["float"]}
             ]
         """
-        new_data = self.decode_avro_msg(msg)
+        new_data = self.decode_msg(msg)
 
-        new_data_point = new_window.Data_Point(new_data['id'], new_data['x'], new_data['y'])
+        new_data_point = new_window.Data_Point(
+            new_data["id"], new_data["x"], new_data["y"]
+        )
         new_window.append_and_check(new_data_point)
 
         if len(new_window.data) < MIN_DATA_POINTS:
-            print(f"Collecting training data for {MODEL_ALGORITHM} "
-                f"({len(new_window.data)}/{MIN_DATA_POINTS})")
-        elif new_data['algorithm'] == MODEL_ALGORITHM:
+            print(
+                f"Collecting training data for {MODEL_ALGORITHM} "
+                f"({len(new_window.data)}/{MIN_DATA_POINTS})"
+            )
+        elif new_data["algorithm"] == MODEL_ALGORITHM:
             # performance tracking
             tracemalloc.start()
             start = time.perf_counter()
@@ -170,8 +183,10 @@ class Learner(KafkaPC):
 
             # print(f'n = {len(X)}')
             rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
-            print(f"Update model with (x={round(new_data['x'], 3)}, y={round(new_data['y'], 3)}) -> "
-                f"RMSE: {round(rmse_score, 3)}")
+            print(
+                f"Update model with (x={round(new_data['x'], 3)}, y={round(new_data['y'], 3)}) -> "
+                f"RMSE: {round(rmse_score, 3)}"
+            )
 
             real_time = round(time.perf_counter() - start, 4)
             process_time = round(time.process_time() - start_process, 4)
@@ -205,43 +220,59 @@ class Learner(KafkaPC):
                 ]
             """
 
-            model_data = {'phase': new_data['phase'],
-                            'model_name': MODEL_ALGORITHM,
-                            'id': new_data['id'],
-                            'n_data_points': len(X),
-                            'id_start_x': id_start_x,
-                            'model': model_pickle,
-                            'model_size': getsizeof(model_pickle),
-                            'rmse': rmse_score,
-                            'mae': mae_score,
-                            'rsquared': r2_score,
-                            'CPU_ms': real_time,
-                            'RAM': peak_mb
-                            }
+            model_data = {
+                "phase": new_data["phase"],
+                "model_name": MODEL_ALGORITHM,
+                "id": new_data["id"],
+                "n_data_points": len(X),
+                "id_start_x": id_start_x,
+                "model": model_pickle,
+                "model_size": getsizeof(model_pickle),
+                "rmse": rmse_score,
+                "mae": mae_score,
+                "rsquared": r2_score,
+                "CPU_ms": real_time,
+                "RAM": peak_mb,
+            }
 
-            self.send_msg(topic='AB_model_data', data=model_data)
+            self.send_msg(topic="AB_model_data", data=model_data)
 
 
-env_vars = {'config_path': os.getenv('config_path'),
-            'config_section': os.getenv('config_section')}
+env_vars = {
+    "config_path": os.getenv("config_path"),
+    "config_section": os.getenv("config_section"),
+}
 
-"""
-env_vars = {'in_topic': {'DB_raw_data': './schema/data.avsc'},
-            'in_group': 'kriging',
-            'in_schema_file': './schema/data.avsc',
-            'out_topic': 'AB_model_data',
-            'out_schema_file': './schema/model.avsc'}
-"""
 
 new_pc = Learner(**env_vars)
 
-MODEL_ALGORITHM = new_pc.config['MODEL_ALGORITHM']
+MODEL_ALGORITHM = new_pc.config["MODEL_ALGORITHM"]
 
-API_URL = new_pc.config['API_URL']
+API_URL = new_pc.config["API_URL"]
 MODEL_PARAMETERS = new_pc.get_model_parameters(API_URL)
 
 new_window = DataWindow()
 MIN_DATA_POINTS = 5
 
-for msg in new_pc.consumer:
-    new_pc.func_dict[msg.topic](msg)
+try:
+    while True:
+        msg = new_pc.consumer.poll(0.1)
+
+        if msg is None:
+            continue
+
+        elif msg.error() is not None:
+            print(f"Error occured: {str(msg.error())}")
+
+        else:
+            new_pc.func_dict[msg.topic](msg)
+            # new_message = new_pc.decode_msg(msg)
+            # print(f"Received on topic '{msg.topic()}': {new_message}")
+
+except KeyboardInterrupt:
+    pass
+
+finally:
+    new_pc.consumer.close()
+# for msg in new_pc.consumer:
+#     new_pc.func_dict[msg.topic](msg)
