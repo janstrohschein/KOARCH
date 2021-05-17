@@ -103,6 +103,7 @@ class ConfigMap:
 
     The original filename is the key, the path is used to mount the original file in a container
     """
+
     name: str
     key: str
     path: str
@@ -124,7 +125,6 @@ class Job:
 
 
 class KubeAPI:
-
     def __init__(self):
         super(KubeAPI, self).__init__()
         self.unit_definitions_file = "C:/Users/stroh/Programming/GitHub/KOARCH/Big_Data_Platform/Kubernetes/Cognition/example/src/kubernetes_units.txt"
@@ -143,7 +143,9 @@ class KubeAPI:
         try:
             k8s.config.load_incluster_config()
         except Exception as e:
-            print(f"Error loading incluster config: {repr(e)}, trying to load local config instead")
+            print(
+                f"Error loading incluster config: {repr(e)}, trying to load local config instead"
+            )
             k8s.config.load_kube_config(self.kube_local_config)
 
         self.core_api = k8s.client.CoreV1Api()
@@ -193,25 +195,29 @@ class KubeAPI:
             print("Connect to Kube Custom API first")
             exit
 
-        node_data = self.custom_api.list_cluster_custom_object("metrics.k8s.io", "v1beta1", "nodes")
+        node_data = self.custom_api.list_cluster_custom_object(
+            "metrics.k8s.io", "v1beta1", "nodes"
+        )
         cluster_alloc = self.get_cluster_allocatable()
 
         res = ClusterInfo()
-        for node in node_data['items']:
-            name = node['metadata']['name']
-            cpu_alloc = cluster_alloc[name]['cpu']
-            mem_alloc = cluster_alloc[name]['mem']
-            cpu_usage = self.q(node['usage']['cpu'])
-            mem_usage = self.q(node['usage']['memory'])
+        for node in node_data["items"]:
+            name = node["metadata"]["name"]
+            cpu_alloc = cluster_alloc[name]["cpu"]
+            mem_alloc = cluster_alloc[name]["mem"]
+            cpu_usage = self.q(node["usage"]["cpu"])
+            mem_usage = self.q(node["usage"]["memory"])
             cpu_perc = self.get_perc_from_quant(cpu_usage, cpu_alloc)
             mem_perc = self.get_perc_from_quant(mem_usage, mem_alloc)
-            node_info = NodeInstance(node_name=name,
-                                     cpu_alloc=cpu_alloc,
-                                     mem_alloc=mem_alloc,
-                                     cpu_usage=cpu_usage,
-                                     mem_usage=mem_usage,
-                                     cpu_perc=cpu_perc,
-                                     mem_perc=mem_perc)
+            node_info = NodeInstance(
+                node_name=name,
+                cpu_alloc=cpu_alloc,
+                mem_alloc=mem_alloc,
+                cpu_usage=cpu_usage,
+                mem_usage=mem_usage,
+                cpu_perc=cpu_perc,
+                mem_perc=mem_perc,
+            )
             res.nodes.append(node_info)
 
         return res
@@ -229,26 +235,30 @@ class KubeAPI:
 
         cluster_alloc = self.get_cluster_allocatable()
 
-        pod_data = self.custom_api.list_cluster_custom_object('metrics.k8s.io', 'v1beta1', 'pods')
+        pod_data = self.custom_api.list_cluster_custom_object(
+            "metrics.k8s.io", "v1beta1", "pods"
+        )
 
         res = {}
-        for pod in pod_data['items']:
-            pod_name = pod['metadata']['name']
-            for container in pod['containers']:
-                name = container['name']
+        for pod in pod_data["items"]:
+            pod_name = pod["metadata"]["name"]
+            for container in pod["containers"]:
+                name = container["name"]
                 if name not in res:
                     res[name] = ContainerInfo(container_name=name)
-                cpu_usage = self.q(container['usage']['cpu'])
-                mem_usage = self.q(container['usage']['memory'])
-                cpu_perc = self.get_perc_from_quant(cpu_usage, cluster_alloc['sum_cpu'])
-                mem_perc = self.get_perc_from_quant(mem_usage, cluster_alloc['sum_mem'])
+                cpu_usage = self.q(container["usage"]["cpu"])
+                mem_usage = self.q(container["usage"]["memory"])
+                cpu_perc = self.get_perc_from_quant(cpu_usage, cluster_alloc["sum_cpu"])
+                mem_perc = self.get_perc_from_quant(mem_usage, cluster_alloc["sum_mem"])
 
-                new_ci = ContainerInstance(pod_name=pod_name,
-                                           container_name=name,
-                                           cpu_usage=cpu_usage,
-                                           mem_usage=mem_usage,
-                                           cpu_perc=cpu_perc,
-                                           mem_perc=mem_perc)
+                new_ci = ContainerInstance(
+                    pod_name=pod_name,
+                    container_name=name,
+                    cpu_usage=cpu_usage,
+                    mem_usage=mem_usage,
+                    cpu_perc=cpu_perc,
+                    mem_perc=mem_perc,
+                )
                 res[name].containers.append(new_ci)
                 # print(f"Container {name} uses CPU: {cpu_usage} ({cpu_per}%), Memory: {mem_usage} ({mem_per}%)")
 
@@ -265,16 +275,15 @@ class KubeAPI:
             exit
 
         node_data = {}
-        node_data['sum_cpu'] = 0
-        node_data['sum_mem'] = 0
+        node_data["sum_cpu"] = 0
+        node_data["sum_mem"] = 0
 
         for node in self.core_api.list_node().items:
             alloc = node.status.allocatable
-            alloc_dict = {'cpu': self.q(alloc['cpu']),
-                          'mem': self.q(alloc['memory'])}
+            alloc_dict = {"cpu": self.q(alloc["cpu"]), "mem": self.q(alloc["memory"])}
             node_data[node.metadata.name] = alloc_dict
-            node_data['sum_cpu'] += alloc_dict['cpu']
-            node_data['sum_mem'] += alloc_dict['mem']
+            node_data["sum_cpu"] += alloc_dict["cpu"]
+            node_data["sum_mem"] += alloc_dict["mem"]
 
         return node_data
 
@@ -351,9 +360,9 @@ class KubeAPI:
         volume_mounts = []
         for cm in cms:
             vm = self.get_vm_from_cm(cm)
-            v1vm = client.V1VolumeMount(name=vm.name,
-                                        mount_path=vm.mount_path,
-                                        sub_path=vm.sub_path)
+            v1vm = client.V1VolumeMount(
+                name=vm.name, mount_path=vm.mount_path, sub_path=vm.sub_path
+            )
             volume_mounts.append(v1vm)
 
         return volume_mounts
@@ -401,25 +410,37 @@ class KubeAPI:
         env_list = []
         for env_name, env_value in job.env_vars.items():
             env_list.append(client.V1EnvVar(name=env_name, value=env_value))
-        env_list.append(client.V1EnvVar(name="config_path", value=self.container_config_path))
+        env_list.append(
+            client.V1EnvVar(name="config_path", value=self.container_config_path)
+        )
 
         container = client.V1Container(name=image_name, image=job.image, env=env_list)
 
-        template.template.spec = client.V1PodSpec(containers=[container], restart_policy="Never")
+        template.template.spec = client.V1PodSpec(
+            containers=[container], restart_policy="Never"
+        )
 
-        template._template._spec.volumes = self.create_volume_from_configmap(job.config_maps)
+        template._template._spec.volumes = self.create_volume_from_configmap(
+            job.config_maps
+        )
 
-        template._template._spec._containers[0].volume_mounts = self.create_volume_mount(job.config_maps)
+        template._template._spec._containers[
+            0
+        ].volume_mounts = self.create_volume_mount(job.config_maps)
 
         # And finally we can create our V1JobSpec
-        body.spec = client.V1JobSpec(ttl_seconds_after_finished=600, template=template.template)
+        body.spec = client.V1JobSpec(
+            ttl_seconds_after_finished=600, template=template.template
+        )
 
         return body
 
     def kube_create_job(self, job):
         body = self.kube_create_job_object(job)
         try:
-            api_response = self.batch_api.create_namespaced_job("default", body, pretty=True)
+            api_response = self.batch_api.create_namespaced_job(
+                "default", body, pretty=True
+            )
             # print(api_response)
         except ApiException as e:
             print("Exception when calling BatchV1Api->create_namespaced_job: %s\n" % e)
@@ -430,27 +451,26 @@ class KubeAPI:
 
     def get_pod_metadata(self):
         ret = self.core_api.list_pod_for_all_namespaces(watch=False)
-        pod_list = [(i.status.pod_ip, i.metadata.namespace, i.metadata.name) for i in ret.items]
+        pod_list = [
+            (i.status.pod_ip, i.metadata.namespace, i.metadata.name) for i in ret.items
+        ]
 
         return pod_list
 
 
+# TODO use imported class
 k_api = KubeAPI()
 k_api.init_kube_connection()
 
 joblist = []
 
-cm_general = ConfigMap(name="general",
-                       key="general_config.yml",
-                       path="general.yml")
+cm_general = ConfigMap(name="general", key="general_config.yml", path="general.yml")
 
-cm_1p = ConfigMap(name="1p-count-up",
-                  key="1p_count_up_config.yml",
-                  path="1p-count-up.yml")
+cm_1p = ConfigMap(
+    name="1p-count-up", key="1p_count_up_config.yml", path="1p-count-up.yml"
+)
 
-cm_2c = ConfigMap(name="2c-print",
-                  key="2c_print_config.yml",
-                  path="2c-print.yml")
+cm_2c = ConfigMap(name="2c-print", key="2c_print_config.yml", path="2c-print.yml")
 
 joblist.append(Job(image="koarch/1p_count_up_example", config_maps=[cm_general, cm_1p]))
 # joblist.append(Job(image="koarch/2c_print_example", config_maps=[cm_general, cm_2c]))
@@ -465,8 +485,6 @@ while True:
     else:
         print("Waiting for resources..")
     sleep(5)
-
-
 
 
 # for pipeline in feasible_pipelines:
