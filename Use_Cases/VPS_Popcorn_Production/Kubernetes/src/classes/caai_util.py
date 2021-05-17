@@ -10,6 +10,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.gaussian_process import kernels
 
+from scipy.optimize import differential_evolution, dual_annealing, minimize
 
 class ObjectiveFunction:
     def __init__(self):
@@ -53,6 +54,59 @@ class ObjectiveFunction:
 
         return result[0].item()
 
+class OptAlgorithm:
+    def __init__(self, bounds, algorithmName, parameters={}):
+        self.opt = None
+        self.algorithName = algorithmName
+        self.bounds = bounds
+
+        parameter_eval = parameters
+        print("Optimizer configurations [" + algorithmName + "]:")
+        print(parameter_eval)
+
+        if algorithmName == "Differential evolution":
+            # Configurations, where from?
+            self.N_MAX_ITER = parameter_eval['maxiter']
+            self.N_POP_SIZE = parameter_eval['popsize']
+            self.MUTATION = parameter_eval['mutation']
+            self.RECOMBINATION = parameter_eval['recombination']
+            self.STRATEGY = parameter_eval['strategy']
+        elif algorithmName == "Dual annealing":
+            self.INITIAL_TEMP = parameter_eval['initial_temp']
+            self.VISIT = parameter_eval['visit']
+            self.ACCEPT = parameter_eval['accept']
+            self.N_MAX_FUN = parameter_eval['maxfun']
+        elif algorithmName == "L-BFGS-B":
+            self.N_MAX_FUN = parameter_eval['maxfun']
+
+    def run(self, objFunction):
+        if self.algorithName == "Differential evolution":
+            result = differential_evolution(objFunction,
+                                        self.bounds,
+                                        maxiter=self.N_MAX_ITER,
+                                        popsize=self.N_POP_SIZE,
+                                        strategy=self.STRATEGY,
+                                        mutation=self.MUTATION,
+                                        recombination=self.RECOMBINATION)
+            return result
+        elif self.algorithName == "Dual annealing":
+            result = dual_annealing(func=objFunction, 
+                            bounds=self.bounds,
+                            maxiter=self.N_MAX_FUN, 
+                            no_local_search=True,
+                            initial_temp=self.INITIAL_TEMP,
+                            visit=self.VISIT,
+                            accept=self.ACCEPT)
+            return result
+        elif self.algorithName == "L-BFGS-B":
+            opts = {}
+            opts['maxfun'] = self.N_MAX_FUN
+            init = np.linspace(self.bounds[0][0], self.bounds[0][1], num=1) # random start point
+            result = minimize(fun=objFunction, 
+                            x0=init,
+                            method="L-BFGS-B",
+                            options=opts)
+            return result
 
 class ModelLearner:
     def __init__(self, learning_algorithm, parameters={}):

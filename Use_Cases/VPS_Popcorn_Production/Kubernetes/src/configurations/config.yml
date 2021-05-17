@@ -66,15 +66,54 @@ Objective_Function:
     AB_application_results: ./schema/application_result.avsc # umbenennen?
     AB_simulation_results: ./schema/simulation_result.avsc
 
-2_pc_optimizer:
+2_pc_optimizer_differential_evolution:
+  OPTIMIZER_NAME: Differential evolution
+  OPTIMIZATION_PARAMETERS:
+    maxiter: 20
+    popsize: 5
+    mutation: 0.5
+    recombination: 0.7
+    strategy: best1bin
   IN_TOPIC:
     DB_raw_data: ./schema/data.avsc
     AB_test_function: ./schema/simulation.avsc
-  IN_GROUP: optimizer
+  IN_GROUP: DE
   OUT_TOPIC:
     AB_apply_on_cpps: ./schema/new_x.avsc
     AB_application_results: ./schema/application_result.avsc 
     AB_simulation_results: ./schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+2_pc_optimizer_dual_annealing:
+  OPTIMIZER_NAME: Dual annealing
+  OPTIMIZATION_PARAMETERS:
+    maxfun: 40
+    initial_temp: 5100
+    visit: 2.62
+    accept: -5
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+    AB_test_function: ./schema/simulation.avsc
+  IN_GROUP: DA
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./schema/new_x.avsc
+    AB_application_results: ./schema/application_result.avsc 
+    AB_simulation_results: ./schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+2_pc_optimizer_lbfgsb:
+  OPTIMIZER_NAME: L-BFGS-B
+  OPTIMIZATION_PARAMETERS:
+    maxfun: 40
+  IN_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+    AB_test_function: ./schema/simulation.avsc
+  IN_GROUP: BFGS
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./schema/new_x.avsc
+    AB_application_results: ./schema/application_result.avsc 
+    AB_simulation_results: ./schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000
 
 3_pc_evaluation:
   IN_TOPIC:

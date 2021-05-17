@@ -10,6 +10,7 @@ import numpy as np
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
+import rpy2.rinterface_lib.callbacks
 
 from classes.KafkaPC import KafkaPC
 from classes.caai_util import ModelLearner, DataWindow, get_cv_scores
@@ -23,7 +24,35 @@ if not sys.warnoptions:
 env_vars = {'config_path': os.getenv('config_path'),
             'config_section': os.getenv('config_section')}
 
-new_pc = KafkaPC(**env_vars)
+class Simulation(KafkaPC):
+    def __init__(self, config_path, config_section):
+        super().__init__(config_path, config_section)
+        self.stdout = []
+        self.stdout_orig = None
+        self.stderr_orig = None
+
+    def add_to_stdout(self, line): 
+            self.stdout.append(line)
+
+    def capture_r_console_output(self):
+        self.stdout = [] # reset buffer
+
+        # Keep the old function
+        self.stdout_orig = rpy2.rinterface_lib.callbacks.consolewrite_print
+        self.stderr_orig = rpy2.rinterface_lib.callbacks.consolewrite_warnerror
+        
+        # redirect output
+        rpy2.rinterface_lib.callbacks.consolewrite_print = self.add_to_stdout
+        rpy2.rinterface_lib.callbacks.consolewrite_warnerror = self.add_to_stdout
+
+    def reset_r_console_output(self):
+        print("reset buffer")
+        self.stdout = []
+        rpy2.rinterface_lib.callbacks.consolewrite_print = self.stdout_orig
+        rpy2.rinterface_lib.callbacks.consolewrite_warnerror = self.stderr_orig
+
+
+new_pc = Simulation(**env_vars)
 
 new_window = DataWindow()
 MIN_DATA_POINTS = 5
@@ -32,12 +61,16 @@ X_MIN = 4000
 X_MAX = 10100
 BUDGET = 40
 N_INSTANCES = new_pc.config['N_INSTANCES']
-print("Simulation: N_INSTANCES to simulate: " +  str(N_INSTANCES))
+print("N_INSTANCES to simulate: " +  str(N_INSTANCES))
 
 generate_new = False
 
 # rpy2 r objects access
 r = robjects.r
+
+# redirect r output to local buffer
+new_pc.capture_r_console_output()
+
 # source R file of cognition implementation
 r.source('L3_PC_Simulation.R')
 # r data.frame to pandas conversion 
@@ -120,3 +153,6 @@ for msg in new_pc.consumer:
                       }
         print("Sending Test function")
         new_pc.send_msg(topic='AB_test_function', data=simulation_data)
+
+# reset r output redirects
+# new_pc.reset_r_console_output()

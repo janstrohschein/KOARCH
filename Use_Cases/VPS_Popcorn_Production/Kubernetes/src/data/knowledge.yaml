@@ -44,26 +44,22 @@ Optimization:
               default: 5
               min: 5
               max: 100
-            strategy: 
+            strategy: best1bin
+            maxiter: 
               type: int
-              default: 2
+              default: 7
               min: 1
-              max: 5
-            F: 
+              max: 100
+            recombination: 
               type: double
-              default: 0.8
+              default: 0.5
+              min: 0.0
+              max: 1.0
+            mutation: 
+              type: double
+              default: 0.5
               min: 0.0
               max: 2.0
-            CR: 
-              type: double
-              default: 0.5
-              min: 0.0
-              max: 1.0
-            c: 
-              type: double
-              default: 0.5
-              min: 0.0
-              max: 1.0
           metadata:
             Class: Population
             Performance: -1
@@ -74,23 +70,28 @@ Optimization:
             Prefer usage: true
             Avoid usage: false
           input: preprocessed data  
-        Generalized SA:
+        Dual annealing:
           parameter:
-            temp: 
+            maxfun: 
               type: int
-              default: 100
-              min: 0
-              max: 10000
-            qv: 
-              type: double
-              default: 2.5
-              min: -10000
-              max: 10000
-            qa: 
-              type: double
-              default: -1
-              min: -10000
-              max: 10000
+              default: 40
+              min: 10
+              max: 100
+            initial_temp: 
+              type: float
+              default: 5230
+              min: 0.01
+              max: 50000
+            visit: 
+              type: float
+              default: 2.62
+              min: 0.01
+              max: 3
+            accept: 
+              type: float
+              default: -5
+              min: -9999.99
+              max: -5
           metadata:
             Class: Trajectory
             Performance: -1
@@ -103,10 +104,10 @@ Optimization:
           input: preprocessed data
         L-BFGS-B:
           parameter:
-            lmm: 
+            maxfun: 
               type: int
-              default: 5
-              min: 1
+              default: 40
+              min: 10
               max: 100
           metadata:
             Class: Hill-climber

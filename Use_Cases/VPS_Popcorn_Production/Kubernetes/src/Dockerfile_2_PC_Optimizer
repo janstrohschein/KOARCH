@@ -6,6 +6,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends r-base r-base-d
 COPY ./configurations/requirements.txt /
 RUN pip install -r requirements.txt
 
+# python libs for r integration
+COPY ./configurations/requirements_RPY2.txt /
+RUN pip install -r requirements_RPY2.txt
+
 # install r packages
 COPY ./configurations/requirements.R /
 RUN Rscript requirements.R
