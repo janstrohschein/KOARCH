@@ -16,6 +16,17 @@ pd.options.display.float_format = "{:.3f}".format
 class CognitionPC(KafkaPC):
     def __init__(self, config_path, config_section):
         super().__init__(config_path, config_section)
+
+        # QUESTION Resources DF, job_id and algorithm_name?
+        df_res_columns = [
+            "job_id",
+            "algorithm_name",
+            "CPU_ms",
+            "RAM",
+            "CPU_perc",
+            "RAM_perc",
+        ]
+
         df_sim_columns = [
             "selection_phase",
             "algorithm",
@@ -62,13 +73,14 @@ class CognitionPC(KafkaPC):
         ]
         self.df_sim = pd.DataFrame(columns=df_sim_columns)
         self.df = pd.DataFrame(columns=df_columns)
+        self.df_res = pd.DataFrame(columns=df_res_columns)
         API_URL = self.config["API_URL"]
         ENDPOINT = "/production_parameter/algorithm"
         self.URL = API_URL + ENDPOINT
         self.nr_of_iterations = 0
         self.theta = 25
         self.zeta = 1
-        self.best_algorithm = "baseline"  # TODO default?
+        self.best_algorithm = "baseline"
         # self.initialize_objective_function()
         self.generate_initial_design()
         # self.generate_test_function()
@@ -78,6 +90,7 @@ class CognitionPC(KafkaPC):
             "AB_application_results": self.process_application_results,
             "AB_monitoring": self.process_monitoring,
             "AB_simulation_results": self.process_simulation_results,
+            "AB_cluster_monitoring": self.process_cluster_monitoring,
         }
 
     def aggregatePerformance(self, cpu, memory, y):
@@ -283,26 +296,6 @@ class CognitionPC(KafkaPC):
         self.send_msg(topic="AB_new_x", data=adaption_data)
         print(f"Sent application results to Adaption: x={new_appl_result['x']}")
 
-        """ Processes incoming messages from the model application and normalizes the values
-            to predict model quality and rate resource consumption.
-
-        """
-        """
-        new_model_appl = self.decode_avro_msg(msg)
-        new_model_appl["timestamp"] = datetime.now()
-
-        self.df = self.df.append(new_model_appl, ignore_index=True)
-        self.normalize_values('pred_y', 'pred_y_norm')
-        self.normalize_values('rmse', 'rmse_norm')
-        self.normalize_values('CPU_ms', 'CPU_norm')
-        self.normalize_values('RAM', 'RAM_norm')
-
-        self.df['pred_quality'] = self.df.apply(lambda row: self.calc_avg((row['pred_y_norm'],
-                                                                           row['rmse_norm'])), axis=1)
-
-        self.df['resources'] = self.df.apply(lambda row: self.calc_avg((row['CPU_norm'], row['RAM_norm'])), axis=1)
-        """
-
     def process_monitoring(self, msg):
         """ Processes incoming messages from the production monitoring tool and
             sends data + instructions to the simulation module.
@@ -430,3 +423,7 @@ class CognitionPC(KafkaPC):
         self.send_msg(topic="AB_new_x", data=adaption_data)
         print(f"Sent application results to Adaption: x={new_appl_result['new_x']}")
 
+    def process_cluster_monitoring(self, msg):
+        # TODO save resources into self.df_res
+        # TODO adjust config to listen on AB_cluster_monitoring
+        pass

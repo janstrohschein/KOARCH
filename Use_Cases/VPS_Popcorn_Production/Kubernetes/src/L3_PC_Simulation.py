@@ -132,6 +132,7 @@ try:
                 # compute baseline performance results and send to cognition
                 selection_phase = 1
                 repetition = 1
+                # TODO Resources for Baseline necessary? Set to 0?
                 CPU_ms = 0.1
                 RAM = 0.05
                 samples = np.random.uniform(low=X_MIN, high=X_MAX, size=BUDGET)
