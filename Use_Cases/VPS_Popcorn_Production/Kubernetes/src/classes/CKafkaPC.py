@@ -1,7 +1,9 @@
 import sys
 import yaml
+from time import sleep
 
 from confluent_kafka import Producer, Consumer
+from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka.serialization import (
     SerializationContext,
     MessageField,
@@ -27,26 +29,112 @@ class KafkaPC:
         self.read_config(config_path, config_section)
         self.connect_schema_registry()
         self.read_topics()
+        self.create_topics_on_broker()
+        self.get_out_schema()
+        self.register_schemas_in_registry()
+        self.get_in_schema()
         self.create_serializer()
         self.create_deserializer()
         self.create_consumer()
         self.create_producer()
 
     def connect_schema_registry(self):
+        MAX_RETRIES = 100
 
         if self.config.get("KAFKA_SCHEMA_REGISTRY_URL") is not None:
             sr_conf = {"url": self.config["KAFKA_SCHEMA_REGISTRY_URL"]}
-            self.schema_registry = SchemaRegistryClient(sr_conf)
+
+            retries = 0
+            while retries < MAX_RETRIES:
+                try:
+                    self.schema_registry = SchemaRegistryClient(sr_conf)
+                    print("Connected to Schema Registry")
+                    break
+                except Exception as e:
+                    retries += 1
+                    print(f"Could not connect to Schema Registry, retry {retries}")
+                    print({repr(e)})
+                    sleep(1)
+            if retries == MAX_RETRIES:
+                raise ConnectionError("Could not connect to Schema Registry")
         else:
             raise ValueError("Need KAFKA_SCHEMA_REGISTRY_URL")
 
+    def register_schemas_in_registry(self, suffix="-value"):
+        MAX_RETRIES = 100
+
+        if self.out_schema is not None:
+            for topic, schema in self.out_schema.items():
+                subject = topic + suffix
+                retries = 0
+                while retries < MAX_RETRIES:
+                    try:
+                        self.schema_registry.register_schema(
+                            subject_name=subject, schema=schema
+                        )
+                        print(f"Registered schema for topic {topic} in registry")
+                        break
+                    except Exception as e:
+                        retries += 1
+                        print(
+                            f"Could not register schema for topic {topic} in registry: {repr(e)}"
+                        )
+                        sleep(1)
+                if retries == MAX_RETRIES:
+                    raise ConnectionError("Could not connect to Schema Registry")
+
+    def create_topics_on_broker(self, partitions=1, replication=1):
+
+        if self.out_topic is not None:
+            a = AdminClient({"bootstrap.servers": self.config["KAFKA_BROKER_URL"]})
+
+            topic_set = set(self.out_topic)
+
+            md = a.list_topics(timeout=10)
+            broker_set = set(md.topics.values())
+            diff_set = topic_set.difference(broker_set)
+            # print(f"Topics not yet available on Broker: {diff_set}")
+            new_topics = [
+                NewTopic(
+                    topic, num_partitions=partitions, replication_factor=replication
+                )
+                for topic in diff_set
+            ]
+
+            fs = a.create_topics(new_topics)
+
+            # Wait for operation to finish.
+            # Timeouts are preferably controlled by passing request_timeout=15.0
+            # to the create_topics() call.
+            # All futures will finish at the same time.
+            for topic, f in fs.items():
+                try:
+                    f.result()  # The result itself is None
+                    print(f"Topic {topic} created on Broker")
+                except Exception as e:
+                    # print(f"Failed to create topic {topic} on Broker: {repr(e)}")
+                    pass
+
     def get_schema_from_registry(self, topic, suffix="-value"):
         response = None
-        try:
-            schema = self.schema_registry.get_latest_version(topic + suffix)
-            response = schema.schema
-        except Exception as e:
-            print(f"Exception: {repr(e)}")
+
+        MAX_RETRIES = 100
+        retries = 0
+        while retries < MAX_RETRIES:
+
+            try:
+                schema = self.schema_registry.get_latest_version(topic + suffix)
+                response = schema.schema
+                print(f"Retrieved schema for topic {topic} from Registry")
+                break
+            except Exception as e:
+                retries += 1
+                # print(f"Failed to get schema: {repr(e)}")
+                sleep(1)
+        if retries == MAX_RETRIES:
+            raise ConnectionError(
+                f"Could not retrieve schema for topic {topic} from Registry"
+            )
         return response
 
     def read_topics(self):
@@ -54,6 +142,11 @@ class KafkaPC:
         if self.config.get("IN_TOPIC") and self.config.get("IN_GROUP"):
             self.in_topic = self.config["IN_TOPIC"]
 
+        if self.config.get("OUT_TOPIC"):
+            self.out_topic = list(self.config["OUT_TOPIC"].keys())
+
+    def get_in_schema(self):
+        if self.in_topic is not None:
             self.in_schema = {}
             for topic in self.in_topic:
                 # try to get schema from registry
@@ -64,8 +157,8 @@ class KafkaPC:
                 else:
                     self.in_schema[topic] = schema
 
-        if self.config.get("OUT_TOPIC"):
-            self.out_topic = list(self.config["OUT_TOPIC"].keys())
+    def get_out_schema(self):
+        if self.out_topic is not None:
             self.out_schema = {}
             for topic, schema in self.config["OUT_TOPIC"].items():
                 self.out_schema[topic] = self.read_avro_schema(schema)
@@ -142,7 +235,7 @@ class KafkaPC:
             return value
         except Exception as e:
             print(f"Error decoding avro data: {repr(e)}")
-            sys.exit()
+            # sys.exit()
 
     def send_msg(self, message, partition=0, topic=None):
 

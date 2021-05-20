@@ -127,7 +127,7 @@ try:
             # tests if msg.topic is in api_dict and calls function from dict
             try:
                 if api_dict.get(msg.topic) is not None:
-                    eval(api_dict[msg.topic])(msg)
+                    eval(api_dict[msg.topic()])(msg)
             except Exception as e:
                 print(
                     f"Processing Topic: {msg.topic} with Function: {api_dict[msg.topic]}\n Error: {e}"

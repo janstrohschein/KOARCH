@@ -46,7 +46,7 @@ try:
             print(f"Error occured: {str(msg.error())}")
 
         else:
-            new_cog.func_dict[msg.topic](msg)
+            new_cog.func_dict[msg.topic()](msg)
             # new_message = new_c.decode_msg(msg)
             # print(f"Received on topic '{msg.topic()}': {new_message}")
 

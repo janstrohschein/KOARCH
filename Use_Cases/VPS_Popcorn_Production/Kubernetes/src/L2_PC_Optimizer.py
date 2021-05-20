@@ -73,13 +73,27 @@ class Optimizer(KafkaPC):
         apply_on_cpps_dict = {"algorithm": OPTIMIZER_NAME, "new_x": x[0]}
 
         print(f"sending from apply_to_cpps() with x={x[0]}")
-        self.send_msg(topic="AB_apply_on_cpps", data=apply_on_cpps_dict)
-        for msg in self.consumer:
-            print(f"Arrived on topic: {msg.topic} ")
-            if msg.topic == "AB_raw_data":
-                new_msg = self.decode_msg(msg)
-                # get y from returning message
-                return new_msg["y"]
+        self.send_msg(topic="AB_apply_on_cpps", message=apply_on_cpps_dict)
+
+        try:
+            while True:
+                msg = new_pc.consumer.poll(0.1)
+
+                if msg is None:
+                    continue
+
+                elif msg.error() is not None:
+                    print(f"Error occured: {str(msg.error())}")
+
+                else:
+                    print(f"Arrived on topic: {msg.topic} ")
+                    if msg.topic == "AB_raw_data":
+                        new_msg = self.decode_msg(msg)
+                        # get y from returning message
+                        return new_msg["y"]
+
+        except KeyboardInterrupt:
+            pass
 
     def process_test_function(self, msg):
         print("Process test instance from Simulation on AB_test_function")
@@ -138,10 +152,10 @@ class Optimizer(KafkaPC):
             "y": best_y,
         }
 
-        self.send_msg(topic="AB_simulation_results", data=simulation_result)
+        self.send_msg(topic="AB_simulation_results", message=simulation_result)
 
     def process_production_data(self, msg):
-        new_production_data = self.decode_avro_msg(msg)
+        new_production_data = self.decode_msg(msg)
         if new_production_data["algorithm"] == OPTIMIZER_NAME:
             print("Process production data from Monitoring on DB_raw_data")
             id = new_production_data["id"]
@@ -186,7 +200,7 @@ class Optimizer(KafkaPC):
                 "y": y,
             }
 
-            self.send_msg(topic="AB_application_results", data=application_results)
+            self.send_msg(topic="AB_application_results", message=application_results)
 
 
 env_vars = {
@@ -220,7 +234,7 @@ try:
             print(f"Error occured: {str(msg.error())}")
 
         else:
-            new_pc.func_dict[msg.topic](msg)
+            new_pc.func_dict[msg.topic()](msg)
             # new_message = new_pc.decode_msg(msg)
             # print(f"Received on topic '{msg.topic()}': {new_message}")
 

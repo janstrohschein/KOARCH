@@ -233,7 +233,8 @@ class CognitionPC(KafkaPC):
         """ Sends the next point from the initial design as message """
         id = self.nr_of_iterations
         self.send_msg(
-            topic="AB_new_x", data={"algorithm": "Initial design", "new_x": self.X[id]}
+            topic="AB_new_x",
+            message={"algorithm": "Initial design", "new_x": self.X[id]},
         )
 
     def calc_y_delta(self, row):
@@ -293,7 +294,7 @@ class CognitionPC(KafkaPC):
             "new_x": new_appl_result["x"],
         }
 
-        self.send_msg(topic="AB_new_x", data=adaption_data)
+        self.send_msg(topic="AB_new_x", message=adaption_data)
         print(f"Sent application results to Adaption: x={new_appl_result['x']}")
 
     def process_monitoring(self, msg):
@@ -348,7 +349,7 @@ class CognitionPC(KafkaPC):
             "y": new_monitoring["y"],
         }
 
-        self.send_msg(topic="AB_simulation_input", data=simulation_data)
+        self.send_msg(topic="AB_simulation_input", message=simulation_data)
 
         self.nr_of_iterations += 1
 
@@ -420,7 +421,7 @@ class CognitionPC(KafkaPC):
             "new_x": new_appl_result["new_x"],
         }
 
-        self.send_msg(topic="AB_new_x", data=adaption_data)
+        self.send_msg(topic="AB_new_x", message=adaption_data)
         print(f"Sent application results to Adaption: x={new_appl_result['new_x']}")
 
     def process_cluster_monitoring(self, msg):

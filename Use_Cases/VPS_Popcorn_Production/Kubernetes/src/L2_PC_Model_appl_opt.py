@@ -74,7 +74,7 @@ class ModelOptimizer(KafkaPC):
             "RAM": new_model["RAM"],
         }
 
-        new_pc.send_msg(topic="AB_simulation_results", data=sim_result_data)
+        new_pc.send_msg(topic="AB_simulation_results", message=sim_result_data)
 
     def process_raw_data(self, msg):
         """
@@ -127,7 +127,7 @@ class ModelOptimizer(KafkaPC):
             "y": surrogate_y,
         }
 
-        new_pc.send_msg(topic="AB_application_results", data=model_appl_data)
+        new_pc.send_msg(topic="AB_application_results", message=model_appl_data)
 
     def evaluate_diff_evo(self, x):
         X = np.array(x).reshape(-1, 1)
@@ -165,7 +165,7 @@ try:
             print(f"Error occured: {str(msg.error())}")
 
         else:
-            new_pc.func_dict[msg.topic](msg)
+            new_pc.func_dict[msg.topic()](msg)
             # new_message = new_pc.decode_msg(msg)
             # print(f"Received on topic '{msg.topic()}': {new_message}")
 

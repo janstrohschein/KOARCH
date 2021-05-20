@@ -144,7 +144,7 @@ class Learner(KafkaPC):
             "RAM": peak_mb,
         }
 
-        self.send_msg(topic="AB_simulation_model_data", data=simulation_model_data)
+        self.send_msg(topic="AB_simulation_model_data", message=simulation_model_data)
 
     def process_raw_data(self, msg):
         """
@@ -235,7 +235,7 @@ class Learner(KafkaPC):
                 "RAM": peak_mb,
             }
 
-            self.send_msg(topic="AB_model_data", data=model_data)
+            self.send_msg(topic="AB_model_data", message=model_data)
 
 
 env_vars = {
@@ -265,7 +265,7 @@ try:
             print(f"Error occured: {str(msg.error())}")
 
         else:
-            new_pc.func_dict[msg.topic](msg)
+            new_pc.func_dict[msg.topic()](msg)
             # new_message = new_pc.decode_msg(msg)
             # print(f"Received on topic '{msg.topic()}': {new_message}")
 
