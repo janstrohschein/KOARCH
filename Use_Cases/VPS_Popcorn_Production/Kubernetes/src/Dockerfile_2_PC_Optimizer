@@ -1,15 +1,8 @@
-# FROM python:3.7-slim-buster
-FROM koarch/confluent_kafka_python:1.6.0
-
-RUN apt-get update && apt-get install -y --no-install-recommends r-base r-base-dev build-essential libcurl4-gnutls-dev libxml2-dev libssl-dev
+FROM koarch/confluent_kafka_python_r:1.6.0
 
 # standard python libs
 COPY ./configurations/requirements.txt /
 RUN pip install -r requirements.txt
-
-# python libs for r integration
-COPY ./configurations/requirements_RPY2.txt /
-RUN pip install -r requirements_RPY2.txt
 
 # install r packages
 COPY ./configurations/requirements.R /

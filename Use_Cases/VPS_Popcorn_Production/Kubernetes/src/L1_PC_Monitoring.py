@@ -59,33 +59,3 @@ except KeyboardInterrupt:
 finally:
     new_pc.consumer.close()
 
-# for msg in new_pc.consumer:
-#     """
-#     "name": "Data",
-#     "fields": [
-#         {"name": "phase", "type": ["string"]},
-#         {"name": "id_x", "type": ["int"]},
-#         {"name": "x", "type": ["float"]},
-#         {"name": "y", "type": ["float"]}
-#         ]
-#     """
-#     new_data = new_pc.decode_avro_msg(msg)
-
-#     """
-#     "name": "Data",
-#     "fields": [
-#         {"name": "phase", "type": ["string"]},
-#         {"name": "id_x", "type": ["int"]},
-#         {"name": "x", "type": ["float"]},
-#         {"name": "y", "type": ["float"]}
-#         ]
-#     """
-
-#     new_data_point = {
-#         "phase": new_data["phase"],
-#         "id": new_data["id"],
-#         "x": new_data["x"],
-#         "y": new_data["y"],
-#     }
-
-#     new_pc.send_msg(new_data_point)
