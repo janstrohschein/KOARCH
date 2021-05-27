@@ -5,7 +5,7 @@ library(SPOT)
 # (1) S <- generateTestFunctions(d)
 
 # generate test functions utilizing COBBS using data points d
-# d has the form: id, x, y 
+# d has the form: id, x, y
 generateTestFunctions <- function(d, n) {
   print("R: generate Test Functions call")
 
@@ -37,14 +37,14 @@ generateTestFunctions <- function(d, n) {
 
   # generate model and functions
   cobbsResult <- generateCOBBS(x, y, cntrl)
-  
+
   # shuffle simulation functions
   cobbsResult$simulation <- sample(cobbsResult$simulation, length(cobbsResult$simulation), replace=FALSE)
-  
-  # TODO plot groundtruth (dashed), model prediction (red), and simulation (blue)
-  # plotSimulation(lower = 3000, upper = 11000, objFun, cobbsResult)  
-  
-  # TODO random sample sims
+
+  # plot groundtruth (dashed), model prediction (red), and simulation (blue)
+  # plotSimulation(lower = 3000, upper = 11000, objFun, cobbsResult)
+
+  # random sample sims
   id <- sample.int(length(cobbsResult$simulation), 1)
   print(paste("R: Sim id ", id, " chosen", sep = "", collapse = NULL))
   S <- cobbsResult$simulation[[id]]
@@ -53,16 +53,16 @@ generateTestFunctions <- function(d, n) {
 }
 
 ###################################################################################
-#' Objective Function based on data points from the VPS 
+#' Objective Function based on data points from the VPS
 #' Compute a Kriging model to estimate the VPS behaviour on real data
-#' returns 
-#' @param data data.frame with x (data$conveyorRuntimeMean) and y (data$yAgg) 
+#' returns
+#' @param data data.frame with x (data$conveyorRuntimeMean) and y (data$yAgg)
 #'
-#' @return objFunction with parameter x to predict new values 
-#'  
+#' @return objFunction with parameter x to predict new values
+#'
 ###################################################################################
 funVPS <- function(data) {
-  # model y ~ x 
+  # model y ~ x
   kriging <- buildKriging(as.matrix(data$x), as.matrix(data$y), control = list(useLambda=TRUE, reinterpolate=TRUE))
   tmp <- function(x) {
     predict(kriging, x)$y
@@ -76,8 +76,8 @@ funVPS <- function(data) {
 #' @param lower vector of lower bounds
 #' @param upper vector of upper bounds
 #' @param objFunction the groundtruth function
-#' @param simulationModel the COBBS result 
-#'  
+#' @param simulationModel the COBBS result
+#'
 ###################################################################################
 plotSimulation <- function(lower, upper, objFun, simulationModel) {
   simfile <- paste("data/", Sys.Date(), "_simulations.png", sep ="", collapse = NULL)
@@ -87,11 +87,11 @@ plotSimulation <- function(lower, upper, objFun, simulationModel) {
   png(file = simfile)
     # plot ground truth function
     plot(xplot, objFun(xplot),type="l", ylim=c(0, 1), lty=2, xlab = "Conveyor runtime (ms)", ylab = "y")
-    # plot estimation (prediction) 
+    # plot estimation (prediction)
     # lines(xplot, simulationModel$estimation(xplot), col="red")
     # plot simulations
     for(sim in simulationModel$simulation) {
-      lines(xplot, sim(xplot), col="blue") 
+      lines(xplot, sim(xplot), col="blue")
     }
   dev.off()
 }
