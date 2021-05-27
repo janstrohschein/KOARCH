@@ -2,8 +2,7 @@ import os
 import requests
 import json
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
 
 
 def forward_topic(msg):

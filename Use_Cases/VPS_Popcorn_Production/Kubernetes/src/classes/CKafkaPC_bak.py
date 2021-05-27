@@ -52,7 +52,8 @@ class KafkaPC:
                     break
                 except Exception as e:
                     retries += 1
-                    print(f"Could not connect to Schema Registry, retry {retries}")
+                    print(
+                        f"Could not connect to Schema Registry, retry {retries}")
                     print({repr(e)})
                     sleep(1)
             if retries == MAX_RETRIES:
@@ -72,7 +73,8 @@ class KafkaPC:
                         self.schema_registry.register_schema(
                             subject_name=subject, schema=schema
                         )
-                        print(f"Registered schema for topic {topic} in registry")
+                        print(
+                            f"Registered schema for topic {topic} in registry")
                         break
                     except Exception as e:
                         retries += 1
@@ -81,12 +83,14 @@ class KafkaPC:
                         )
                         sleep(1)
                 if retries == MAX_RETRIES:
-                    raise ConnectionError("Could not connect to Schema Registry")
+                    raise ConnectionError(
+                        "Could not connect to Schema Registry")
 
     def create_topics_on_broker(self, partitions=1, replication=1):
 
         if self.out_topic is not None:
-            a = AdminClient({"bootstrap.servers": self.config["KAFKA_BROKER_URL"]})
+            a = AdminClient(
+                {"bootstrap.servers": self.config["KAFKA_BROKER_URL"]})
 
             topic_set = set(self.out_topic)
 
@@ -123,7 +127,8 @@ class KafkaPC:
         while retries < MAX_RETRIES:
 
             try:
-                schema = self.schema_registry.get_latest_version(topic + suffix)
+                schema = self.schema_registry.get_latest_version(
+                    topic + suffix)
                 response = schema.schema
                 print(f"Retrieved schema for topic {topic} from Registry")
                 break
@@ -199,7 +204,8 @@ class KafkaPC:
 
     def create_producer(self):
         if self.config.get("OUT_TOPIC"):
-            producer_conf = {"bootstrap.servers": self.config["KAFKA_BROKER_URL"]}
+            producer_conf = {
+                "bootstrap.servers": self.config["KAFKA_BROKER_URL"]}
             self.producer = Producer(producer_conf)
 
     def read_config(self, config_path, config_section):
@@ -207,7 +213,8 @@ class KafkaPC:
         if config_path is not None and config_section is not None:
             config_section = config_section.replace(" ", "").split(",")
         else:
-            raise ValueError("Configuration requires config_path and config_section")
+            raise ValueError(
+                "Configuration requires config_path and config_section")
         try:
             with open(config_path, "r") as ymlfile:
                 config = yaml.load(ymlfile, Loader=yaml.FullLoader)

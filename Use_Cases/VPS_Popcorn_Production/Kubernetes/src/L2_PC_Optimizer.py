@@ -12,12 +12,9 @@ import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
 
-from classes.caai_util import OptAlgorithm
+from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import OptAlgorithm
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
-
-# from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes import KafkaPC
 
 pandas2ri.activate()
 
@@ -172,7 +169,8 @@ class Optimizer(KafkaPC):
                 return
 
             # instantiate optimizer
-            alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME, OPTIMIZER_PARAMETERS)
+            alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME,
+                               OPTIMIZER_PARAMETERS)
             result = alg.run(self.apply_on_cpps)
             x = result.x[0]
             y = None
@@ -200,7 +198,8 @@ class Optimizer(KafkaPC):
                 "y": y,
             }
 
-            self.send_msg(topic="AB_application_results", message=application_results)
+            self.send_msg(topic="AB_application_results",
+                          message=application_results)
 
 
 env_vars = {

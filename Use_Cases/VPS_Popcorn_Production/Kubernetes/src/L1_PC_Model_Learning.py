@@ -1,3 +1,5 @@
+import warnings
+import sys
 import os
 import tracemalloc
 import time
@@ -12,11 +14,10 @@ from rpy2.robjects.conversion import localconverter
 
 import numpy as np
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
-from classes.caai_util import ModelLearner, DataWindow, get_cv_scores
-import sys
-import warnings
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
+
+from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import ModelLearner, DataWindow, get_cv_scores
+
 
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
@@ -144,7 +145,8 @@ class Learner(KafkaPC):
             "RAM": peak_mb,
         }
 
-        self.send_msg(topic="AB_simulation_model_data", message=simulation_model_data)
+        self.send_msg(topic="AB_simulation_model_data",
+                      message=simulation_model_data)
 
     def process_raw_data(self, msg):
         """
@@ -177,7 +179,8 @@ class Learner(KafkaPC):
 
             ML = ModelLearner(MODEL_ALGORITHM, MODEL_PARAMETERS)
 
-            X, y = new_window.get_arrays(reshape_x=ML.reshape_x, reshape_y=ML.reshape_y)
+            X, y = new_window.get_arrays(
+                reshape_x=ML.reshape_x, reshape_y=ML.reshape_y)
             id_start_x = new_window.get_id_start_x()
             ML.model.fit(X, y)
 

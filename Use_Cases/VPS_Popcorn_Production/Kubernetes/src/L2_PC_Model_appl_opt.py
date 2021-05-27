@@ -4,8 +4,7 @@ from math import ceil
 import pickle
 import numpy as np
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
 
 
 class ModelOptimizer(KafkaPC):
@@ -127,7 +126,8 @@ class ModelOptimizer(KafkaPC):
             "y": surrogate_y,
         }
 
-        new_pc.send_msg(topic="AB_application_results", message=model_appl_data)
+        new_pc.send_msg(topic="AB_application_results",
+                        message=model_appl_data)
 
     def evaluate_diff_evo(self, x):
         X = np.array(x).reshape(-1, 1)

@@ -1,22 +1,17 @@
 import os
-import tracemalloc
-import time
-from sys import getsizeof
 import pickle
-import json
-import requests
 import numpy as np
+import sys
+import warnings
 
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
 import rpy2.rinterface_lib.callbacks
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
-from classes.caai_util import ModelLearner, DataWindow, get_cv_scores
-import sys
-import warnings
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
+from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import ModelLearner, DataWindow, get_cv_scores
+
 
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
@@ -170,9 +165,11 @@ try:
                 )
 
                 objective_pickle = pickle.dumps(testInstance)
-                simulation_data = {"id": new_data["id"], "simulation": objective_pickle}
+                simulation_data = {
+                    "id": new_data["id"], "simulation": objective_pickle}
                 print("Sending Test function")
-                new_pc.send_msg(topic="AB_test_function", message=simulation_data)
+                new_pc.send_msg(topic="AB_test_function",
+                                message=simulation_data)
 
 except KeyboardInterrupt:
     pass

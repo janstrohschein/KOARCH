@@ -1,0 +1,12 @@
+FROM python:3.7-slim-buster
+
+# standard python libs
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/requirements_API_Knowledge.txt ./configurations/requirements_API_Knowledge.txt
+RUN pip install -r ./configurations/requirements_API_Knowledge.txt
+
+COPY /Big_Data_Platform /Big_Data_Platform
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/ /Use_Cases/VPS_Popcorn_Production/Kubernetes 
+ENV PYTHONPATH="${PYTHONPATH}:/"
+WORKDIR /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/
+
+CMD ["uvicorn", "L5_API_Knowledge:knowledgebase", "--host", "0.0.0.0", "--log-level", "warning"]

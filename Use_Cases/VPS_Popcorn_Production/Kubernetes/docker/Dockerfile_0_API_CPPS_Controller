@@ -1,0 +1,12 @@
+FROM python:3.7-slim-buster
+
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/requirements_API.txt ./configurations/requirements_API.txt
+RUN pip install -r ./configurations/requirements_API.txt
+
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/ /Use_Cases/VPS_Popcorn_Production/Kubernetes 
+ENV PYTHONPATH="${PYTHONPATH}:/"
+WORKDIR /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/
+
+
+
+CMD ["uvicorn", "L0_API_CPPS_Controller:CPPS_Controller", "--host", "0.0.0.0", "--log-level", "warning"]

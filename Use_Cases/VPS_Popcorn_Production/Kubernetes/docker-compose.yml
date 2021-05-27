@@ -5,8 +5,8 @@ services:
     container_name: 0_API_CPPS_Controller
     hostname: 0_API_CPPS_Controller
     build:
-      context: ./src
-      dockerfile: Dockerfile_0_API_CPPS_Controller
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_API_CPPS_Controller
     expose:
     - "8000"
     ports:
@@ -15,8 +15,8 @@ services:
   0_pc_cpps:
     container_name: 0_PC_CPPS
     build:
-      context: ./src
-      dockerfile: Dockerfile_0_PC_CPPS
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_PC_CPPS
     environment:
       config_path: ./configurations/config.yml
       config_section: General, Initial_Design, Objective_Function, 0_pc_cpps
@@ -26,8 +26,8 @@ services:
   1_pc_monitoring:
     container_name: 1_PC_Monitoring
     build:
-      context: ./src
-      dockerfile: Dockerfile_1_PC_Monitoring
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_1_PC_Monitoring
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 1_pc_monitoring
@@ -35,8 +35,8 @@ services:
   1_pc_model_learning_rf:
     container_name: 1_PC_Model_Learning_RF
     build:
-      context: ./src
-      dockerfile: Dockerfile_1_PC_Model_Learning
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_1_PC_Model_Learning
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 1_pc_model_learning_rf
@@ -46,8 +46,8 @@ services:
   1_pc_model_learning_kriging:
     container_name: 1_PC_Model_Learning_Kriging
     build:
-      context: ./src
-      dockerfile: Dockerfile_1_PC_Model_Learning
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_1_PC_Model_Learning
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 1_pc_model_learning_kriging
@@ -57,8 +57,8 @@ services:
   2_pc_model_appl_opt:
     container_name: 2_PC_Model_appl_opt
     build:
-      context: ./src
-      dockerfile: Dockerfile_2_PC_Model_appl_opt
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_2_PC_Model_appl_opt
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 2_pc_model_appl_opt
@@ -66,8 +66,8 @@ services:
   2_pc_optimizer_differential_evolution:
     container_name: 2_PC_Optimizer_Differential_evolution
     build:
-      context: ./src
-      dockerfile: Dockerfile_2_PC_Optimizer
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_2_PC_Optimizer
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 2_pc_optimizer_differential_evolution
@@ -75,8 +75,8 @@ services:
   2_pc_optimizer_dual_annealing:
     container_name: 2_PC_Optimizer_Dual_annealing
     build:
-      context: ./src
-      dockerfile: Dockerfile_2_PC_Optimizer
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_2_PC_Optimizer
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 2_pc_optimizer_dual_annealing
@@ -84,8 +84,8 @@ services:
   2_pc_optimizer_lbfgsb:
     container_name: 2_PC_Optimizer_LBFGSB
     build:
-      context: ./src
-      dockerfile: Dockerfile_2_PC_Optimizer
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_2_PC_Optimizer
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 2_pc_optimizer_lbfgsb
@@ -93,8 +93,8 @@ services:
   3_pc_evaluation:
     container_name: 3_PC_Evaluation
     build:
-      context: ./src
-      dockerfile: Dockerfile_3_PC_Evaluation
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Evaluation
     environment:
       config_path: ./configurations/config.yml
       config_section: General, Initial_Design, Objective_Function, 3_pc_evaluation
@@ -104,8 +104,8 @@ services:
   3_pc_simulation:
     container_name: 3_PC_Simulation
     build:
-      context: ./src
-      dockerfile: Dockerfile_3_PC_Simulation
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Simulation
     environment:
       config_path: ./configurations/config.yml
       config_section: General, 3_pc_simulation
@@ -113,8 +113,8 @@ services:
   4_pc_adaption:
     container_name: 4_PC_Adaption
     build:
-      context: ./src
-      dockerfile: Dockerfile_4_PC_Adaption
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_PC_Adaption
     environment:
         config_path: ./configurations/config.yml
         config_section: General, 4_pc_adaption
@@ -124,8 +124,8 @@ services:
   # 4_plot_data:
   #   container_name: 4_Plot_Data
   #   build:
-  #     context: ./src
-  #     dockerfile: Dockerfile_4_Plot_Data
+        # context:  ../../../
+  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_Plot_Data
   #   environment:
   #     config_path: ./configurations/config.yml
   #     config_section: 4_plot_data
@@ -137,8 +137,8 @@ services:
   # 4_c_reporting:
   #   container_name: 4_C_Reporting
   #   build:
-  #     context: ./src
-  #     dockerfile: Dockerfile_4_C_Reporting
+        # context:  ../../../
+  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_C_Reporting
   #   environment:
   #     config_path: ./configurations/config.yml
   #     config_section: General, 4_c_reporting
@@ -149,8 +149,8 @@ services:
   #   container_name: 5_API_HMI
   #   hostname: 5_API_HMI
   #   build:
-  #     context: ./src
-  #     dockerfile: Dockerfile_5_API_HMI
+        # context:  ../../../
+  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_5_API_HMI
   #   environment:
   #     config_path: ./configurations/config.yml
   #     config_section: 4_c_reporting
@@ -163,8 +163,8 @@ services:
     container_name: 5_API_Knowledge
     hostname: 5_API_Knowledge
     build:
-      context: ./src
-      dockerfile: Dockerfile_5_API_Knowledge
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_5_API_Knowledge
     expose:
     - "8000"
     ports:

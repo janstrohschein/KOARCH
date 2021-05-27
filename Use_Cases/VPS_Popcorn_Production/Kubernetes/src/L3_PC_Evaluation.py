@@ -3,8 +3,7 @@ from time import sleep
 
 import pandas as pd
 
-# from classes.KafkaPC import KafkaPC
-from classes.CognitionPC import CognitionPC
+from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.CognitionPC import CognitionPC
 
 pd.set_option("display.max_columns", None)
 pd.options.display.float_format = "{:.3f}".format

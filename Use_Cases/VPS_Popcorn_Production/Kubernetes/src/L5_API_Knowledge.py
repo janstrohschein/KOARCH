@@ -4,7 +4,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 
 
-def import_knowledge(knowledge_path="knowledge.yaml"):
+def import_knowledge(knowledge_path="./data/knowledge.yaml"):
 
     with open(knowledge_path, "r") as ymlfile:
         knowledge = yaml.load(ymlfile, Loader=yaml.FullLoader)

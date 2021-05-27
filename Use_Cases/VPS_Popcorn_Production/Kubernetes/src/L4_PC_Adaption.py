@@ -1,8 +1,7 @@
 import os
 import requests
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
 
 env_vars = {
     "config_path": os.getenv("config_path"),
@@ -40,10 +39,12 @@ try:
             new_message = new_pc.decode_msg(msg)
 
             # defining a params dict for the parameters to be sent to the API
-            params = {"x": new_message["new_x"], "algorithm": new_message["algorithm"]}
+            params = {"x": new_message["new_x"],
+                      "algorithm": new_message["algorithm"]}
 
             # sending get request and saving the response as response object
-            print(f"Send x={round(new_message['new_x'], 3)} to the CPPS Controller")
+            print(
+                f"Send x={round(new_message['new_x'], 3)} to the CPPS Controller")
             r = requests.put(url=URL, json=params)
 
 except KeyboardInterrupt:

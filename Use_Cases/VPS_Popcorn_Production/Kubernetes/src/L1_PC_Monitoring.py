@@ -1,7 +1,7 @@
 import os
 
 # from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
 
 
 env_vars = {
@@ -58,4 +58,3 @@ except KeyboardInterrupt:
 
 finally:
     new_pc.consumer.close()
-

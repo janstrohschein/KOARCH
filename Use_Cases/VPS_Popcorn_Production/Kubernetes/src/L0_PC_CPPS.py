@@ -3,10 +3,10 @@ import json
 import time
 import os
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
-from classes.caai_util import ObjectiveFunction
-
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import (
+    KafkaPC,
+)
+from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import ObjectiveFunction
 
 env_vars = {
     "config_path": os.getenv("config_path"),

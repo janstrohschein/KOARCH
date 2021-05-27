@@ -5,9 +5,8 @@ import requests
 import pandas as pd
 import numpy as np
 
-# from classes.KafkaPC import KafkaPC
-from classes.CKafkaPC import KafkaPC
-from classes.caai_util import ObjectiveFunction
+from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
+from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import ObjectiveFunction
 
 pd.set_option("display.max_columns", None)
 pd.options.display.float_format = "{:.3f}".format
@@ -152,37 +151,45 @@ class CognitionPC(KafkaPC):
 
         if df_pred_y.empty is False:
             df_pred_y["pred_quality"] = (
-                df_pred_y["pred_quality"] * self.config["USER_WEIGHTS"]["QUALITY"]
+                df_pred_y["pred_quality"] *
+                self.config["USER_WEIGHTS"]["QUALITY"]
             )
             df_pred_y["resources"] = (
-                df_pred_y["resources"] * self.config["USER_WEIGHTS"]["RESOURCES"]
+                df_pred_y["resources"] *
+                self.config["USER_WEIGHTS"]["RESOURCES"]
             )
             df_pred_y["overall_quality"] = df_pred_y.apply(
-                lambda row: self.calc_avg((row["pred_quality"], row["resources"])),
+                lambda row: self.calc_avg(
+                    (row["pred_quality"], row["resources"])),
                 axis=1,
             )
 
         if df_real_y.empty is False:
             df_real_y["real_quality"] = (
-                df_real_y["real_quality"] * self.config["USER_WEIGHTS"]["QUALITY"]
+                df_real_y["real_quality"] *
+                self.config["USER_WEIGHTS"]["QUALITY"]
             )
             df_real_y["resources"] = (
-                df_real_y["resources"] * self.config["USER_WEIGHTS"]["RESOURCES"]
+                df_real_y["resources"] *
+                self.config["USER_WEIGHTS"]["RESOURCES"]
             )
             df_real_y["overall_quality"] = df_real_y.apply(
-                lambda row: self.calc_avg((row["real_quality"], row["resources"])),
+                lambda row: self.calc_avg(
+                    (row["real_quality"], row["resources"])),
                 axis=1,
             )
 
         combined_df = pd.concat([df_pred_y, df_real_y], axis=0, sort=False)
         if combined_df["overall_quality"].empty is False:
-            best_quality = combined_df.loc[combined_df["overall_quality"].idxmin()]
+            best_quality = combined_df.loc[combined_df["overall_quality"].idxmin(
+            )]
 
             selected_algo_id = best_quality.name
             selected_algo = best_quality["model_name"]
             best_x = best_quality["x"]
 
-            print(f"Algorithm selection: {selected_algo}({selected_algo_id})\nDetails:")
+            print(
+                f"Algorithm selection: {selected_algo}({selected_algo_id})\nDetails:")
 
             print(
                 best_quality[
@@ -295,7 +302,8 @@ class CognitionPC(KafkaPC):
         }
 
         self.send_msg(topic="AB_new_x", message=adaption_data)
-        print(f"Sent application results to Adaption: x={new_appl_result['x']}")
+        print(
+            f"Sent application results to Adaption: x={new_appl_result['x']}")
 
     def process_monitoring(self, msg):
         """ Processes incoming messages from the production monitoring tool and
@@ -390,7 +398,8 @@ class CognitionPC(KafkaPC):
         print(new_sim_results)
         if len(row) > 0:
             self.df_sim["rel_y"] = self.df_sim["y"] / row["y"][0]
-            self.df_sim["rel_CPU_ms"] = self.df_sim["CPU_ms"] / row["CPU_ms"][0]
+            self.df_sim["rel_CPU_ms"] = self.df_sim["CPU_ms"] / \
+                row["CPU_ms"][0]
             self.df_sim["rel_RAM"] = self.df_sim["RAM"] / row["RAM"][0]
 
             # normalize performance, if something to normalize exists
@@ -406,11 +415,14 @@ class CognitionPC(KafkaPC):
                     y=self.df_sim["norm_y"],
                 )
                 # take max performance y_agg
-                self.best_algorithm = self.df_sim.loc[self.df_sim["y_agg"].idxmax()]
-                print("Best performing algorithm: " + self.best_algorithm["algorithm"])
+                self.best_algorithm = self.df_sim.loc[self.df_sim["y_agg"].idxmax(
+                )]
+                print("Best performing algorithm: " +
+                      self.best_algorithm["algorithm"])
 
                 r = requests.patch(
-                    url=self.URL, params={"value": self.best_algorithm["algorithm"]}
+                    url=self.URL, params={
+                        "value": self.best_algorithm["algorithm"]}
                 )
 
     def process_apply_on_cpps(self, msg):
@@ -422,7 +434,8 @@ class CognitionPC(KafkaPC):
         }
 
         self.send_msg(topic="AB_new_x", message=adaption_data)
-        print(f"Sent application results to Adaption: x={new_appl_result['new_x']}")
+        print(
+            f"Sent application results to Adaption: x={new_appl_result['new_x']}")
 
     def process_cluster_monitoring(self, msg):
         # TODO save resources into self.df_res

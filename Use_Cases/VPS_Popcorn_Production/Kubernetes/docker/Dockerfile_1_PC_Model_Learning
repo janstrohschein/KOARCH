@@ -1,0 +1,16 @@
+FROM koarch/confluent_kafka_python_r:1.6.0
+
+# standard python libs
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/requirements.txt ./configurations/requirements.txt
+RUN pip install -r ./configurations/requirements.txt
+
+# install r packages
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/requirements.R ./configurations/requirements.R
+RUN Rscript ./configurations/requirements.R
+
+COPY /Big_Data_Platform /Big_Data_Platform
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/ /Use_Cases/VPS_Popcorn_Production/Kubernetes 
+ENV PYTHONPATH="${PYTHONPATH}:/"
+WORKDIR /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/
+
+CMD ["python", "-u", "L1_PC_Model_Learning.py"]
