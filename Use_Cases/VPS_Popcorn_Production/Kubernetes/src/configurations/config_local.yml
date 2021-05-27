@@ -1,0 +1,170 @@
+General:
+  KAFKA_BROKER_URL: localhost:9092
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
+  KAFKA_SCHEMA_REGISTRY_URL: http://localhost:8081
+
+Initial_Design:
+  N_INITIAL_DESIGN: 5
+  MAX_PRODUCTION_CYCLES: 50
+  X_MIN: 4000.0
+  X_MAX: 10100.0
+
+Objective_Function:
+  data_path: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/data/vpsFeatures.csv
+  # data_path: ./data/vpsFeatures_It2_AlterMais.csv
+  # data_path: ./data/vpsFeatures_It2_Premium.csv
+  x_columns:
+    conveyorRuntimeMean: float
+  y_columns:
+    yAgg: float
+
+0_pc_cpps:
+  OUT_TOPIC:
+    DB_raw_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/data.avsc
+  API_URL: http://0_API_CPPS_Controller:8000
+
+1_pc_monitoring:
+  IN_TOPIC:
+    # DB_raw_data: ./schema/data.avsc
+    - DB_raw_data
+  IN_GROUP: "monitoring"
+  OUT_TOPIC:
+    AB_monitoring: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/monitoring.avsc
+
+1_pc_model_learning_rf:
+  MODEL_ALGORITHM: Random Forest
+  MODEL_PARAMETERS:
+    n_estimators: 3
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: RF
+  OUT_TOPIC:
+    AB_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/model.avsc
+    AB_simulation_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_model.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+1_pc_model_learning_kriging:
+  MODEL_ALGORITHM: Kriging
+  MODEL_PARAMETERS:
+    kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
+    n_restarts_optimizer: 5
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: Kriging
+  OUT_TOPIC:
+    AB_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/model.avsc
+    AB_simulation_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_model.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+2_pc_model_appl_opt:
+  IN_TOPIC:
+    - AB_model_data
+    - AB_simulation_model_data
+  IN_GROUP: model_appl
+  OUT_TOPIC:
+    AB_application_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/application_result.avsc # umbenennen?
+    AB_simulation_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_result.avsc
+
+2_pc_optimizer_differential_evolution:
+  OPTIMIZER_NAME: Differential evolution
+  OPTIMIZATION_PARAMETERS:
+    maxiter: 20
+    popsize: 5
+    mutation: 0.5
+    recombination: 0.7
+    strategy: best1bin
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: DE
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/new_x.avsc
+    AB_application_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/application_result.avsc
+    AB_simulation_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+2_pc_optimizer_dual_annealing:
+  OPTIMIZER_NAME: Dual annealing
+  OPTIMIZATION_PARAMETERS:
+    maxfun: 40
+    initial_temp: 5100
+    visit: 2.62
+    accept: -5
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: DA
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/new_x.avsc
+    AB_application_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/application_result.avsc
+    AB_simulation_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+2_pc_optimizer_lbfgsb:
+  OPTIMIZER_NAME: L-BFGS-B
+  OPTIMIZATION_PARAMETERS:
+    maxfun: 40
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: BFGS
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/new_x.avsc
+    AB_application_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/application_result.avsc
+    AB_simulation_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000
+
+3_pc_evaluation:
+  IN_TOPIC:
+    - AB_apply_on_cpps
+    - AB_application_results
+    - AB_monitoring
+    - AB_simulation_results
+  IN_GROUP: evaluation
+  OUT_TOPIC:
+    AB_new_x: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/new_x.avsc
+    AB_simulation_input: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_data.avsc
+  USER_WEIGHTS:
+    QUALITY: 0.95
+    RESOURCES: 0.05
+  API_URL: http://0_API_CPPS_Controller:8000
+
+3_pc_simulation:
+  N_INSTANCES: 5
+  IN_TOPIC:
+    - AB_simulation_input
+  IN_GROUP: simulation
+  OUT_TOPIC:
+    AB_test_function: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation.avsc
+    AB_simulation_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_result.avsc
+
+4_pc_adaption:
+  IN_TOPIC:
+    - AB_new_x
+  IN_GROUP: adaption
+  API_URL: http://0_API_CPPS_Controller:8000
+
+4_c_reporting:
+  IN_TOPIC:
+    - AB_model_evaluation
+    - AB_monitoring
+    - AB_application_results
+  IN_GROUP: reporting
+  OUT_TOPIC:
+    AB_plot_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/plot.avsc
+  PLOT_TOPIC:
+    AB_model_evaluation: plot_data_multi
+    AB_monitoring: plot_monitoring
+    AB_application_results: plot_model_application
+  API_OUT:
+    AB_model_evaluation: forward_topic
+    AB_monitoring: forward_topic
+    AB_application_results: forward_topic
+  API_URL: http://5_API_HMI:8000
+  API_ENDPOINT: /topic/
+
+4_plot_data:
+  IN_TOPIC:
+    AB_plot_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/plot.avsc

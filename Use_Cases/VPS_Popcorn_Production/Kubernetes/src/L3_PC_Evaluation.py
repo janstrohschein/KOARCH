@@ -8,9 +8,14 @@ from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.CognitionPC import 
 pd.set_option("display.max_columns", None)
 pd.options.display.float_format = "{:.3f}".format
 
+# env_vars = {
+#     "config_path": os.getenv("config_path"),
+#     "config_section": os.getenv("config_section"),
+# }
+
 env_vars = {
-    "config_path": os.getenv("config_path"),
-    "config_section": os.getenv("config_section"),
+    "config_path": "./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/config_local.yml",
+    "config_section": "General, Initial_Design, Objective_Function, 3_pc_evaluation"
 }
 
 new_cog = CognitionPC(**env_vars)
