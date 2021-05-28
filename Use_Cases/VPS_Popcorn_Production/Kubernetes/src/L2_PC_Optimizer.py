@@ -83,8 +83,8 @@ class Optimizer(KafkaPC):
                     print(f"Error occured: {str(msg.error())}")
 
                 else:
-                    print(f"Arrived on topic: {msg.topic} ")
-                    if msg.topic == "AB_raw_data":
+                    print(f"Arrived on topic: {msg.topic()} ")
+                    if msg.topic() == "AB_raw_data":
                         new_msg = self.decode_msg(msg)
                         # get y from returning message
                         return new_msg["y"]

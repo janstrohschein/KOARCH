@@ -90,16 +90,16 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, 2_pc_optimizer_lbfgsb
 
-  3_pc_evaluation:
-    container_name: 3_PC_Evaluation
-    build:
-      context:  ../../../
-      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Evaluation
-    environment:
-      config_path: ./configurations/config.yml
-      config_section: General, Initial_Design, Objective_Function, 3_pc_evaluation
-    depends_on:
-      - 4_pc_adaption
+  # 3_pc_evaluation:
+  #   container_name: 3_PC_Evaluation
+  #   build:
+  #     context:  ../../../
+  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Evaluation
+  #   environment:
+  #     config_path: ./configurations/config.yml
+  #     config_section: General, Initial_Design, Objective_Function, 3_pc_evaluation
+  #   depends_on:
+  #     - 4_pc_adaption
 
   3_pc_simulation:
     container_name: 3_PC_Simulation

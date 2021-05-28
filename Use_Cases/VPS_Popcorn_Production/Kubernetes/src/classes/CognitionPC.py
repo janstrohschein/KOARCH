@@ -377,53 +377,58 @@ class CognitionPC(KafkaPC):
             {"name": "RAM", "type": ["float"]}
             ]
         """
-        new_sim_results = self.decode_msg(msg)
+        try:
+            new_sim_results = self.decode_msg(msg)
 
-        print(
-            f"Processing simulation results from {new_sim_results['algorithm']} on AB_simulation_results"
-        )
+            print(
+                f"Processing simulation results from {new_sim_results['algorithm']} on AB_simulation_results"
+            )
 
-        # append to df_sim
-        self.df_sim = self.df_sim.append(new_sim_results, ignore_index=True)
+            # append to df_sim
+            self.df_sim = self.df_sim.append(
+                new_sim_results, ignore_index=True)
 
-        print("df_sim:")
-        print(self.df_sim)
+            print("df_sim:")
+            print(self.df_sim)
 
-        # compute rel performance, if baseline exists
-        is_baseline = self.df_sim["algorithm"] == "baseline"
-        row = self.df_sim[is_baseline].tail(1)  # [-1:]
-        print("Simulation results selects baseline: ")
-        print(row)
-        print("for new Simulation results: ")
-        print(new_sim_results)
-        if len(row) > 0:
-            self.df_sim["rel_y"] = self.df_sim["y"] / row["y"][0]
-            self.df_sim["rel_CPU_ms"] = self.df_sim["CPU_ms"] / \
-                row["CPU_ms"][0]
-            self.df_sim["rel_RAM"] = self.df_sim["RAM"] / row["RAM"][0]
+            # compute rel performance, if baseline exists
+            is_baseline = self.df_sim["algorithm"] == "baseline"
+            row = self.df_sim[is_baseline].tail(1)  # [-1:]
+            print("Simulation results selects baseline: ")
+            print(row)
+            print("for new Simulation results: ")
+            print(new_sim_results)
+            if len(row) > 0:
+                self.df_sim["rel_y"] = self.df_sim["y"] / row["y"][0]
+                self.df_sim["rel_CPU_ms"] = self.df_sim["CPU_ms"] / \
+                    row["CPU_ms"][0]
+                self.df_sim["rel_RAM"] = self.df_sim["RAM"] / row["RAM"][0]
 
-            # normalize performance, if something to normalize exists
-            if len(self.df_sim) > 1:
-                self.normalize_values("rel_y", "norm_y", False)
-                self.normalize_values("rel_CPU_ms", "norm_CPU_ms", True)
-                self.normalize_values("rel_RAM", "norm_RAM", True)
+                # normalize performance, if something to normalize exists
+                if len(self.df_sim) > 1:
+                    self.normalize_values("rel_y", "norm_y", False)
+                    self.normalize_values("rel_CPU_ms", "norm_CPU_ms", True)
+                    self.normalize_values("rel_RAM", "norm_RAM", True)
 
-                # aggregate
-                self.df_sim["y_agg"] = np.vectorize(self.aggregatePerformance)(
-                    cpu=self.df_sim["norm_CPU_ms"],
-                    memory=self.df_sim["norm_RAM"],
-                    y=self.df_sim["norm_y"],
-                )
-                # take max performance y_agg
-                self.best_algorithm = self.df_sim.loc[self.df_sim["y_agg"].idxmax(
-                )]
-                print("Best performing algorithm: " +
-                      self.best_algorithm["algorithm"])
+                    # aggregate
+                    self.df_sim["y_agg"] = np.vectorize(self.aggregatePerformance)(
+                        cpu=self.df_sim["norm_CPU_ms"],
+                        memory=self.df_sim["norm_RAM"],
+                        y=self.df_sim["norm_y"],
+                    )
+                    # take max performance y_agg
+                    # TODO baseline should not be winning algorithm, use regular grid to find optima?
+                    self.best_algorithm = self.df_sim.loc[self.df_sim["y_agg"].idxmax(
+                    )]
+                    print("Best performing algorithm: " +
+                          self.best_algorithm["algorithm"])
 
-                r = requests.patch(
-                    url=self.URL, params={
-                        "value": self.best_algorithm["algorithm"]}
-                )
+                    r = requests.patch(
+                        url=self.URL, params={
+                            "value": self.best_algorithm["algorithm"]}
+                    )
+        except Exception as e:
+            print(f"Error determining next best algorithm: {repr(e)}")
 
     def process_apply_on_cpps(self, msg):
         new_appl_result = self.decode_msg(msg)
