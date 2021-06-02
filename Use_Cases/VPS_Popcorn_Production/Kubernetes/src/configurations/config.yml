@@ -25,9 +25,8 @@ Objective_Function:
 
 1_pc_monitoring:
   IN_TOPIC:
-    # DB_raw_data: ./schema/data.avsc
     - DB_raw_data
-  IN_GROUP: 'monitoring'
+  IN_GROUP: "monitoring"
   OUT_TOPIC:
     AB_monitoring: ./schema/monitoring.avsc
 
@@ -81,7 +80,7 @@ Objective_Function:
   IN_GROUP: DE
   OUT_TOPIC:
     AB_apply_on_cpps: ./schema/new_x.avsc
-    AB_application_results: ./schema/application_result.avsc 
+    AB_application_results: ./schema/application_result.avsc
     AB_simulation_results: ./schema/simulation_result.avsc
   API_URL: http://5_API_Knowledge:8000
 
@@ -98,7 +97,7 @@ Objective_Function:
   IN_GROUP: DA
   OUT_TOPIC:
     AB_apply_on_cpps: ./schema/new_x.avsc
-    AB_application_results: ./schema/application_result.avsc 
+    AB_application_results: ./schema/application_result.avsc
     AB_simulation_results: ./schema/simulation_result.avsc
   API_URL: http://5_API_Knowledge:8000
 
@@ -112,7 +111,7 @@ Objective_Function:
   IN_GROUP: BFGS
   OUT_TOPIC:
     AB_apply_on_cpps: ./schema/new_x.avsc
-    AB_application_results: ./schema/application_result.avsc 
+    AB_application_results: ./schema/application_result.avsc
     AB_simulation_results: ./schema/simulation_result.avsc
   API_URL: http://5_API_Knowledge:8000
 
@@ -138,7 +137,7 @@ Objective_Function:
   IN_GROUP: simulation
   OUT_TOPIC:
     AB_test_function: ./schema/simulation.avsc
-    AB_simulation_results:  ./schema/simulation_result.avsc
+    AB_simulation_results: ./schema/simulation_result.avsc
 
 4_pc_adaption:
   IN_TOPIC:
@@ -157,7 +156,7 @@ Objective_Function:
   PLOT_TOPIC:
     AB_model_evaluation: plot_data_multi
     AB_monitoring: plot_monitoring
-    AB_application_results : plot_model_application
+    AB_application_results: plot_model_application
   API_OUT:
     AB_model_evaluation: forward_topic
     AB_monitoring: forward_topic
@@ -165,6 +164,6 @@ Objective_Function:
   API_URL: http://5_API_HMI:8000
   API_ENDPOINT: /topic/
 
-4_plot_data:
+4_c_plot_data:
   IN_TOPIC:
     AB_plot_data: ./schema/plot.avsc

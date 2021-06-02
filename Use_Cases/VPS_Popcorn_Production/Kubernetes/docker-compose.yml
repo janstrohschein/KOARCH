@@ -90,16 +90,16 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, 2_pc_optimizer_lbfgsb
 
-  # 3_pc_evaluation:
-  #   container_name: 3_PC_Evaluation
-  #   build:
-  #     context:  ../../../
-  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Evaluation
-  #   environment:
-  #     config_path: ./configurations/config.yml
-  #     config_section: General, Initial_Design, Objective_Function, 3_pc_evaluation
-  #   depends_on:
-  #     - 4_pc_adaption
+  3_pc_evaluation:
+    container_name: 3_PC_Evaluation
+    build:
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Evaluation
+    environment:
+      config_path: ./configurations/config.yml
+      config_section: General, Initial_Design, Objective_Function, 3_pc_evaluation
+    depends_on:
+      - 4_pc_adaption
 
   3_pc_simulation:
     container_name: 3_PC_Simulation
@@ -121,14 +121,14 @@ services:
     depends_on:
       - 0_api_cpps_controller
 
-  # 4_plot_data:
-  #   container_name: 4_Plot_Data
+  # 4_c_plot_data:
+  #   container_name: 4_c_Plot_Data
   #   build:
         # context:  ../../../
   #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_Plot_Data
   #   environment:
   #     config_path: ./configurations/config.yml
-  #     config_section: 4_plot_data
+  #     config_section: 4_c_plot_data
   #   expose:
   #   - "8000"
   #   ports:

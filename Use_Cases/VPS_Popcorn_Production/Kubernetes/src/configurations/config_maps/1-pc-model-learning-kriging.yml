@@ -1,0 +1,13 @@
+1_pc_model_learning_kriging:
+  MODEL_ALGORITHM: Kriging
+  MODEL_PARAMETERS:
+    kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
+    n_restarts_optimizer: 5
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: Kriging
+  OUT_TOPIC:
+    AB_model_data: ./schema/model.avsc
+    AB_simulation_model_data: ./schema/simulation_model.avsc
+  API_URL: http://5_API_Knowledge:8000

@@ -1,0 +1,8 @@
+Objective_Function:
+  data_path: ./data/vpsFeatures.csv
+  # data_path: ./data/vpsFeatures_It2_AlterMais.csv
+  # data_path: ./data/vpsFeatures_It2_Premium.csv
+  x_columns:
+    conveyorRuntimeMean: float
+  y_columns:
+    yAgg: float

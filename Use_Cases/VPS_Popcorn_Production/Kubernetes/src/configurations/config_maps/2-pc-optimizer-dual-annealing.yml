@@ -1,0 +1,16 @@
+2_pc_optimizer_dual_annealing:
+  OPTIMIZER_NAME: Dual annealing
+  OPTIMIZATION_PARAMETERS:
+    maxfun: 40
+    initial_temp: 5100
+    visit: 2.62
+    accept: -5
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: DA
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./schema/new_x.avsc
+    AB_application_results: ./schema/application_result.avsc
+    AB_simulation_results: ./schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000

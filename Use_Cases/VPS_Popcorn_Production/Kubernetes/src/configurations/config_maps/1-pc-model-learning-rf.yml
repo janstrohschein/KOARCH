@@ -1,0 +1,12 @@
+1_pc_model_learning_rf:
+  MODEL_ALGORITHM: Random Forest
+  MODEL_PARAMETERS:
+    n_estimators: 3
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: RF
+  OUT_TOPIC:
+    AB_model_data: ./schema/model.avsc
+    AB_simulation_model_data: ./schema/simulation_model.avsc
+  API_URL: http://5_API_Knowledge:8000

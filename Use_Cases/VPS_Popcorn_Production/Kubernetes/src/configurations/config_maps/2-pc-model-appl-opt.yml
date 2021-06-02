@@ -1,0 +1,8 @@
+2_pc_model_appl_opt:
+  IN_TOPIC:
+    - AB_model_data
+    - AB_simulation_model_data
+  IN_GROUP: model_appl
+  OUT_TOPIC:
+    AB_application_results: ./schema/application_result.avsc # umbenennen?
+    AB_simulation_results: ./schema/simulation_result.avsc

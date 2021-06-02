@@ -1,0 +1,5 @@
+4_pc_adaption:
+  IN_TOPIC:
+    - AB_new_x
+  IN_GROUP: adaption
+  API_URL: http://0_API_CPPS_Controller:8000

@@ -1,0 +1,8 @@
+3_pc_simulation:
+  N_INSTANCES: 5
+  IN_TOPIC:
+    - AB_simulation_input
+  IN_GROUP: simulation
+  OUT_TOPIC:
+    AB_test_function: ./schema/simulation.avsc
+    AB_simulation_results: ./schema/simulation_result.avsc

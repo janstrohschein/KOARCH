@@ -1,0 +1,17 @@
+2_pc_optimizer_differential_evolution:
+  OPTIMIZER_NAME: Differential evolution
+  OPTIMIZATION_PARAMETERS:
+    maxiter: 20
+    popsize: 5
+    mutation: 0.5
+    recombination: 0.7
+    strategy: best1bin
+  IN_TOPIC:
+    - DB_raw_data
+    - AB_test_function
+  IN_GROUP: DE
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./schema/new_x.avsc
+    AB_application_results: ./schema/application_result.avsc
+    AB_simulation_results: ./schema/simulation_result.avsc
+  API_URL: http://5_API_Knowledge:8000

@@ -1,0 +1,3 @@
+4_c_plot_data:
+  IN_TOPIC:
+    AB_plot_data: ./schema/plot.avsc

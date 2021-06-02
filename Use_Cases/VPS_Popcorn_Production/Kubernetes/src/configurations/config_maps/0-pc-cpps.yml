@@ -1,0 +1,4 @@
+0_pc_cpps:
+  OUT_TOPIC:
+    DB_raw_data: ./schema/data.avsc
+  API_URL: http://0_API_CPPS_Controller:8000

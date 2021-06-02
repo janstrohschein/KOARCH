@@ -1,0 +1,14 @@
+3_pc_evaluation:
+  IN_TOPIC:
+    - AB_apply_on_cpps
+    - AB_application_results
+    - AB_monitoring
+    - AB_simulation_results
+  IN_GROUP: evaluation
+  OUT_TOPIC:
+    AB_new_x: ./schema/new_x.avsc
+    AB_simulation_input: ./schema/simulation_data.avsc
+  USER_WEIGHTS:
+    QUALITY: 0.95
+    RESOURCES: 0.05
+  API_URL: http://0_API_CPPS_Controller:8000

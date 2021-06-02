@@ -1,0 +1,4 @@
+General:
+  KAFKA_BROKER_URL: kafka-all-broker:29092
+  KAFKA_CONSUMER_TIMEOUT_MS: 120000
+  KAFKA_SCHEMA_REGISTRY_URL: http://karapace-registry-service:80
