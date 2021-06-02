@@ -29,7 +29,7 @@ The Cognition evaluates results of machine learning algorithms on production pro
   Provides access to data for humans and other systems based on the OpenAPI specification.
   - [Jupyter](HMI/Jupyter/readme.md)\
   The Jupyter datascience notebook includes libraries for data analysis in Julia, Python and R.
-- [Kafka](Kafka/readme.md)\
+- [Kafka](Kafka_Client/Confluent_Kafka_Python/readme.md)\
 All modules rely on the messaging ability for indirect communication with other modules.
 Thus the Kafka building block is the base class for most other modules and more specialized blocks like a connector to PostgresDB inherit the additional Kafka functionality.
 - [Knowledge](Knowledge/readme.md)\
