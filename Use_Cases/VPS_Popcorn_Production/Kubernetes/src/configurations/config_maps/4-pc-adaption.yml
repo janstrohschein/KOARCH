@@ -2,4 +2,4 @@
   IN_TOPIC:
     - AB_new_x
   IN_GROUP: adaption
-  API_URL: http://0_API_CPPS_Controller:8000
+  API_URL: http://api-cpps-controller-service:80

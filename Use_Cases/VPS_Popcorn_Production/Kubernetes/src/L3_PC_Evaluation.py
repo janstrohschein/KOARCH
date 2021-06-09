@@ -8,7 +8,7 @@ from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.CognitionPC import 
 pd.set_option("display.max_columns", None)
 pd.options.display.float_format = "{:.3f}".format
 
-debugging = True
+debugging = False
 
 if debugging is True:
     env_vars = {

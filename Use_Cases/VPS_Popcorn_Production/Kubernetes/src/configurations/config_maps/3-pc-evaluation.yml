@@ -11,4 +11,4 @@
   USER_WEIGHTS:
     QUALITY: 0.95
     RESOURCES: 0.05
-  API_URL: http://0_API_CPPS_Controller:8000
+  API_URL: http://api-cpps-controller-service:80
