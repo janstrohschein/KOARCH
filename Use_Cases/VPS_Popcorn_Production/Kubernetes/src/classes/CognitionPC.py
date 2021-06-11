@@ -255,16 +255,24 @@ class CognitionPC(KafkaPC):
 
         return result
 
-    def normalize_values(self, norm_source, norm_dest, invert):
+    def normalize_values(self, selection_phase, norm_source, norm_dest, invert):
         if invert:
-            self.df_sim[norm_dest] = 1 - (
-                (self.df_sim[norm_source] - self.df_sim[norm_source].min())
-                / (self.df_sim[norm_source].max() - self.df_sim[norm_source].min())
+            self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_dest] = 1 - (
+                (self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_source] - self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_source].min())
+                / (self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_source].max() - self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_source].min())
             )
+#            self.df_sim[norm_dest] = 1 - (
+#                (self.df_sim[norm_source] - self.df_sim[norm_source].min())
+#                / (self.df_sim[norm_source].max() - self.df_sim[norm_source].min())
+#            )
         else:
-            self.df_sim[norm_dest] = (
-                self.df_sim[norm_source] - self.df_sim[norm_source].min()
-            ) / (self.df_sim[norm_source].max() - self.df_sim[norm_source].min())
+            self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_dest] = (
+                self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_source].min()
+            ) / (self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_source].max() - self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, norm_source].min())
+            
+#            self.df_sim[norm_dest] = (
+#                self.df_sim[norm_source] - self.df_sim[norm_source].min()
+#            ) / (self.df_sim[norm_source].max() - self.df_sim[norm_source].min())
 
     def assign_real_y(self, x, y):
         if self.df.empty is False:
@@ -387,45 +395,51 @@ class CognitionPC(KafkaPC):
             # append to df_sim
             self.df_sim = self.df_sim.append(
                 new_sim_results, ignore_index=True)
+            
+            selection_phase = new_sim_results["selection_phase"]
 
-            print("df_sim:")
-            print(self.df_sim)
+            # subselect data of current "selection_phase"
+            current = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase]
+            is_baseline = current["algorithm"] == "baseline"
+            row = current[is_baseline].tail(1)  # [-1:]
 
             # compute rel performance, if baseline exists
-            is_baseline = self.df_sim["algorithm"] == "baseline"
-            row = self.df_sim[is_baseline].tail(1)  # [-1:]
             print("Simulation results selects baseline: ")
             print(row)
             print("for new Simulation results: ")
             print(new_sim_results)
             if len(row) > 0:
-                self.df_sim["rel_y"] = self.df_sim["y"] / row["y"][0]
-                self.df_sim["rel_CPU_ms"] = self.df_sim["CPU_ms"] / \
-                    row["CPU_ms"][0]
-                self.df_sim["rel_RAM"] = self.df_sim["RAM"] / row["RAM"][0]
-
+                # performance y relative to baseline
+                self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "rel_y"] = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "y"] / row["y"][0]
+                # CPU cons. relative to baseline
+                self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "rel_CPU_ms"] = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "CPU_ms"] / row["CPU_ms"][0]
+                # RAM cons. relative to baseline
+                self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "rel_RAM"] = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "RAM"] / row["RAM"][0]
                 # normalize performance, if something to normalize exists
-                if len(self.df_sim) > 1:
-                    self.normalize_values("rel_y", "norm_y", False)
-                    self.normalize_values("rel_CPU_ms", "norm_CPU_ms", True)
-                    self.normalize_values("rel_RAM", "norm_RAM", True)
-
+                if len(self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase]) > 1:
+                    self.normalize_values(selection_phase, "rel_y", "norm_y", False)
+                    self.normalize_values(selection_phase, "rel_CPU_ms", "norm_CPU_ms", True)
+                    self.normalize_values(selection_phase, "rel_RAM", "norm_RAM", True)
                     # aggregate
-                    self.df_sim["y_agg"] = np.vectorize(self.aggregatePerformance)(
-                        cpu=self.df_sim["norm_CPU_ms"],
-                        memory=self.df_sim["norm_RAM"],
-                        y=self.df_sim["norm_y"],
+                    self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "y_agg"]  = np.vectorize(self.aggregatePerformance)(
+                        cpu = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "norm_CPU_ms"],
+                        memory = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "norm_RAM"],
+                        y = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "norm_y"]
                     )
+
+                    print("Performance results: ")
+                    print(self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase])
+                    
                     # take max performance y_agg
                     # TODO baseline should not be winning algorithm, use regular grid to find optima?
-                    self.best_algorithm = self.df_sim.loc[self.df_sim["y_agg"].idxmax(
-                    )]
+                    id = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "y_agg"].idxmax()
+                    self.best_algorithm = self.df_sim.loc[self.df_sim['selection_phase'] == selection_phase, "algorithm"][id]
                     print("Best performing algorithm: " +
-                          self.best_algorithm["algorithm"])
+                          self.best_algorithm)
 
                     r = requests.patch(
                         url=self.URL, params={
-                            "value": self.best_algorithm["algorithm"]}
+                            "value": self.best_algorithm}
                     )
         except Exception as e:
             print(f"Error determining next best algorithm: {repr(e)}")

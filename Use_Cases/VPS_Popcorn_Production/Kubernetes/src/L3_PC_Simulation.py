@@ -64,6 +64,8 @@ print("N_INSTANCES to simulate: " + str(N_INSTANCES))
 
 generate_new = False
 
+selection_phase = 0
+
 # rpy2 r objects access
 r = robjects.r
 
@@ -125,7 +127,7 @@ try:
 
                 testInstance = generateTestFunctions(df, N_INSTANCES)
                 # compute baseline performance results and send to cognition
-                selection_phase = 1
+                selection_phase = selection_phase + 1
                 repetition = 1
                 # TODO Resources for Baseline necessary? Set to 0?
                 CPU_ms = 0.1
@@ -166,7 +168,9 @@ try:
 
                 objective_pickle = pickle.dumps(testInstance)
                 simulation_data = {
-                    "id": new_data["id"], "simulation": objective_pickle}
+                    "id": new_data["id"], 
+                    "selection_phase": selection_phase,
+                    "simulation": objective_pickle}
                 print("Sending Test function")
                 new_pc.send_msg(topic="AB_test_function",
                                 message=simulation_data)

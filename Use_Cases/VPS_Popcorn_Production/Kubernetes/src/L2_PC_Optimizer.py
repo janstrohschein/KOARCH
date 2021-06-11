@@ -99,11 +99,13 @@ class Optimizer(KafkaPC):
         "name": "Simulation",
         "fields": [
             {"name": "id", "type": ["int"]},
+            {"name": "selection_phase", "type": ["int"]},
             {"name": "simulation", "type": ["byte"]},
             ]
         """
         new_test_function = self.decode_msg(msg)
         objFunction = pickle.loads(new_test_function["simulation"])
+        selection_phase = new_test_function["selection_phase"]
 
         # instantiate optimizer
         alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME, OPTIMIZER_PARAMETERS)
@@ -118,9 +120,8 @@ class Optimizer(KafkaPC):
 
         budget = result.nfev
         # QUESTION include real resource consumption in Cognition?
-
         repetition = 1
-        selection_phase = 1
+        
         CPU_ms = 0.35
         RAM = 23.6
 

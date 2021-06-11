@@ -73,6 +73,7 @@ class Learner(KafkaPC):
         "name": "Simulation",
         "fields": [
             {"name": "id", "type": ["int"]},
+            {"name": "selection_phase", "type": ["int"]},
             {"name": "simulation", "type": ["byte"]},
             ]
         """
@@ -80,6 +81,7 @@ class Learner(KafkaPC):
         new_sim = self.decode_msg(msg)
         # extract objective
         objFunction = pickle.loads(new_sim["simulation"])
+        selection_phase = new_sim["selection_phase"]
 
         # performance tracking
         tracemalloc.start()
@@ -136,7 +138,7 @@ class Learner(KafkaPC):
         """
 
         simulation_model_data = {
-            "selection_phase": 1,
+            "selection_phase": selection_phase,
             "algorithm": MODEL_ALGORITHM,
             "repetition": 1,
             "budget": budget,
