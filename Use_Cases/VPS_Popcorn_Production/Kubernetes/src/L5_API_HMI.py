@@ -35,7 +35,7 @@ custom_enum_values = {key: key for key in config["API_OUT"]}
 
 TypeEnum = Enum("TypeEnum", custom_enum_values)
 
-results_api = FastAPI()
+results_api = FastAPI(root_path="/topic_data")
 
 
 @results_api.get("/topics")

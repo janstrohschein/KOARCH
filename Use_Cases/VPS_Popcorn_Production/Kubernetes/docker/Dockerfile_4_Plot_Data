@@ -1,6 +1,6 @@
 FROM node:12
 
-COPY ./configurations/package*.json ./
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/package*.json ./
 RUN npm install
 
 RUN apt-get update

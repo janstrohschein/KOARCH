@@ -29,6 +29,22 @@ All modules are implemented as Docker Containers and communicate via Kafka.
 Please follow our instructions [here](../../../Big_Data_Platform/Kubernetes/readme.md) to install the Kubernetes cluster and the required tools.
 
 # Run the experiment
+
+Create a ConfigMap `vps-use-case` with the folder content:
+- `kubectl create configmap vps-use-case --from-file=./src/configurations/config_maps`  
+
+Create a Service Account with the necessary rights for the Cognition:
+- `kubectl apply -f cognition_preparation_custom_service_account.yaml`
+
+Deploy the experiment onto the cluster:
+- `kubectl apply -f kubernetes_deployment.yml`
+
+Available endpoints:
+- `localhost/cpps/docs`
+- `localhost/knowledge/docs`
+- `localhost/topic_data/docs` 
+
+
 #TODO Describe experiment
 <!---
 Open another terminal to start the experiment:\

@@ -44,12 +44,13 @@ def get_pipelines(knowledge, search_base, search, parent=None, pipelines=[]):
             pipelines.append(pipeline)
         else:
 
-            pipelines = get_pipelines(knowledge, search_base, values['input'], pipeline, pipelines)
+            pipelines = get_pipelines(
+                knowledge, search_base, values['input'], pipeline, pipelines)
 
     return pipelines
 
 
-knowledgebase = FastAPI()
+knowledgebase = FastAPI(root_path="/knowledge")
 knowledge = import_knowledge()
 
 
@@ -134,9 +135,11 @@ async def get_feasible_pipelines(use_case=None, goal=None, feature=None):
 
     search_base = f"{use_case}.{goal}.{feature}"
 
-    pipeline_start = 'algorithms'  # brauchen wir einen dynamischen Start? wie können wir diesen kennzeichnen?
+    # brauchen wir einen dynamischen Start? wie können wir diesen kennzeichnen?
+    pipeline_start = 'algorithms'
 
-    pipelines = get_pipelines(knowledge, search_base, pipeline_start, pipelines=[])
+    pipelines = get_pipelines(knowledge, search_base,
+                              pipeline_start, pipelines=[])
     return JSONResponse(pipelines, status_code=200)
 
 
