@@ -58,7 +58,7 @@ MIN_DATA_POINTS = 5
 
 X_MIN = 4000
 X_MAX = 10100
-BUDGET = 40
+BUDGET = 20
 N_INSTANCES = new_pc.config["N_INSTANCES"]
 print("N_INSTANCES to simulate: " + str(N_INSTANCES))
 

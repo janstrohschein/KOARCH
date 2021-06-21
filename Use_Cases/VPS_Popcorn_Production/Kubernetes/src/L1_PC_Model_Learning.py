@@ -88,7 +88,7 @@ class Learner(KafkaPC):
         start = time.perf_counter()
         start_process = time.process_time()
 
-        budget = 40
+        budget = 20
         # initdesign to sample obj for initial model training
         X = np.linspace(X_MIN, X_MAX, num=budget)
         # evaluate design

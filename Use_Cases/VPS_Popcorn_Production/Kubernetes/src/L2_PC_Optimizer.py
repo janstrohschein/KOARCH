@@ -8,6 +8,8 @@ import numpy as np
 import json
 import requests
 
+import random
+
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.conversion import localconverter
@@ -122,8 +124,8 @@ class Optimizer(KafkaPC):
         # QUESTION include real resource consumption in Cognition?
         repetition = 1
         
-        CPU_ms = 0.35
-        RAM = 23.6
+        CPU_ms = 0.35 + random.uniform(0, 1)
+        RAM = 23.6 + random.uniform(0, 1)
 
         """
          "name": "Simulation_Result",
