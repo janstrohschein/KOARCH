@@ -21,7 +21,7 @@ Objective_Function:
 0_pc_cpps:
   OUT_TOPIC:
     DB_raw_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/data.avsc
-  API_URL: http://0_API_CPPS_Controller:8000
+  API_URL: http://localhost:8000
 
 1_pc_monitoring:
   IN_TOPIC:
