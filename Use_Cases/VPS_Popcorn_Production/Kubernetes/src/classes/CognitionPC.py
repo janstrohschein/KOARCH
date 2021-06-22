@@ -265,7 +265,7 @@ class CognitionPC(KafkaPC):
             )
         else:
             self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) & (self.df_sim['algorithm'] != "baseline"), norm_dest] = (
-                self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) & (self.df_sim['algorithm'] != "baseline"), norm_source].min()
+                self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) & (self.df_sim['algorithm'] != "baseline"), norm_source] - self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) & (self.df_sim['algorithm'] != "baseline"), norm_source].min()
             ) / (self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) & (self.df_sim['algorithm'] != "baseline"), norm_source].max() - self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) & (self.df_sim['algorithm'] != "baseline"), norm_source].min())
             
 
@@ -404,7 +404,6 @@ class CognitionPC(KafkaPC):
             print(new_sim_results)
             
             newNotBaseline = new_sim_results["algorithm"] != "baseline"
-            print(newNotBaseline)
 
             if (len(baseline) > 0) & (newNotBaseline == True):
                 baseline_y = baseline["y"].item()
