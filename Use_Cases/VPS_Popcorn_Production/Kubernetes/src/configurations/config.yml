@@ -147,18 +147,18 @@ Objective_Function:
 
 4_c_reporting:
   IN_TOPIC:
-    - AB_model_evaluation
+    - AB_new_x
     - AB_monitoring
     - AB_application_results
   IN_GROUP: reporting
   OUT_TOPIC:
     AB_plot_data: ./schema/plot.avsc
   PLOT_TOPIC:
-    AB_model_evaluation: plot_data_multi
+    AB_new_x: plot_data_multi
     AB_monitoring: plot_monitoring
     AB_application_results: plot_model_application
   API_OUT:
-    AB_model_evaluation: forward_topic
+    AB_new_x: forward_topic
     AB_monitoring: forward_topic
     AB_application_results: forward_topic
   API_URL: http://5_API_HMI:8000
