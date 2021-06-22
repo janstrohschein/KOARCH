@@ -4,6 +4,7 @@ import traceback
 import pandas as pd
 
 from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.CognitionPC import CognitionPC
+from Big_Data_Platform.Kubernetes.Cognition.example.src.classes.KubeAPI import KubeAPI
 
 pd.set_option("display.max_columns", None)
 pd.options.display.float_format = "{:.3f}".format
