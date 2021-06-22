@@ -170,5 +170,4 @@ services:
 
 networks:
   default:
-    external:
-      name: caai
+    name: caai
