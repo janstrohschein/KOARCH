@@ -17,10 +17,20 @@ if not sys.warnoptions:
     warnings.simplefilter("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
 
-env_vars = {
-    "config_path": os.getenv("config_path"),
-    "config_section": os.getenv("config_section"),
-}
+debugging = False
+
+if debugging is True:
+    prefix = "Use_Cases/VPS_Popcorn_Production/Kubernetes/src/"
+    env_vars = {
+        "config_path": "./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/config_local.yml",
+        "config_section": "General, 3_pc_simulation"
+    }
+else:
+    prefix = ""
+    env_vars = {
+        "config_path": os.getenv("config_path"),
+        "config_section": os.getenv("config_section"),
+    }
 
 
 class Simulation(KafkaPC):
@@ -72,9 +82,11 @@ r = robjects.r
 # redirect r output to local buffer
 new_pc.capture_r_console_output()
 
-# source R file of cognition implementation
-r.source("L3_PC_Simulation.R")
-# r data.frame to pandas conversion
+# source R file of test functions generator implementation
+source_simulation_r = prefix + "L3_PC_Simulation.R"
+r.source(source_simulation_r)
+
+# enable r data.frame to pandas conversion
 pandas2ri.activate()
 
 try:
@@ -119,11 +131,13 @@ try:
             elif generate_new == True:
                 # reset generation request
                 generate_new = False
-                # TODO consider theta, etha, count iteration
+
                 # take x/y to instantiate R simulator with nr_instances
                 generateTestFunctions = robjects.r["generateTestFunctions"]
 
                 df = new_window.to_df()
+                
+                print(df)
 
                 testInstance = generateTestFunctions(df, N_INSTANCES)
                 # compute baseline performance results and send to cognition
