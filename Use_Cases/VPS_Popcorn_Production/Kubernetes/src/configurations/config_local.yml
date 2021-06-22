@@ -42,7 +42,7 @@ Objective_Function:
   OUT_TOPIC:
     AB_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/model.avsc
     AB_simulation_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_model.avsc
-  API_URL: http://5_API_Knowledge:8000
+  API_URL: http://localhost:8002
 
 1_pc_model_learning_kriging:
   MODEL_ALGORITHM: Kriging
@@ -56,7 +56,7 @@ Objective_Function:
   OUT_TOPIC:
     AB_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/model.avsc
     AB_simulation_model_data: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_model.avsc
-  API_URL: http://5_API_Knowledge:8000
+  API_URL: http://localhost:8002
 
 2_pc_model_appl_opt:
   IN_TOPIC:
@@ -83,7 +83,7 @@ Objective_Function:
     AB_apply_on_cpps: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/new_x.avsc
     AB_application_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/application_result.avsc
     AB_simulation_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_result.avsc
-  API_URL: http://5_API_Knowledge:8000
+  API_URL: http://localhost:8002
 
 2_pc_optimizer_dual_annealing:
   OPTIMIZER_NAME: Dual annealing
@@ -114,7 +114,7 @@ Objective_Function:
     AB_apply_on_cpps: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/new_x.avsc
     AB_application_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/application_result.avsc
     AB_simulation_results: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/src/schema/simulation_result.avsc
-  API_URL: http://5_API_Knowledge:8000
+  API_URL: http://localhost:8002
 
 3_pc_evaluation:
   IN_TOPIC:
@@ -129,7 +129,7 @@ Objective_Function:
   USER_WEIGHTS:
     QUALITY: 0.95
     RESOURCES: 0.05
-  API_URL: http://0_API_CPPS_Controller:8000
+  API_URL: http://localhost:8000
 
 3_pc_simulation:
   N_INSTANCES: 5
@@ -144,7 +144,7 @@ Objective_Function:
   IN_TOPIC:
     - AB_new_x
   IN_GROUP: adaption
-  API_URL: http://0_API_CPPS_Controller:8000
+  API_URL: http://localhost:8000
 
 4_c_reporting:
   IN_TOPIC:
@@ -162,7 +162,7 @@ Objective_Function:
     AB_model_evaluation: forward_topic
     AB_monitoring: forward_topic
     AB_application_results: forward_topic
-  API_URL: http://5_API_HMI:8000
+  API_URL: http://localhost:8001
   API_ENDPOINT: /topic/
 
 4_plot_data:
