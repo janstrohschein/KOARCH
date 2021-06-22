@@ -7,7 +7,7 @@ RUN apt-get update
 RUN apt-get install -y python-pip
 RUN pip install plotly==4.10.0
 
-COPY . /src
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/ /src
 WORKDIR /src
 
 CMD ["node", "L4_plotServer.js"]
