@@ -2,6 +2,7 @@
  "name": "Simulation",
  "fields": [
     {"name": "id", "type": ["int"]},
+    {"name": "selection_phase", "type": ["int"]},
     {"name": "simulation", "type": ["bytes"]}
     
     ]

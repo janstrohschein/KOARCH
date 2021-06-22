@@ -1,6 +1,6 @@
 import os
 from time import sleep
-
+import traceback
 import pandas as pd
 
 from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.CognitionPC import CognitionPC
@@ -70,6 +70,7 @@ try:
             except Exception as e:
                 print(
                     f"Error accessing the function for topic {msg.topic()}: {repr(e)}")
+                print(traceback.format_exc())
 
 except KeyboardInterrupt:
     pass
