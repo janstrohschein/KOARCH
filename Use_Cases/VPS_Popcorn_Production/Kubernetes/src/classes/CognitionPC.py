@@ -34,7 +34,6 @@ class CognitionPC(KafkaPC):
         df_sim_columns = [
             "selection_phase",
             "algorithm",
-            ""
             "repetition",
             "budget",
             "x",
@@ -477,7 +476,7 @@ class CognitionPC(KafkaPC):
                 f"Sent application results to Adaption: x={new_appl_result['new_x']}")
         else:
             print(
-                f"Apply on CPPS receives from {new_appl_result['algorithm']} but current best algo is {self.best_algorithm}")
+                f"Apply on CPPS receives from {new_appl_result['algorithm']} but current best algorithm is {self.best_algorithm}")
 
     def process_cluster_monitoring(self, msg):
         # TODO save resources into self.df_sim
