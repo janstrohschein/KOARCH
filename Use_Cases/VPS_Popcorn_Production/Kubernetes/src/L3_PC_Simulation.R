@@ -1,7 +1,6 @@
 library(COBBS)
 library(SPOT)
 
-
 # (1) S <- generateTestFunctions(d)
 
 # generate test functions utilizing COBBS using data points d
@@ -9,13 +8,22 @@ library(SPOT)
 generateTestFunctions <- function(d, n) {
   print("R: generate Test Functions call")
 
-  # names(d) <- c('id', 'x', 'y')
-
   S <- list()
 
-  # print(summary(d))
-  x <- cbind(unique(d$x))
-  y <- cbind(unique(d$y))
+  # remove duplicate x values 
+  d <- d[!duplicated(d[, "x"]), ] 
+
+  minData <- 5
+  if(nrow(d) > minData)
+    # take first #minData data points and 3 random additional points
+    d <- d[c(1:(minData + 3)), ]
+    #d <- d[c(1:minData, sort(sample((minData+1):nrow(d), 3))), ]
+
+  x <- cbind(d$x) # cbind(unique(d$x))
+  y <- cbind(d$y) # cbind(unique(d$y))
+
+#  print(x)
+#  print(y)
 
   ## nr of functions to generate
   nrTestFunctions <- n
@@ -80,7 +88,8 @@ funVPS <- function(data) {
 #'
 ###################################################################################
 plotSimulation <- function(lower, upper, objFun, simulationModel) {
-  simfile <- paste("data/", Sys.Date(), "_simulations.png", sep ="", collapse = NULL)
+  simfile <- paste(Sys.Date(), "_simulations.png", sep ="", collapse = NULL)
+  # simfile <- paste("data/", Sys.Date(), "_simulations.png", sep ="", collapse = NULL)
   print(paste("Plot groundtruth and simulation instances: ", simfile, sep = "", collapse = NULL))
   ## legend: dashed (groundtruth), red (estimation), blue (simulations)
   xplot <- seq(from=lower,to=upper, length.out=100)

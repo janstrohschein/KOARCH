@@ -126,7 +126,7 @@ namespace LibUA
             var connectRes = client.Connect();
             var openRes = client.OpenSecureChannel(MessageSecurityMode.None, SecurityPolicy.None, null);
             var createRes = client.CreateSession(appDesc, "urn:DemoApplication", 120);
-            var activateRes = client.ActivateSession(new UserIdentityAnonymousToken("0"), new[] { "en" });
+            var activateRes = client.ActivateSession(new UserIdentityAnonymousToken("Anonymous"), new[] { "en" });
             return client;
         }
 
