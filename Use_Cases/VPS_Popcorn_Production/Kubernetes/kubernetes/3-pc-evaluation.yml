@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 3-pc-evaluation
+  labels:
+    app: 3-pc-evaluation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: 3-pc-evaluation
+  template:
+    metadata:
+      labels:
+        app: 3-pc-evaluation
+    spec:
+      containers:
+        - name: 3-pc-evaluation
+          image: koarch/vps_3_pc_evaluation:0.17-amd64
+          env:
+            - name: config_path
+              value: "/etc/config/"
+          volumeMounts:
+            - name: general
+              mountPath: /etc/config/general.yml
+              subPath: general.yml
+            - name: initial-design
+              mountPath: /etc/config/initial-design.yml
+              subPath: initial-design.yml
+            - name: objective-function
+              mountPath: /etc/config/objective-function.yml
+              subPath: objective-function.yml
+            - name: 3-pc-evaluation
+              mountPath: /etc/config/3-pc-evaluation.yml
+              subPath: 3-pc-evaluation.yml
+      serviceAccountName: cognition
+      volumes:
+        - name: general
+          configMap:
+            name: vps-use-case
+            items:
+              - key: general.yml
+                path: general.yml
+        - name: initial-design
+          configMap:
+            name: vps-use-case
+            items:
+              - key: initial-design.yml
+                path: initial-design.yml
+        - name: objective-function
+          configMap:
+            name: vps-use-case
+            items:
+              - key: objective-function.yml
+                path: objective-function.yml
+        - name: 3-pc-evaluation
+          configMap:
+            name: vps-use-case
+            items:
+              - key: 3-pc-evaluation.yml
+                path: 3-pc-evaluation.yml

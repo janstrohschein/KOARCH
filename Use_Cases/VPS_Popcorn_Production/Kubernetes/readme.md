@@ -31,7 +31,7 @@ Please follow our instructions [here](../../../Big_Data_Platform/Kubernetes/read
 # Run the experiment
 
 Create a ConfigMap `vps-use-case` with the folder content:
-- `kubectl create configmap vps-use-case --from-file=./src/configurations/config_maps`  
+- `kubectl create configmap vps-use-case --from-file=./src/configurations/config_maps`
 
 Create a Service Account with the necessary rights for the Cognition:
 - `kubectl apply -f cognition_preparation_custom_service_account.yaml`
@@ -42,7 +42,7 @@ Deploy the experiment onto the cluster:
 Available endpoints:
 - `localhost/cpps/docs`
 - `localhost/knowledge/docs`
-- `localhost/topic_data/docs` 
+- `localhost/topic_data/docs`
 
 
 #TODO Describe experiment
@@ -98,7 +98,7 @@ Execute both commands to remove the containers:\
 
 -->
 # Experiment results
-The detailed results for the experiment can be found [here](experiments/readme.md). 
+The detailed results for the experiment can be found [here](experiments/readme.md).
 
 # Technical details
 #TODO: Describe technical details

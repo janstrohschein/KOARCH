@@ -4,7 +4,9 @@ import string
 import random
 import logging
 import yaml
-import sys, os, time
+import sys
+import os
+import time
 import requests
 import json
 from collections import defaultdict
@@ -16,18 +18,20 @@ from kubernetes.client.rest import ApiException
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 # Setup K8 configs
-config.load_kube_config("C:/Users/stroh/.kube/config")
+config.load_kube_config("/mnt/c/Users/stroh/.kube/config")
 v1 = client.CoreV1Api()
 
 configuration = kubernetes.client.Configuration()
-api_instance = kubernetes.client.BatchV1Api(kubernetes.client.ApiClient(configuration))
+api_instance = kubernetes.client.BatchV1Api(
+    kubernetes.client.ApiClient(configuration))
 
 
 def list_pods():
     print("Listing pods with their IPs:")
     ret = v1.list_pod_for_all_namespaces(watch=False)
     for i in ret.items:
-        print("%s\t%s\t%s" % (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
+        print("%s\t%s\t%s" %
+              (i.status.pod_ip, i.metadata.namespace, i.metadata.name))
 
 
 def kube_delete_empty_pods(namespace='default', phase='Succeeded'):
@@ -48,20 +52,24 @@ def kube_delete_empty_pods(namespace='default', phase='Succeeded'):
                                             pretty=True,
                                             timeout_seconds=60)
     except ApiException as e:
-        logging.error("Exception when calling CoreV1Api->list_namespaced_pod: %s\n" % e)
+        logging.error(
+            "Exception when calling CoreV1Api->list_namespaced_pod: %s\n" % e)
 
     for pod in pods.items:
         logging.debug(pod)
         podname = pod.metadata.name
         try:
             if pod.status.phase == phase:
-                api_response = api_pods.delete_namespaced_pod(podname, namespace)
+                api_response = api_pods.delete_namespaced_pod(
+                    podname, namespace)
                 logging.info("Pod: {} deleted!".format(podname))
                 logging.debug(api_response)
             else:
-                logging.info("Pod: {} still not done... Phase: {}".format(podname, pod.status.phase))
+                logging.info("Pod: {} still not done... Phase: {}".format(
+                    podname, pod.status.phase))
         except ApiException as e:
-            logging.error("Exception when calling CoreV1Api->delete_namespaced_pod: %s\n" % e)
+            logging.error(
+                "Exception when calling CoreV1Api->delete_namespaced_pod: %s\n" % e)
 
     return
 
@@ -98,7 +106,8 @@ def kube_cleanup_finished_jobs(namespace='default', state='Finished'):
         jobstatus = job.status.conditions
         if job.status.succeeded == 1:
             # Clean up Job
-            logging.info("Cleaning up Job: {}. Finished at: {}".format(jobname, job.status.completion_time))
+            logging.info("Cleaning up Job: {}. Finished at: {}".format(
+                jobname, job.status.completion_time))
             try:
                 # What is at work here. Setting Grace Period to 0 means delete ASAP. Otherwise it defaults to
                 # some value I can't find anywhere. Propagation policy makes the Garbage cleaning Async
@@ -108,11 +117,13 @@ def kube_cleanup_finished_jobs(namespace='default', state='Finished'):
                                                                   propagation_policy='Background')
                 logging.debug(api_response)
             except ApiException as e:
-                print("Exception when calling BatchV1Api->delete_namespaced_job: %s\n" % e)
+                print(
+                    "Exception when calling BatchV1Api->delete_namespaced_job: %s\n" % e)
         else:
             if jobstatus is None and job.status.active == 1:
                 jobstatus = 'active'
-            logging.info("Job: {} not cleaned up. Current status: {}".format(jobname, jobstatus))
+            logging.info("Job: {} not cleaned up. Current status: {}".format(
+                jobname, jobstatus))
 
     # Now that we have the jobs cleaned, let's clean the pods
     kube_delete_empty_pods(namespace)
@@ -159,10 +170,13 @@ def kube_create_job_object(name, container_image, namespace="default", container
     env_list = []
     for env_name, env_value in env_vars.items():
         env_list.append(client.V1EnvVar(name=env_name, value=env_value))
-    container = client.V1Container(name=container_name, image=container_image, env=env_list)
-    template.template.spec = client.V1PodSpec(containers=[container], restart_policy='Never')
+    container = client.V1Container(
+        name=container_name, image=container_image, env=env_list)
+    template.template.spec = client.V1PodSpec(
+        containers=[container], restart_policy='Never')
     # And finaly we can create our V1JobSpec!
-    body.spec = client.V1JobSpec(ttl_seconds_after_finished=600, template=template.template)
+    body.spec = client.V1JobSpec(
+        ttl_seconds_after_finished=600, template=template.template)
     return body
 
 
@@ -192,7 +206,8 @@ def kube_create_job(image, parameter=None):
     # body = kube_create_job_object(name, container_image, env_vars={"VAR": "TESTING"})
     body = kube_create_job_object(name, image, env_vars=parameter)
     try:
-        api_response = api_instance.create_namespaced_job("default", body, pretty=True)
+        api_response = api_instance.create_namespaced_job(
+            "default", body, pretty=True)
         # print(api_response)
     except ApiException as e:
         print("Exception when calling BatchV1Api->create_namespaced_job: %s\n" % e)
@@ -246,16 +261,17 @@ if __name__ == '__main__':
     - create job for each module in pipeline
     - clean up finished jobs   
         - clean up finished pipelines instead? keep track of pipelines jobs?
-         
-    
+
+
     """
 
     """
     get info from config.yml?
     """
 
-    API_URL = "http://127.0.0.1:8001"
+    # API_URL = "http://127.0.0.1:8001"
     # API_URL = new_pc.config['API_URL']
+    API_URL = "http://api-knowledge-service.default:80"
     ENDPOINT_USER_INPUT = "/use_case/"
     URL_USER_INPUT = API_URL + ENDPOINT_USER_INPUT
 
@@ -266,7 +282,6 @@ if __name__ == '__main__':
 
     user_input = get_from_API(URL_USER_INPUT)
     feasible_pipelines = get_from_API(URL_FEASIBLE_PIPELINES, user_input)
-
     jobs = defaultdict(list)
 
     for pipeline in feasible_pipelines:
@@ -292,6 +307,6 @@ if __name__ == '__main__':
             print(job, parameter)
             kube_create_job(job, parameter)
 
-    list_pods()
+    # list_pods()
 
     sys.exit(0)

@@ -1,6 +1,5 @@
 import os
 
-# from classes.KafkaPC import KafkaPC
 from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
 
 
@@ -45,10 +44,10 @@ try:
             """
 
             new_data_point = {
-                "phase": new_data["phase"],
-                "id": new_data["id"],
-                "x": new_data["x"],
-                "y": new_data["y"],
+                "phase": "observation",
+                "id": new_data["cycle"],
+                "x": new_data["x"]["x"],
+                "y": new_data["y_agg_norm"],
             }
 
             new_pc.send_msg(new_data_point)

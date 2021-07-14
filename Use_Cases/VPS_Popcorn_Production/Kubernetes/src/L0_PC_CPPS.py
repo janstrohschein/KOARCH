@@ -47,14 +47,24 @@ while current_data_point < MAX_PRODUCTION_CYCLES:
     new_x = req_json["x"]
     new_y = new_objective.get_objective(new_x)
 
-    new_data_point = {
-        "id": current_data_point,
-        "phase": phase,
-        "algorithm": req_json["algorithm"],
-        "x": new_x,
-        "y": new_y,
-    }
+    # new_data_point = {
+    #     "id": current_data_point,
+    #     "phase": phase,
+    #     "algorithm": req_json["algorithm"],
+    #     "x": new_x,
+    #     "y": new_y,
+    # }
 
+    new_data_point = {
+        "cycle": current_data_point,
+        "timestamp": 12345,
+        "x": {"x": new_x},
+        "y_values": {"y": new_y},
+        "y_agg": new_y,
+        "y_values_norm": {"y": new_y},
+        "y_agg_norm": new_y
+    }
+    # print(new_data_point)
     new_pc.send_msg(new_data_point)
     print(f"The CPPS produced with x={round(new_x, 3)} -> y={round(new_y, 3)}")
     current_data_point += 1

@@ -1,8 +1,6 @@
 import os
+from sys import exit
 
-# from scipy.optimize import differential_evolution
-# from scipy.optimize import minimize
-from math import ceil
 import pickle
 import numpy as np
 import json
@@ -10,9 +8,7 @@ import requests
 
 import random
 
-import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
-from rpy2.robjects.conversion import localconverter
 
 from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import OptAlgorithm
 from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
@@ -31,7 +27,7 @@ class Optimizer(KafkaPC):
         self.last_raw_id = None
         self.func_dict = {
             "AB_test_function": self.process_test_function,
-            "DB_raw_data": self.process_production_data,
+            "DB_features": self.process_features,
         }
 
     def get_optimizer_parameters(self, API_URL):
@@ -123,7 +119,7 @@ class Optimizer(KafkaPC):
         budget = result.nfev
         # QUESTION include real resource consumption in Cognition?
         repetition = 1
-        
+
         CPU_ms = 0.35 + random.uniform(0, 1)
         RAM = 23.6 + random.uniform(0, 1)
 
@@ -153,56 +149,61 @@ class Optimizer(KafkaPC):
         }
 
         self.send_msg(topic="AB_simulation_results", message=simulation_result)
+        exit(0)
 
-    def process_production_data(self, msg):
+    def process_features(self, msg):
         new_production_data = self.decode_msg(msg)
-        if new_production_data["algorithm"] == OPTIMIZER_NAME:
-            print("Process production data from Monitoring on DB_raw_data")
-            id = new_production_data["id"]
-            self.last_raw_id = id
-            self.raw_data_dict[id] = {
-                "id": new_production_data["id"],
-                "phase": new_production_data["phase"],
-                "algorithm": OPTIMIZER_NAME,
-                "x": new_production_data["x"],
-                #            'y': new_production_data['y']
-            }
-            if new_production_data["phase"] == "init":
-                print("Production still in init phase")
-                return
+        # if new_production_data["algorithm"] == OPTIMIZER_NAME:
+        print("Process production data from Monitoring on DB_raw_data")
+        id = new_production_data["cycle"]
+        self.last_raw_id = id
+        self.raw_data_dict[id] = {
+            "id": id,
+            "phase": "observation",
+            "algorithm": OPTIMIZER_NAME,
+            "x": new_production_data["x"],
+            #            'y': new_production_data['y']
+        }
+        # if new_production_data["phase"] == "init":
+        #     print("Production still in init phase")
+        #     return
 
-            # instantiate optimizer
-            alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME,
-                               OPTIMIZER_PARAMETERS)
-            result = alg.run(self.apply_on_cpps)
-            x = result.x[0]
-            y = None
-            if isinstance(result.fun, (np.float, np.float64)):
-                y = result.fun
-            else:
-                y = result.fun[0]
+        if new_production_data["cycle"] < 5:
+            print("Production still in init phase")
+            return
 
-            """
-            "name": "Application_Result",
-            "fields": [
-                {"name": "phase", "type": ["string"]},
-                {"name": "algorithm", "type": ["string"]},
-                {"name": "id", "type": ["int"]},
-                {"name": "x", "type": ["float"]},
-                {"name": "y", "type": ["float"]}
-                ]
-            """
-            # fill dictionary with required result fields
-            application_results = {
-                "phase": new_production_data["phase"],
-                "algorithm": OPTIMIZER_NAME,
-                "id": new_production_data["id"],
-                "x": x,
-                "y": y,
-            }
+        # instantiate optimizer
+        alg = OptAlgorithm(self.bounds, OPTIMIZER_NAME,
+                           OPTIMIZER_PARAMETERS)
+        result = alg.run(self.apply_on_cpps)
+        x = result.x[0]
+        y = None
+        if isinstance(result.fun, (np.float, np.float64)):
+            y = result.fun
+        else:
+            y = result.fun[0]
 
-            self.send_msg(topic="AB_application_results",
-                          message=application_results)
+        """
+        "name": "Application_Result",
+        "fields": [
+            {"name": "phase", "type": ["string"]},
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "id", "type": ["int"]},
+            {"name": "x", "type": ["float"]},
+            {"name": "y", "type": ["float"]}
+            ]
+        """
+        # fill dictionary with required result fields
+        application_results = {
+            "phase": "observation",
+            "algorithm": OPTIMIZER_NAME,
+            "id": new_production_data["cycle"],
+            "x": x,
+            "y": y,
+        }
+
+        self.send_msg(topic="AB_application_results",
+                      message=application_results)
 
 
 env_vars = {

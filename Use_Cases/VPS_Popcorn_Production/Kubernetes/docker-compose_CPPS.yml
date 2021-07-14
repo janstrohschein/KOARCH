@@ -1,16 +1,16 @@
 version: '2'
 
 services:
-  0_api_cpps_controller:
-    container_name: 0_API_CPPS_Controller
-    hostname: 0_API_CPPS_Controller
-    build:
-      context:  ../../../
-      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_API_CPPS_Controller
-    expose:
-    - "8000"
-    ports:
-    - "8000:8000"
+  # 0_api_cpps_controller:
+  #   container_name: 0_API_CPPS_Controller
+  #   hostname: 0_API_CPPS_Controller
+  #   build:
+  #     context:  ../../../
+  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_API_CPPS_Controller
+  #   expose:
+  #   - "8000"
+  #   ports:
+  #   - "8000:8000"
 
   0_p_schema_init:
     container_name: 0_P_Schema_Init
@@ -21,14 +21,14 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, 0_p_schema_init
 
-  0_pc_cpps:
-    container_name: 0_PC_CPPS
-    build:
-      context:  ../../../
-      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_PC_CPPS
-    environment:
-      config_path: ./configurations/config.yml
-      config_section: General, Initial_Design, Objective_Function, 0_pc_cpps
+  # 0_pc_cpps:
+  #   container_name: 0_PC_CPPS
+  #   build:
+  #     context:  ../../../
+  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_PC_CPPS
+  #   environment:
+  #     config_path: ./configurations/config.yml
+  #     config_section: General, Initial_Design, Objective_Function, 0_pc_cpps
 
   1_pc_monitoring:
     container_name: 1_PC_Monitoring
@@ -117,16 +117,14 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, 3_pc_simulation
 
-  4_pc_adaption:
-    container_name: 4_PC_Adaption
+  4_pc_cpps_adaption:
+    container_name: 4_PC_cpps_Adaption
     build:
       context:  ../../../
-      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_PC_Adaption
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_PC_CPPS_Adaption
     environment:
         config_path: ./configurations/config.yml
         config_section: General, 4_pc_adaption
-    depends_on:
-      - 0_api_cpps_controller
 
   4_c_plot_data:
     container_name: 4_C_Plot_Data

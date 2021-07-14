@@ -1,0 +1,22 @@
+{"namespace": "schema",
+ "type": "record",
+ "name": "Features",
+ "fields": [
+    {"name": "cycle", "type": "int"},
+    {"name": "timestamp", "type": "long", "logicalType": "timestamp-millis"},
+    {"name": "x", "type": {
+      "type": "map", 
+      "values": ["int", "long", "boolean", "float", "double", "string"]}
+    },
+    {"name": "y_values", "type": {
+      "type": "map", 
+      "values": ["int", "long", "boolean", "float", "double", "string"]}
+    },
+    {"name": "y_agg", "type": "double"},
+    {"name": "y_values_norm", "type": {
+      "type": "map", 
+      "values": ["int", "long", "boolean", "float", "double", "string"]}
+    },
+    {"name": "y_agg_norm", "type": "double"}
+    ]
+    }

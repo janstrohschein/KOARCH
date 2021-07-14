@@ -6,11 +6,10 @@ import warnings
 
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
-from rpy2.robjects.conversion import localconverter
 import rpy2.rinterface_lib.callbacks
 
 from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classes.CKafkaPC import KafkaPC
-from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import ModelLearner, DataWindow, get_cv_scores
+from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.caai_util import DataWindow
 
 
 if not sys.warnoptions:
@@ -64,7 +63,7 @@ print("N_INSTANCES to simulate: " + str(N_INSTANCES))
 
 generate_new = False
 
-selection_phase = 0
+# selection_phase = 0
 
 # rpy2 r objects access
 r = robjects.r
@@ -96,6 +95,7 @@ try:
             "name": "Simulation_Data",
             "fields": [
                 {"name": "id", "type": ["int"]},
+                {"name": "selection_phase", "type": ["int"]},
                 {"name": "new_simulation", "type": ["bool"]},
                 {"name": "x", "type": ["float"]},
                 {"name": "y", "type": ["float"]}
@@ -109,14 +109,14 @@ try:
             new_window.append_and_check(new_data_point)
 
             # print(new_data)
-            if new_data["new_simulation"] == True:
+            if new_data["new_simulation"] is True:
                 generate_new = True
             if len(new_window.data) < MIN_DATA_POINTS:
                 print(
                     f"Collecting training data for Test function generator "
                     f"({len(new_window.data)}/{MIN_DATA_POINTS})"
                 )
-            elif generate_new == True:
+            elif generate_new is True:
                 # reset generation request
                 generate_new = False
                 # TODO consider theta, etha, count iteration
@@ -127,7 +127,7 @@ try:
 
                 testInstance = generateTestFunctions(df, N_INSTANCES)
                 # compute baseline performance results and send to cognition
-                selection_phase = selection_phase + 1
+                # selection_phase = selection_phase + 1
                 repetition = 1
                 # TODO Resources for Baseline necessary? Set to 0?
                 CPU_ms = 0.1
@@ -152,7 +152,7 @@ try:
                     ]
                 """
                 simulation_result_data = {
-                    "selection_phase": selection_phase,
+                    "selection_phase": new_data["selection_phase"],
                     "algorithm": "baseline",
                     "repetition": repetition,
                     "budget": BUDGET,
@@ -168,8 +168,8 @@ try:
 
                 objective_pickle = pickle.dumps(testInstance)
                 simulation_data = {
-                    "id": new_data["id"], 
-                    "selection_phase": selection_phase,
+                    "id": new_data["id"],
+                    "selection_phase": new_data["selection_phase"],
                     "simulation": objective_pickle}
                 print("Sending Test function")
                 new_pc.send_msg(topic="AB_test_function",

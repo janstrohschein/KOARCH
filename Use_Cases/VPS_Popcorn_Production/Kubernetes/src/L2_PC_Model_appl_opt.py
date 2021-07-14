@@ -166,13 +166,9 @@ try:
 
         else:
             new_pc.func_dict[msg.topic()](msg)
-            # new_message = new_pc.decode_msg(msg)
-            # print(f"Received on topic '{msg.topic()}': {new_message}")
 
 except KeyboardInterrupt:
     pass
 
 finally:
     new_pc.consumer.close()
-# for msg in new_pc.consumer:
-#     new_pc.func_dict[msg.topic](msg)

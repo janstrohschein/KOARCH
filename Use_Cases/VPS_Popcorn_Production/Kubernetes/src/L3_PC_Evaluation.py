@@ -4,7 +4,6 @@ import traceback
 import pandas as pd
 
 from Use_Cases.VPS_Popcorn_Production.Kubernetes.src.classes.CognitionPC import CognitionPC
-from Big_Data_Platform.Kubernetes.Cognition.example.src.classes.KubeAPI import KubeAPI
 
 pd.set_option("display.max_columns", None)
 pd.options.display.float_format = "{:.3f}".format
@@ -38,9 +37,11 @@ print(
 "name": "New X",
 "fields": [
     {"name": "algorithm", "type": ["string"]},
-     {"name": "new_x", "type": ["float"]}
+    {"name": "new_x", "type": ["float"]}
  ]
 """
+
+# QUESTION continue sending initial design?
 new_cog.send_point_from_initial_design()
 new_cog.nr_of_iterations += 1
 
@@ -79,6 +80,3 @@ except KeyboardInterrupt:
 
 finally:
     new_cog.consumer.close()
-
-# for msg in new_cog.consumer:
-#     new_cog.func_dict[msg.topic](msg)

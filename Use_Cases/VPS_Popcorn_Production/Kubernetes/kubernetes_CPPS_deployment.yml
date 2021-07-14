@@ -1,58 +1,42 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: 0-api-cpps-controller
+  name: 0-protocol-translation
   labels:
-    app: 0-api-cpps-controller
+    app: 0-protocol-translation
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: 0-api-cpps-controller
+      app: 0-protocol-translation
   template:
     metadata:
       labels:
-        app: 0-api-cpps-controller
+        app: 0-protocol-translation
     spec:
       containers:
-        - name: 0-api-cpps-controller
-          image: koarch/vps_0_api_cpps_controller:0.11-amd64
-          ports:
-            - containerPort: 8000
+        - name: 0-protocol-translation
+          image: koarch/vps_0_protocol_translation:0.1-amd64
 ---
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: api-cpps-controller-service
+  name: 0-feature-extraction
+  labels:
+    app: 0-feature-extraction
 spec:
+  replicas: 1
   selector:
-    app: 0-api-cpps-controller
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8000
-      name: 0-api-cpps-controller
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: api-cpps-controller-ingress
-  annotations:
-    ingress.kubernetes.io/ssl-redirect: "false"
-    kubernetes.io/ingress.class: "traefik"
-    traefik.ingress.kubernetes.io/rule-type: "PathPrefixStrip"
-    traefik.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /cpps
-            pathType: Exact
-            backend:
-              service:
-                name: api-cpps-controller-service
-                port:
-                  number: 80
+    matchLabels:
+      app: 0-feature-extraction
+  template:
+    metadata:
+      labels:
+        app: 0-feature-extraction
+    spec:
+      containers:
+        - name: 0-feature-extraction
+          image: koarch/vps_0_feature_extraction:0.1-amd64
 ---
 apiVersion: v1
 kind: Pod
@@ -342,20 +326,20 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: 4-pc-adaption
+  name: 4-pc-CPPS-adaption
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: 4-pc-adaption
+      app: 4-pc-CPPS-adaption
   template:
     metadata:
       labels:
-        app: 4-pc-adaption
+        app: 4-pc-CPPS-adaption
     spec:
       containers:
-        - name: 4-pc-adaption
-          image: koarch/vps_4_pc_adaption:0.1-amd64
+        - name: 4-pc-CPPS-adaption
+          image: koarch/vps_4_pc_cpps_adaption:0.1-amd64
           env:
             - name: config_path
               value: "/etc/config/"

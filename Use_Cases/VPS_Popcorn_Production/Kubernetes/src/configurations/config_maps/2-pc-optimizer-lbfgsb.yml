@@ -8,6 +8,6 @@
   IN_GROUP: BFGS
   OUT_TOPIC:
     AB_apply_on_cpps: ./schema/new_x.avsc
-    AB_application_results: ./schema/application_result.avsc 
+    AB_application_results: ./schema/application_result.avsc
     AB_simulation_results: ./schema/simulation_result.avsc
-  API_URL: http://5_API_Knowledge:8000
+  API_URL: http://api-knowledge-service.default:80

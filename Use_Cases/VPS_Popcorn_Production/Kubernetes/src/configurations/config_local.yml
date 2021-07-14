@@ -1,7 +1,7 @@
 General:
-  KAFKA_BROKER_URL: localhost:9092
+  KAFKA_BROKER_URL: kafka-all-broker.default:29092
   KAFKA_CONSUMER_TIMEOUT_MS: 120000
-  KAFKA_SCHEMA_REGISTRY_URL: http://localhost:8081
+  KAFKA_SCHEMA_REGISTRY_URL: http://karapace-registry-service.default:80
 
 Initial_Design:
   N_INITIAL_DESIGN: 5

@@ -1,0 +1,45 @@
+apiVersion: skaffold/v2beta17
+kind: Config
+metadata:
+  name: kubernetes
+build:
+  artifacts:
+  - image: koarch/vps_0_api_cpps_controller
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_API_CPPS_Controller
+  - image: koarch/vps_0_p_schema_init
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_P_Schema_Init
+  - image: koarch/vps_0_pc_cpps
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_PC_CPPS
+  - image: koarch/vps_1_pc_monitoring
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_1_PC_Monitoring
+  - image: koarch/vps_3_pc_evaluation
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Evaluation
+  - image: koarch/vps_3_pc_simulation
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_PC_Simulation
+  - image: koarch/vps_4_pc_adaption
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_PC_Adaption
+  - image: koarch/vps_5_api_knowledge
+    context:  ../../../
+    docker:
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_5_API_Knowledge
+deploy:
+  kubectl:
+    manifests:
+    - cognition_preparation_custom_service_account.yaml
+    - kubernetes_deployment.yml
+    - skaffold.yaml
+    - kubernetes/3-pc-evaluation.yml

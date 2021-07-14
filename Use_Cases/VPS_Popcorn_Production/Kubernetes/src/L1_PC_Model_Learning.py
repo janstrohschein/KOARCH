@@ -3,14 +3,12 @@ import sys
 import os
 import tracemalloc
 import time
-from sys import getsizeof
+from sys import getsizeof, exit
 import pickle
 import json
 import requests
 
-import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
-from rpy2.robjects.conversion import localconverter
 
 import numpy as np
 
@@ -36,7 +34,7 @@ class Learner(KafkaPC):
 
         self.func_dict = {
             "AB_test_function": self.process_test_function,
-            "DB_raw_data": self.process_raw_data,
+            "DB_features": self.process_features,
         }
 
     def get_model_parameters(self, API_URL):
@@ -149,8 +147,9 @@ class Learner(KafkaPC):
 
         self.send_msg(topic="AB_simulation_model_data",
                       message=simulation_model_data)
+        exit(0)
 
-    def process_raw_data(self, msg):
+    def process_features(self, msg):
         """
         "name": "Data",
         "fields": [
@@ -160,11 +159,25 @@ class Learner(KafkaPC):
             {"name": "x", "type": ["float"]},
             {"name": "y", "type": ["float"]}
             ]
+
+
+        new_data_point = {
+            "cycle": current_data_point,
+            "timestamp": 12345,
+            "x": {"x": new_x},
+            "y_values": {"y": new_y},
+            "y_agg": new_y,
+            "y_values_norm": {"y": new_y},
+            "y_agg_norm": new_y
+        }
+
+
         """
         new_data = self.decode_msg(msg)
+        # print(new_data)
 
         new_data_point = new_window.Data_Point(
-            new_data["id"], new_data["x"], new_data["y"]
+            new_data["cycle"], new_data["x"]["x"], new_data["y_agg_norm"]
         )
         new_window.append_and_check(new_data_point)
 
@@ -173,7 +186,8 @@ class Learner(KafkaPC):
                 f"Collecting training data for {MODEL_ALGORITHM} "
                 f"({len(new_window.data)}/{MIN_DATA_POINTS})"
             )
-        elif new_data["algorithm"] == MODEL_ALGORITHM:
+        # elif new_data["algorithm"] == MODEL_ALGORITHM:
+        else:
             # performance tracking
             tracemalloc.start()
             start = time.perf_counter()
@@ -189,7 +203,7 @@ class Learner(KafkaPC):
             # print(f'n = {len(X)}')
             rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
             print(
-                f"Update model with (x={round(new_data['x'], 3)}, y={round(new_data['y'], 3)}) -> "
+                f"Update model with (x={round(new_data['x']['x'], 3)}, y={round(new_data['y_agg_norm'], 3)}) -> "
                 f"RMSE: {round(rmse_score, 3)}"
             )
 
@@ -226,9 +240,9 @@ class Learner(KafkaPC):
             """
 
             model_data = {
-                "phase": new_data["phase"],
+                "phase": "observation",
                 "model_name": MODEL_ALGORITHM,
-                "id": new_data["id"],
+                "id": new_data["cycle"],
                 "n_data_points": len(X),
                 "id_start_x": id_start_x,
                 "model": model_pickle,
@@ -271,13 +285,9 @@ try:
 
         else:
             new_pc.func_dict[msg.topic()](msg)
-            # new_message = new_pc.decode_msg(msg)
-            # print(f"Received on topic '{msg.topic()}': {new_message}")
 
 except KeyboardInterrupt:
     pass
 
 finally:
     new_pc.consumer.close()
-# for msg in new_pc.consumer:
-#     new_pc.func_dict[msg.topic](msg)
