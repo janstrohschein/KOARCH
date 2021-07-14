@@ -18,14 +18,22 @@ Objective_Function:
   y_columns:
     yAgg: float
 
+0_p_schema_init:
+  OUT_TOPIC:
+    AB_apply_on_cpps: ./schema/new_x.avsc
+    AB_application_results: ./schema/application_result.avsc
+    AB_simulation_results: ./schema/simulation_result.avsc
+
 0_pc_cpps:
   OUT_TOPIC:
-    DB_raw_data: ./schema/data.avsc
+    # DB_raw_data: ./schema/data.avsc
+    DB_features: ./schema/CPPSFeatures.avsc
   API_URL: http://0_API_CPPS_Controller:8000
 
 1_pc_monitoring:
   IN_TOPIC:
-    - DB_raw_data
+    # - DB_raw_data
+    - DB_features
   IN_GROUP: "monitoring"
   OUT_TOPIC:
     AB_monitoring: ./schema/monitoring.avsc
@@ -35,7 +43,8 @@ Objective_Function:
   MODEL_PARAMETERS:
     n_estimators: 3
   IN_TOPIC:
-    - DB_raw_data
+    # - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: RF
   OUT_TOPIC:
@@ -49,7 +58,8 @@ Objective_Function:
     kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
     n_restarts_optimizer: 5
   IN_TOPIC:
-    - DB_raw_data
+    # - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: Kriging
   OUT_TOPIC:
@@ -75,7 +85,8 @@ Objective_Function:
     recombination: 0.7
     strategy: best1bin
   IN_TOPIC:
-    - DB_raw_data
+    # - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: DE
   OUT_TOPIC:
@@ -92,7 +103,8 @@ Objective_Function:
     visit: 2.62
     accept: -5
   IN_TOPIC:
-    - DB_raw_data
+    # - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: DA
   OUT_TOPIC:
@@ -106,7 +118,8 @@ Objective_Function:
   OPTIMIZATION_PARAMETERS:
     maxfun: 40
   IN_TOPIC:
-    - DB_raw_data
+    # - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: BFGS
   OUT_TOPIC:

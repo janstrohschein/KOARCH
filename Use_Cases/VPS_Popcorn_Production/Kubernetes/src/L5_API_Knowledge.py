@@ -50,7 +50,7 @@ def get_pipelines(knowledge, search_base, search, parent=None, pipelines=[]):
     return pipelines
 
 
-knowledgebase = FastAPI(root_path="/knowledge")
+knowledgebase = FastAPI(root_path="/knowledge_api")
 knowledge = import_knowledge()
 
 

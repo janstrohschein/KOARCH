@@ -37,9 +37,11 @@ print(
 "name": "New X",
 "fields": [
     {"name": "algorithm", "type": ["string"]},
-     {"name": "new_x", "type": ["float"]}
+    {"name": "new_x", "type": ["float"]}
  ]
 """
+
+# QUESTION continue sending initial design?
 new_cog.send_point_from_initial_design()
 new_cog.nr_of_iterations += 1
 
@@ -78,6 +80,3 @@ except KeyboardInterrupt:
 
 finally:
     new_cog.consumer.close()
-
-# for msg in new_cog.consumer:
-#     new_cog.func_dict[msg.topic](msg)

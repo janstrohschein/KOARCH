@@ -10,4 +10,4 @@
   OUT_TOPIC:
     AB_model_data: ./schema/model.avsc
     AB_simulation_model_data: ./schema/simulation_model.avsc
-  API_URL: http://5_API_Knowledge:8000
+  API_URL: http://api-knowledge-service.default:80

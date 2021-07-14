@@ -3,3 +3,5 @@ numpy==1.18.1
 scipy==1.2.2
 scikit-learn==0.22.1
 requests==2.25.1
+kubernetes==17.17.0
+pint==0.17
