@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: 0-protocol-translation
-          image: koarch/vps_0_protocol_translation:0.16-amd64
+          image: koarch/vps_0_protocol_translation:0.17-amd64
 ---
 apiVersion: apps/v1
 kind: Deployment
