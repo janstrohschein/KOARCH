@@ -128,6 +128,17 @@ services:
     depends_on:
       - 0_api_cpps_controller
 
+  4_pc_cpps_adaption:
+    container_name: 4_PC_CPPS_Adaption
+    build:
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_4_PC_CPPS_Adaption
+    environment:
+        config_path: ./configurations/config.yml
+        config_section: General, 4_pc_adaption
+    depends_on:
+      - 0_api_cpps_controller
+
   4_c_plot_data:
     container_name: 4_C_Plot_Data
     build:
