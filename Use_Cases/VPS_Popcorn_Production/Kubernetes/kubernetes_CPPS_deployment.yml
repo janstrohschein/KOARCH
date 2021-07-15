@@ -70,67 +70,67 @@ spec:
         items:
           - key: 0-p-schema-init.yml
             path: 0-p-schema-init.yml
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: 0-pc-cpps
-  labels:
-    app: 0-pc-cpps
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: 0-pc-cpps
-  template:
-    metadata:
-      labels:
-        app: 0-pc-cpps
-    spec:
-      containers:
-        - name: 0-pc-cpps
-          image: koarch/vps_0_pc_cpps:0.1-amd64
-          env:
-            - name: config_path
-              value: "/etc/config/"
-          volumeMounts:
-            - name: general
-              mountPath: /etc/config/general.yml
-              subPath: general.yml
-            - name: initial-design
-              mountPath: /etc/config/initial-design.yml
-              subPath: initial-design.yml
-            - name: objective-function
-              mountPath: /etc/config/objective-function.yml
-              subPath: objective-function.yml
-            - name: 0-pc-cpps
-              mountPath: /etc/config/0-pc-cpps.yml
-              subPath: 0-pc-cpps.yml
-      volumes:
-        - name: general
-          configMap:
-            name: vps-use-case
-            items:
-              - key: general.yml
-                path: general.yml
-        - name: initial-design
-          configMap:
-            name: vps-use-case
-            items:
-              - key: initial-design.yml
-                path: initial-design.yml
-        - name: objective-function
-          configMap:
-            name: vps-use-case
-            items:
-              - key: objective-function.yml
-                path: objective-function.yml
-        - name: 0-pc-cpps
-          configMap:
-            name: vps-use-case
-            items:
-              - key: 0-pc-cpps.yml
-                path: 0-pc-cpps.yml
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: 0-pc-cpps
+#   labels:
+#     app: 0-pc-cpps
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: 0-pc-cpps
+#   template:
+#     metadata:
+#       labels:
+#         app: 0-pc-cpps
+#     spec:
+#       containers:
+#         - name: 0-pc-cpps
+#           image: koarch/vps_0_pc_cpps:0.1-amd64
+#           env:
+#             - name: config_path
+#               value: "/etc/config/"
+#           volumeMounts:
+#             - name: general
+#               mountPath: /etc/config/general.yml
+#               subPath: general.yml
+#             - name: initial-design
+#               mountPath: /etc/config/initial-design.yml
+#               subPath: initial-design.yml
+#             - name: objective-function
+#               mountPath: /etc/config/objective-function.yml
+#               subPath: objective-function.yml
+#             - name: 0-pc-cpps
+#               mountPath: /etc/config/0-pc-cpps.yml
+#               subPath: 0-pc-cpps.yml
+#       volumes:
+#         - name: general
+#           configMap:
+#             name: vps-use-case
+#             items:
+#               - key: general.yml
+#                 path: general.yml
+#         - name: initial-design
+#           configMap:
+#             name: vps-use-case
+#             items:
+#               - key: initial-design.yml
+#                 path: initial-design.yml
+#         - name: objective-function
+#           configMap:
+#             name: vps-use-case
+#             items:
+#               - key: objective-function.yml
+#                 path: objective-function.yml
+#         - name: 0-pc-cpps
+#           configMap:
+#             name: vps-use-case
+#             items:
+#               - key: 0-pc-cpps.yml
+#                 path: 0-pc-cpps.yml
 
 ---
 apiVersion: apps/v1
