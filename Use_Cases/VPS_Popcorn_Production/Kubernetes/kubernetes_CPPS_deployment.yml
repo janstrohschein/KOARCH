@@ -339,7 +339,7 @@ spec:
     spec:
       containers:
         - name: 4-pc-cpps-adaption
-          image: koarch/vps_4_pc_cpps_adaption:0.1-amd64
+          image: koarch/vps_4_pc_cpps_adaption:0.11-amd64
           env:
             - name: config_path
               value: "/etc/config/"
