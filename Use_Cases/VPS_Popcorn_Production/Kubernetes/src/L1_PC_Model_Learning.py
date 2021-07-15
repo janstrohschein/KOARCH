@@ -177,7 +177,7 @@ class Learner(KafkaPC):
         # print(new_data)
 
         new_data_point = new_window.Data_Point(
-            new_data["cycle"], new_data["x"]["x"], new_data["y_agg_norm"]
+            new_data["cycle"], new_data["x"]["conveyorRuntime"], new_data["y_agg_norm"]
         )
         new_window.append_and_check(new_data_point)
 
@@ -203,7 +203,7 @@ class Learner(KafkaPC):
             # print(f'n = {len(X)}')
             rmse_score, mae_score, r2_score = get_cv_scores(ML.model, X, y)
             print(
-                f"Update model with (x={round(new_data['x']['x'], 3)}, y={round(new_data['y_agg_norm'], 3)}) -> "
+                f"Update model with (x={round(new_data['x']['conveyorRuntime'], 3)}, y={round(new_data['y_agg_norm'], 3)}) -> "
                 f"RMSE: {round(rmse_score, 3)}"
             )
 

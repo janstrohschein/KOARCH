@@ -154,14 +154,14 @@ class Optimizer(KafkaPC):
     def process_features(self, msg):
         new_production_data = self.decode_msg(msg)
         # if new_production_data["algorithm"] == OPTIMIZER_NAME:
-        print("Process production data from Monitoring on DB_raw_data")
+        print("Process production data from Monitoring on DB_features")
         id = new_production_data["cycle"]
         self.last_raw_id = id
         self.raw_data_dict[id] = {
             "id": id,
             "phase": "observation",
             "algorithm": OPTIMIZER_NAME,
-            "x": new_production_data["x"],
+            "x": new_production_data["x"]["conveyorRuntime"],
             #            'y': new_production_data['y']
         }
         # if new_production_data["phase"] == "init":
