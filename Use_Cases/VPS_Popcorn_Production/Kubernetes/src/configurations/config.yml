@@ -23,10 +23,10 @@ Objective_Function:
     AB_apply_on_cpps: ./schema/new_x.avsc
     AB_application_results: ./schema/application_result.avsc
     AB_simulation_results: ./schema/simulation_result.avsc
+    DB_features: ./schema/CPPSFeatures.avsc
 
 0_pc_cpps:
   OUT_TOPIC:
-    # DB_raw_data: ./schema/data.avsc
     DB_features: ./schema/CPPSFeatures.avsc
   API_URL: http://0_API_CPPS_Controller:8000
 
