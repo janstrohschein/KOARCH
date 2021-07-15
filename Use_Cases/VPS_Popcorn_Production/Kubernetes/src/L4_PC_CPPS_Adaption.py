@@ -39,6 +39,7 @@ try:
                 {'|var|CODESYS Control for Raspberry Pi SL.Application.GVL.varTime':
                     int(new_message["new_x"])})
 
+            print(f"Sending to Topic CPPSadaption: {msg}")
             producer.produce("CPPSadaption", msg)
             producer.flush()
 
