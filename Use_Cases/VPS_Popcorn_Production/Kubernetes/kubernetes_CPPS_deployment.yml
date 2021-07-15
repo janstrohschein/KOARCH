@@ -151,7 +151,7 @@ spec:
     spec:
       containers:
         - name: 1-pc-monitoring
-          image: koarch/vps_1_pc_monitoring:0.12-amd64
+          image: koarch/vps_1_pc_monitoring:0.13-amd64
           env:
             - name: config_path
               value: "/etc/config/"

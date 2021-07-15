@@ -31,6 +31,7 @@ try:
                 {"name": "y", "type": ["float"]}
                 ]
             """
+            print("Trying to decode new message")
             new_data = new_pc.decode_msg(msg)
             topic = msg.topic()
 
@@ -49,7 +50,7 @@ try:
             new_data_point = {
                 "phase": "observation",
                 "id": new_data["cycle"],
-                "x": new_data["x"]["x"],
+                "x": new_data["x"]["conveyorRuntime"],
                 "y": new_data["y_agg_norm"],
             }
             print("Sending new message:")
