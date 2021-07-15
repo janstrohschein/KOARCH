@@ -1,6 +1,6 @@
 1_pc_monitoring:
   IN_TOPIC:
-    - DB_raw_data
+    - DB_features
   IN_GROUP: "monitoring"
   OUT_TOPIC:
     AB_monitoring: ./schema/monitoring.avsc
