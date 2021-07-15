@@ -32,7 +32,10 @@ try:
                 ]
             """
             new_data = new_pc.decode_msg(msg)
+            topic = msg.topic()
 
+            print(f"Message on Topic {topic}:")
+            print(new_data)
             """
             "name": "Data",
             "fields": [
@@ -49,6 +52,8 @@ try:
                 "x": new_data["x"]["x"],
                 "y": new_data["y_agg_norm"],
             }
+            print("Sending new message:")
+            print(new_data_point)
 
             new_pc.send_msg(new_data_point)
 
