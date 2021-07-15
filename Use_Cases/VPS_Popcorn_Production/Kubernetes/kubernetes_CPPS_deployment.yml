@@ -45,7 +45,7 @@ metadata:
 spec:
   containers:
     - name: 0-p-schema-init
-      image: koarch/vps_0_p_schema_init:0.11-amd64
+      image: koarch/vps_0_p_schema_init:0.12-amd64
       env:
         - name: config_path
           value: "/etc/config/"
