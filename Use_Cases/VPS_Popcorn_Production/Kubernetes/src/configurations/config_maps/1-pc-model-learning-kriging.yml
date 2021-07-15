@@ -4,7 +4,7 @@
     kernel: 1.0 * kernels.RationalQuadratic(length_scale=1.0, alpha=1)
     n_restarts_optimizer: 5
   IN_TOPIC:
-    - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: Kriging
   OUT_TOPIC:

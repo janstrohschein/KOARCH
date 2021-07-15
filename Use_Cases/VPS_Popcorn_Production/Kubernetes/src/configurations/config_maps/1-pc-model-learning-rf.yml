@@ -3,7 +3,7 @@
   MODEL_PARAMETERS:
     n_estimators: 3
   IN_TOPIC:
-    - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: RF
   OUT_TOPIC:

@@ -7,7 +7,7 @@
     recombination: 0.7
     strategy: best1bin
   IN_TOPIC:
-    - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: DE
   OUT_TOPIC:

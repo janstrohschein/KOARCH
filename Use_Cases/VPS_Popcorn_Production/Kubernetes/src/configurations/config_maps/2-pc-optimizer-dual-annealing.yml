@@ -6,7 +6,7 @@
     visit: 2.62
     accept: -5
   IN_TOPIC:
-    - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: DA
   OUT_TOPIC:

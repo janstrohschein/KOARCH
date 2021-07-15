@@ -3,7 +3,7 @@
   OPTIMIZATION_PARAMETERS:
     maxfun: 40
   IN_TOPIC:
-    - DB_raw_data
+    - DB_features
     - AB_test_function
   IN_GROUP: BFGS
   OUT_TOPIC:
