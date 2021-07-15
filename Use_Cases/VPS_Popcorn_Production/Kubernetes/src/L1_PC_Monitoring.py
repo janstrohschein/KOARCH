@@ -61,5 +61,8 @@ try:
 except KeyboardInterrupt:
     pass
 
+except Exception as e:
+    print(f"Exception: {repr(e)}")
+
 finally:
     new_pc.consumer.close()
