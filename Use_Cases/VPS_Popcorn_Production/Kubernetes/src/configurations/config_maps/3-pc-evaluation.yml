@@ -3,6 +3,7 @@
     - AB_apply_on_cpps
     - AB_application_results
     - AB_monitoring
+    - AB_cluster_monitoring
     - AB_simulation_results
   IN_GROUP: evaluation
   OUT_TOPIC:
@@ -11,4 +12,3 @@
   USER_WEIGHTS:
     QUALITY: 0.95
     RESOURCES: 0.05
-  API_URL: http://api-cpps-controller-service:80

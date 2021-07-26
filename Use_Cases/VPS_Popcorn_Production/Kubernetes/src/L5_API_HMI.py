@@ -2,33 +2,56 @@ import os
 import json
 import sys
 import csv
+import pathlib
 from enum import Enum
 import yaml
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse, FileResponse
 
 
-def read_config(config_path, config_section):
-    config = {}
+# def read_config(config_path, config_section):
+#     config = {}
+#     try:
+#         with open(config_path, "r") as ymlfile:
+#             config = yaml.load(ymlfile, Loader=yaml.FullLoader)
+#             for section in config_section:
+#                 for key, value in config[section].items():
+#                     config[key] = value
+
+#     except Exception as e:
+#         print(f'Failed to read the config: {repr(e)}')
+#         sys.exit()
+#     return config
+
+def read_config(config_path, config_section=None):
+    config_dict = {}
+    if config_path is None:
+        raise ValueError("Configuration requires config_path")
     try:
-        with open(config_path, "r") as ymlfile:
-            config = yaml.load(ymlfile, Loader=yaml.FullLoader)
-            for section in config_section:
-                for key, value in config[section].items():
-                    config[key] = value
+        file_list = []
+        for p in pathlib.Path(config_path).iterdir():
+            file_list.append(p)
+        for file in file_list:
+            with open(file, "r") as ymlfile:
+                config = yaml.load(ymlfile, Loader=yaml.FullLoader)
+                for section in config:
+                    for key, value in config[section].items():
+                        config_dict[key] = value
 
     except Exception as e:
-        print(f'Failed to read the config: {repr(e)}')
+        print(f"Failed to read the config: {repr(e)}")
         sys.exit()
-    return config
+
+    return config_dict
 
 
 config_path = os.getenv('config_path')
-config_section = os.getenv('config_section')
 
-if config_path is not None and config_section is not None:
-    config_section = config_section.replace(' ', '').split(',')
-    config = read_config(config_path, config_section)
+if config_path is not None:
+    config = read_config(config_path)
+else:
+    print("Need config_path to read config")
+    sys.exit(1)
 
 results = {key: [] for key in config["API_OUT"]}
 custom_enum_values = {key: key for key in config["API_OUT"]}

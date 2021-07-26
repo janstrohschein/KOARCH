@@ -52,20 +52,21 @@ best_alg_dep = Deployment(name=name, image=image,
                           version=version, config_maps=cm_list)
 
 
-# dep_obj = k_api.kube_create_deployment_object(best_alg_dep)
-# k_api.kube_create_deployment(dep_obj)
+dep_obj = k_api.kube_create_deployment_object(best_alg_dep)
+k_api.kube_create_deployment(dep_obj)
 
 # sleep(5)
 k_api.kube_delete_deployment(best_alg_dep)
 
-# while True:
-#     if k_api.has_capacity():
-#         job_list = k_api.get_jobs_from_pipelines(feasible_pipelines)
-#         for job in job_list:
-#             print(job)
-#             k_api.kube_create_job(job)
+while True:
+    # if k_api.has_capacity():
+    if True:
+        job_list = k_api.get_jobs_from_pipelines(feasible_pipelines)
+        for job in job_list:
+            print(job)
+            k_api.kube_create_job(job)
 
-#         pprint(k_api.get_pod_metadata())
-#     else:
-#         print("Waiting for resources..")
-#     sleep(5)
+        pprint(k_api.get_pod_metadata())
+    else:
+        print("Waiting for resources..")
+    sleep(5)

@@ -1,0 +1,3 @@
+1_p_cluster_monitoring:
+  OUT_TOPIC:
+    AB_cluster_monitoring: ./schema/cluster_monitoring.avsc

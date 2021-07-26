@@ -11,7 +11,7 @@ Ei = Ki^6
 # cpu units
 
 kcpuunits = 1 = [kcpuunits]
-m = 1/1000 * kcpuunits
+millicpu = 1/1000 * kcpuunits
 n = 1/1000000000 * kcpuunits
 k = 1000 * kcpuunits
 M = k^2

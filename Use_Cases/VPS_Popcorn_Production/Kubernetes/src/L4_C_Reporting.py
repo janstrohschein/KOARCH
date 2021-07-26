@@ -7,9 +7,9 @@ from Big_Data_Platform.Kubernetes.Kafka_Client.Confluent_Kafka_Python.src.classe
 
 def forward_topic(msg):
     """ forwards the incoming message to the API endpoint """
-
+    print("Entering function forward_topic()")
     new_message = new_c.decode_msg(msg)
-    ENDPOINT_PARAMETER = msg.topic
+    ENDPOINT_PARAMETER = msg.topic()
 
     param_str = json.dumps(new_message)
     params = {"row": param_str}
@@ -17,6 +17,8 @@ def forward_topic(msg):
     URL = API_URL + ENDPOINT + ENDPOINT_PARAMETER
 
     requests.post(url=URL, params=params)
+    print(f"Post to URL: {URL}:")
+    print(params)
 
 
 def plot_monitoring(msg):
@@ -96,7 +98,6 @@ def plot_data_multi(msg):
 
 env_vars = {
     "config_path": os.getenv("config_path"),
-    "config_section": os.getenv("config_section"),
 }
 
 new_c = KafkaPC(**env_vars)
@@ -104,10 +105,13 @@ new_c = KafkaPC(**env_vars)
 api_dict = new_c.config["API_OUT"]
 plot_dict = new_c.config["PLOT_TOPIC"]
 
+print(f"api_dict: {api_dict}")
 
 API_URL = new_c.config["API_URL"]
 ENDPOINT = new_c.config["API_ENDPOINT"]
 
+print(f"API_URL: {API_URL}")
+print(f"ENDPOINT: {ENDPOINT}")
 
 try:
     while True:
@@ -120,25 +124,22 @@ try:
             print(f"Error occured: {str(msg.error())}")
 
         else:
-            # new_message = new_c.decode_msg(msg)
-            # print(f"Received on topic '{msg.topic()}': {new_message}")
-
             # tests if msg.topic is in api_dict and calls function from dict
             try:
-                if api_dict.get(msg.topic) is not None:
+                if api_dict.get(msg.topic()) is not None:
                     eval(api_dict[msg.topic()])(msg)
             except Exception as e:
                 print(
-                    f"Processing Topic: {msg.topic} with Function: {api_dict[msg.topic]}\n Error: {e}"
+                    f"Processing Topic: {msg.topic} with Function: {api_dict[msg.topic()]}\n Error: {e}"
                 )
 
             # tests if msg.topic is in plot_dict and calls function from dict
             try:
-                if plot_dict.get(msg.topic) is not None:
-                    eval(plot_dict[msg.topic])(msg)
+                if plot_dict.get(msg.topic()) is not None:
+                    eval(plot_dict[msg.topic()])(msg)
             except Exception as e:
                 print(
-                    f"Processing Topic: {msg.topic} with Function: {plot_dict[msg.topic]}\n Error: {e}"
+                    f"Processing Topic: {msg.topic()} with Function: {plot_dict[msg.topic()]}\n Error: {e}"
                 )
 
 except KeyboardInterrupt:
@@ -146,23 +147,3 @@ except KeyboardInterrupt:
 
 finally:
     new_c.consumer.close()
-
-
-# for msg in new_c.consumer:
-#     # tests if msg.topic is in api_dict and calls function from dict
-#     try:
-#         if api_dict.get(msg.topic) is not None:
-#             eval(api_dict[msg.topic])(msg)
-#     except Exception as e:
-#         print(
-#             f"Processing Topic: {msg.topic} with Function: {api_dict[msg.topic]}\n Error: {e}"
-#         )
-
-#     # tests if msg.topic is in plot_dict and calls function from dict
-#     try:
-#         if plot_dict.get(msg.topic) is not None:
-#             eval(plot_dict[msg.topic])(msg)
-#     except Exception as e:
-#         print(
-#             f"Processing Topic: {msg.topic} with Function: {plot_dict[msg.topic]}\n Error: {e}"
-#         )

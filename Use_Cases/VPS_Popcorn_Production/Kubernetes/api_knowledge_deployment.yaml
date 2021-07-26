@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: 5-api-knowledge
-          image: koarch/vps_5_api_knowledge:0.17-amd64
+          image: koarch/vps_5_api_knowledge:0.20-amd64
           ports:
             - containerPort: 8000
 

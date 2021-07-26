@@ -1,17 +1,6 @@
 version: '2'
 
 services:
-  # 0_api_cpps_controller:
-  #   container_name: 0_API_CPPS_Controller
-  #   hostname: 0_API_CPPS_Controller
-  #   build:
-  #     context:  ../../../
-  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_API_CPPS_Controller
-  #   expose:
-  #   - "8000"
-  #   ports:
-  #   - "8000:8000"
-
   0_p_schema_init:
     container_name: 0_P_Schema_Init
     build:
@@ -21,14 +10,14 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, 0_p_schema_init
 
-  # 0_pc_cpps:
-  #   container_name: 0_PC_CPPS
-  #   build:
-  #     context:  ../../../
-  #     dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_0_PC_CPPS
-  #   environment:
-  #     config_path: ./configurations/config.yml
-  #     config_section: General, Initial_Design, Objective_Function, 0_pc_cpps
+  1_p_cluster_monitoring:
+    container_name: 1_P_Cluster_Monitoring
+    build:
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_1_P_Cluster_Monitoring
+    environment:
+      config_path: ./configurations/config.yml
+      config_section: General, 1_p_cluster_monitoring
 
   1_pc_monitoring:
     container_name: 1_PC_Monitoring
@@ -106,7 +95,18 @@ services:
       config_path: ./configurations/config.yml
       config_section: General, Initial_Design, Objective_Function, 3_pc_evaluation
     depends_on:
-      - 4_pc_adaption
+      - 4_pc_cpps_adaption
+
+  3_api_cognition:
+    container_name: 3_API_Cognition
+    hostname: 3_API_Cognition
+    build:
+      context:  ../../../
+      dockerfile: ./Use_Cases/VPS_Popcorn_Production/Kubernetes/docker/Dockerfile_3_API_Cognition
+    expose:
+    - "8000"
+    ports:
+    - "8000:8000"
 
   3_pc_simulation:
     container_name: 3_PC_Simulation

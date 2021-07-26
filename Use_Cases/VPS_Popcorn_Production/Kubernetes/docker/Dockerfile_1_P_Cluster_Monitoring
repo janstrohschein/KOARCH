@@ -1,0 +1,12 @@
+FROM koarch/confluent_kafka_python:1.6.0
+
+# standard python libs
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/configurations/requirements.txt ./configurations/requirements.txt
+RUN pip install -r ./configurations/requirements.txt
+
+COPY /Big_Data_Platform /Big_Data_Platform
+COPY /Use_Cases/VPS_Popcorn_Production/Kubernetes/ /Use_Cases/VPS_Popcorn_Production/Kubernetes
+ENV PYTHONPATH="${PYTHONPATH}:/"
+WORKDIR /Use_Cases/VPS_Popcorn_Production/Kubernetes/src/
+
+CMD ["python", "-u", "L1_P_Cluster_Monitoring.py"]

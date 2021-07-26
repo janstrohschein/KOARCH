@@ -1,0 +1,9 @@
+{
+   "type": "record",
+   "name": "Cluster_Monitoring",
+   "fields": [
+      {"name": "algorithm", "type": ["string"]},
+      {"name": "CPU_ms", "type": ["float"]},
+      {"name": "RAM", "type": ["float"]}
+   ]
+}

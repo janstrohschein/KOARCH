@@ -1,10 +1,9 @@
 from typing import Optional
 from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-CPPS_Controller = FastAPI(root_path="/cpps")
+CPPS_Controller = FastAPI(root_path="/cognition")
 
 
 class Parameters(BaseModel):
@@ -12,7 +11,7 @@ class Parameters(BaseModel):
     x: Optional[float] = -1
 
 
-production_parameters = Parameters(x=4000.0, algorithm="init")
+production_parameters = Parameters(x=0, algorithm="init")
 
 
 @CPPS_Controller.get("/production_parameters/", response_model=Parameters)

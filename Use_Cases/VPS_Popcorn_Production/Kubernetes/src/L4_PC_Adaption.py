@@ -25,9 +25,6 @@ try:
             print(f"Error occured: {str(msg.error())}")
 
         else:
-            # new_message = new_pc.decode_msg(msg)
-            # print(f"Received on topic '{msg.topic()}': {new_message}")
-
             """
             "name": "New X",
             "fields": [
@@ -42,7 +39,7 @@ try:
             params = {"x": new_message["new_x"],
                       "algorithm": new_message["algorithm"]}
 
-            # sending get request and saving the response as response object
+            # sending put request and saving the response as response object
             print(
                 f"Send x={round(new_message['new_x'], 3)} to the CPPS Controller")
             r = requests.put(url=URL, json=params)
@@ -52,21 +49,3 @@ except KeyboardInterrupt:
 
 finally:
     new_pc.consumer.close()
-
-# for msg in new_pc.consumer:
-#     """
-#     "name": "New X",
-#     "fields": [
-#         {"name": "algorithm", "type": ["string"]},
-#         {"name": "new_x", "type": ["float"]}
-#         ]
-#     """
-
-#     new_message = new_pc.decode_avro_msg(msg)
-
-#     # defining a params dict for the parameters to be sent to the API
-#     params = {"x": new_message["new_x"], "algorithm": new_message["algorithm"]}
-
-#     # sending get request and saving the response as response object
-#     print(f"Send x={round(new_message['new_x'], 3)} to the CPPS Controller")
-#     r = requests.put(url=URL, json=params)

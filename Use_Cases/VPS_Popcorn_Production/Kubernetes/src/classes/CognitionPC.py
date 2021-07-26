@@ -48,39 +48,14 @@ class CognitionPC(KafkaPC):
             "norm_RAM",
         ]
 
-        # df_columns = [
-        #     "phase",
-        #     "model_name",
-        #     "id_x",
-        #     "n_data_points",
-        #     "id_start_x",
-        #     "model_size",
-        #     "x",
-        #     "pred_y",
-        #     "pred_y_norm",
-        #     "y",
-        #     "y_norm",
-        #     "y_delta",
-        #     "y_delta_norm",
-        #     "rmse",
-        #     "rmse_norm",
-        #     "mae",
-        #     "rsquared",
-        #     "CPU_ms",
-        #     "CPU_norm",
-        #     "RAM",
-        #     "RAM_norm",
-        #     "pred_quality",
-        #     "real_quality",
-        #     "resources",
-        #     "timestamp",
-        # ]
         self.df_sim = pd.DataFrame(columns=df_sim_columns)
         # self.df = pd.DataFrame(columns=df_columns)
         self.df_res = pd.DataFrame(columns=df_res_columns)
-        API_URL = self.config["API_URL"]
+        API_URL = "http://api-cognition-service:80"
         ENDPOINT = "/production_parameter/algorithm"
-        self.production_parameter_url = API_URL + ENDPOINT
+        self.production_parameter_alg_url = API_URL + ENDPOINT
+        ENDPOINT = "/production_parameters/"
+        self.production_parameters_url = API_URL + ENDPOINT
         self.nr_of_iterations = 0
         self.selection_phase = 0
         self.theta = 25
@@ -258,6 +233,13 @@ class CognitionPC(KafkaPC):
         print(
             f"Sent application results to Adaption: x={new_appl_result['x']}")
 
+        # defining a params dict for the parameters to be sent to the API
+        params = {"x": new_appl_result["new_x"],
+                  "algorithm": new_appl_result["algorithm"]}
+
+        # sending put request and saving the response as response object
+        r = requests.put(url=self.production_parameters_url, json=params)
+
     def process_monitoring(self, msg):
         """ Processes incoming messages from the production monitoring tool and
             sends data + instructions to the simulation module.
@@ -376,7 +358,8 @@ class CognitionPC(KafkaPC):
                     new_sim_results, ignore_index=True)
             else:
                 new_sim_series = pd.Series(new_sim_results)
-                new_in_df = self.df_sim[con_phase & con_al].index.tolist()[0]
+                # new_in_df = self.df_sim[con_phase & con_al].index.tolist()[0]
+                new_in_df = in_df[0]
                 self.df_sim.iloc[new_in_df] = new_sim_series
 
             print(self.df_sim)
@@ -445,8 +428,6 @@ class CognitionPC(KafkaPC):
                     print("Best performing algorithm: " +
                           self.best_algorithm)
 
-                    # TODO instantiate best performing algorithm
-
                     if self.current_alg_dep is not None:
                         self.k_api.kube_delete_deployment(self.current_alg_dep)
                     sleep(1)
@@ -455,7 +436,7 @@ class CognitionPC(KafkaPC):
                     self.current_alg_dep = best_alg_dep
 
                     r = requests.patch(
-                        url=self.production_parameter_url, params={
+                        url=self.production_parameter_alg_url, params={
                             "value": self.best_algorithm}
                     )
 
@@ -479,6 +460,27 @@ class CognitionPC(KafkaPC):
                 f"Apply on CPPS receives from {new_appl_result['algorithm']} but current best algorithm is {self.best_algorithm}")
 
     def process_cluster_monitoring(self, msg):
-        # TODO save resources into self.df_sim
-        # TODO adjust config to listen on AB_cluster_monitoring
-        pass
+        """
+        "name": "Cluster_Monitoring",
+        "fields": [
+            {"name": "algorithm", "type": ["string"]},
+            {"name": "CPU_ms", "type": ["float"]},
+            {"name": "RAM", "type": ["float"]}
+        """
+
+        new_cm = self.decode_msg(msg)
+
+        # find max selection_phase
+        selection_phase = self.df_sim['selection_phase'].max()
+        # conditions for df
+        con_phase = self.df_sim['selection_phase'] == selection_phase
+        con_al = self.df_sim['algorithm'] == new_cm["algorithm"]
+
+        in_df = self.df_sim[con_phase & con_al].index.tolist()
+        if len(in_df) == 0:
+            # append to df_sim if not there yet
+            self.df_sim = self.df_sim.append(new_cm, ignore_index=True)
+        else:
+            # insert values in existing row
+            self.df_sim.iloc[in_df[0]]['CPU_ms'] = new_cm["CPU_ms"]
+            self.df_sim.iloc[in_df[0]]['RAM'] = new_cm["RAM"]
