@@ -287,7 +287,9 @@ class CognitionPC(KafkaPC):
             print("Setting new_simulation=True")
             # add the baseline to the df
             job_info = {"selection_phase": self.selection_phase,
-                        "algorithm": "baseline"}
+                        "algorithm": "baseline",
+                        "CPU_ms": 1234,
+                        "RAM": 1234}
             job_series = pd.Series(job_info)
             self.df_sim = self.df_sim.append(job_series, ignore_index=True)
 
