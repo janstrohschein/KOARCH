@@ -52,3 +52,13 @@ else:
     df_sim.iloc[in_df[0]]['RAM'] = new_sim_results["RAM"]
 
 print(df_sim)
+
+
+job_info = {"selection_phase": 1,
+            "algorithm": "Kriging",
+            "x": 1,
+            "y": 2}
+new_sim_series = pd.Series(job_info)
+df_sim.iloc[in_df[0]] = job_info
+print("Update x and y")
+print(df_sim)
