@@ -25,8 +25,6 @@ class ModelOptimizer(KafkaPC):
             {"name": "repetition", "type": ["int"]},
             {"name": "budget", "type": ["int"]},
             {"name": "model", "type": ["bytes"]},
-            {"name": "CPU_ms", "type": ["float"]},
-            {"name": "RAM", "type": ["float"]}
             ]
         """
         new_model = new_pc.decode_msg(msg)
@@ -57,8 +55,6 @@ class ModelOptimizer(KafkaPC):
             {"name": "budget", "type": ["int"]},
             {"name": "x", "type": ["float"]},
             {"name": "y", "type": ["float"]},
-            {"name": "CPU_ms", "type": ["float"]},
-            {"name": "RAM", "type": ["float"]}
             ]
         """
 
@@ -69,8 +65,8 @@ class ModelOptimizer(KafkaPC):
             "budget": new_model["budget"],
             "x": surrogate_x,
             "y": surrogate_y,
-            "CPU_ms": new_model["CPU_ms"],
-            "RAM": new_model["RAM"],
+            # "CPU_ms": new_model["CPU_ms"],
+            # "RAM": new_model["RAM"],
         }
 
         new_pc.send_msg(topic="AB_simulation_results", message=sim_result_data)
@@ -88,8 +84,6 @@ class ModelOptimizer(KafkaPC):
             {"name": "rmse", "type": ["null", "float"]},
             {"name": "mae", "type": ["null", "float"]},
             {"name": "rsquared", "type": ["null", "float"]},
-            {"name": "CPU_ms", "type": ["int"]},
-            {"name": "RAM", "type": ["int"]}
             ]
         """
 

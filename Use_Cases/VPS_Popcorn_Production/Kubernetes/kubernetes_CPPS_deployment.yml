@@ -175,7 +175,7 @@ spec:
     spec:
       containers:
         - name: 2-pc-model-appl-opt
-          image: koarch/vps_2_pc_model_appl_opt:0.1-amd64
+          image: koarch/vps_2_pc_model_appl_opt:0.11-amd64
           env:
             - name: config_path
               value: "/etc/config/"
@@ -461,7 +461,7 @@ spec:
     spec:
       containers:
         - name: 5-api-knowledge
-          image: koarch/vps_5_api_knowledge:0.20-amd64
+          image: koarch/vps_5_api_knowledge:0.21-amd64
           ports:
             - containerPort: 8000
 

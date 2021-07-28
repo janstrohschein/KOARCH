@@ -117,11 +117,10 @@ class Optimizer(KafkaPC):
         algorithm = OPTIMIZER_NAME
 
         budget = result.nfev
-        # QUESTION include real resource consumption in Cognition?
         repetition = 1
 
-        CPU_ms = 0.35 + random.uniform(0, 1)
-        RAM = 23.6 + random.uniform(0, 1)
+        # CPU_ms = 0.35 + random.uniform(0, 1)
+        # RAM = 23.6 + random.uniform(0, 1)
 
         """
          "name": "Simulation_Result",
@@ -142,8 +141,8 @@ class Optimizer(KafkaPC):
             "selection_phase": selection_phase,
             "repetition": repetition,
             "budget": budget,
-            "CPU_ms": CPU_ms,
-            "RAM": RAM,
+            # "CPU_ms": CPU_ms,
+            # "RAM": RAM,
             "x": best_x,
             "y": best_y,
         }
@@ -211,14 +210,6 @@ env_vars = {
     "config_section": os.getenv("config_section"),
 }
 
-
-"""
-def evaluate_diff_evo(x):
-    X = np.array(x).reshape(-1, 1)
-    res = model.predict(X)
-
-    return res[0].item()
-"""
 new_pc = Optimizer(**env_vars)
 OPTIMIZER_NAME = new_pc.config["OPTIMIZER_NAME"]
 
@@ -238,14 +229,9 @@ try:
 
         else:
             new_pc.func_dict[msg.topic()](msg)
-            # new_message = new_pc.decode_msg(msg)
-            # print(f"Received on topic '{msg.topic()}': {new_message}")
 
 except KeyboardInterrupt:
     pass
 
 finally:
     new_pc.consumer.close()
-
-# for msg in new_pc.consumer:
-#     new_pc.func_dict[msg.topic](msg)

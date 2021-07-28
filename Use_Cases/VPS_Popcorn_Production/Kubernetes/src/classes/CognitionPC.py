@@ -357,10 +357,13 @@ class CognitionPC(KafkaPC):
                 self.df_sim = self.df_sim.append(
                     new_sim_results, ignore_index=True)
             else:
-                new_sim_series = pd.Series(new_sim_results)
-                # new_in_df = self.df_sim[con_phase & con_al].index.tolist()[0]
-                new_in_df = in_df[0]
-                self.df_sim.iloc[new_in_df] = new_sim_series
+                # repetition, budget, x, y
+                self.df_sim.iloc[in_df[0]
+                                 ]['repetition'] = new_sim_results['repetition']
+                self.df_sim.iloc[in_df[0]
+                                 ]['budget'] = new_sim_results['budget']
+                self.df_sim.iloc[in_df[0]]['x'] = new_sim_results['x']
+                self.df_sim.iloc[in_df[0]]['y'] = new_sim_results['y']
 
             print(self.df_sim)
 
@@ -383,20 +386,14 @@ class CognitionPC(KafkaPC):
                 baseline_ram = baseline["RAM"].item()
 
                 # performance y relative to baseline
-                # self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) and (self.df_sim['algorithm'] != "baseline"), "rel_y"] = (
-                #     baseline_y - self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) and (self.df_sim['algorithm'] != "baseline"), "y"]) / baseline_y
                 self.df_sim.loc[con_phase & con_al, "rel_y"] = (
                     baseline_y - self.df_sim.loc[con_phase & con_al, "y"]) / baseline_y
 
                 # CPU cons. relative to baseline
-                # self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) and (self.df_sim['algorithm'] != "baseline"), "rel_CPU_ms"] = self.df_sim.loc[(
-                #     self.df_sim['selection_phase'] == selection_phase) and (self.df_sim['algorithm'] != "baseline"), "CPU_ms"] / baseline_cpu
                 self.df_sim.loc[con_phase & con_al,
                                 "rel_CPU_ms"] = self.df_sim.loc[con_phase & con_al, "CPU_ms"] / baseline_cpu
 
                 # RAM cons. relative to baseline
-                # self.df_sim.loc[(self.df_sim['selection_phase'] == selection_phase) & (self.df_sim['algorithm'] != "baseline"), "rel_RAM"] = self.df_sim.loc[(
-                #     self.df_sim['selection_phase'] == selection_phase) and (self.df_sim['algorithm'] != "baseline"), "RAM"] / baseline_ram
                 self.df_sim.loc[con_phase & con_al,
                                 "rel_RAM"] = self.df_sim.loc[con_phase & con_al, "RAM"] / baseline_ram
 

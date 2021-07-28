@@ -6,8 +6,6 @@
     {"name": "repetition", "type": ["int"]},
     {"name": "budget", "type": ["int"]},
     {"name": "x", "type": ["float"]},
-    {"name": "y", "type": ["float"]},
-    {"name": "CPU_ms", "type": ["float"]},
-    {"name": "RAM", "type": ["float"]}
+    {"name": "y", "type": ["float"]}
     ]
     }

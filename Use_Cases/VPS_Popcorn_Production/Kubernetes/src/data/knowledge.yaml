@@ -20,7 +20,7 @@ Optimization:
             Avoid usage: false
           container:
             Image: koarch/vps_1_pc_model_learning_rf
-            Version: 0.13-amd64
+            Version: 0.14-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"
@@ -49,7 +49,7 @@ Optimization:
             Avoid usage: false
           container:
             Image: koarch/vps_1_pc_model_learning_kriging
-            Version: 0.13-amd64
+            Version: 0.14-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"
@@ -93,7 +93,7 @@ Optimization:
             Avoid usage: false
           container:
             Image: koarch/vps_2_pc_optimizer_differential_evolution
-            Version: 0.13-amd64
+            Version: 0.14-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"
@@ -136,7 +136,7 @@ Optimization:
             Avoid usage: false
           container:
             Image: koarch/vps_2_pc_optimizer_dual_annealing
-            Version: 0.13-amd64
+            Version: 0.14-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"
@@ -164,7 +164,7 @@ Optimization:
             Avoid usage: false
           container:
             Image: koarch/vps_2_pc_optimizer_lbfgsb
-            Version: 0.13-amd64
+            Version: 0.14-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"

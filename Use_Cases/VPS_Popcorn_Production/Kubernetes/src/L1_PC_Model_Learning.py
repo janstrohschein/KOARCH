@@ -130,8 +130,6 @@ class Learner(KafkaPC):
             {"name": "repetition", "type": ["int"]},
             {"name": "budget", "type": ["int"]},
             {"name": "model", "type": ["bytes"]},
-            {"name": "CPU_ms", "type": ["float"]},
-            {"name": "RAM", "type": ["float"]}
             ]
         """
 
@@ -141,8 +139,8 @@ class Learner(KafkaPC):
             "repetition": 1,
             "budget": budget,
             "model": model_pickle,
-            "CPU_ms": real_time,
-            "RAM": peak_mb,
+            # "CPU_ms": real_time,
+            # "RAM": peak_mb,
         }
 
         self.send_msg(topic="AB_simulation_model_data",
@@ -234,8 +232,6 @@ class Learner(KafkaPC):
                 {"name": "rmse", "type": ["null, float"]},
                 {"name": "mae", "type": ["null, float"]},
                 {"name": "rsquared", "type": ["null, float"]},
-                {"name": "CPU_ms", "type": ["float"]},
-                {"name": "RAM", "type": ["float"]}
                 ]
             """
 
@@ -250,8 +246,8 @@ class Learner(KafkaPC):
                 "rmse": rmse_score,
                 "mae": mae_score,
                 "rsquared": r2_score,
-                "CPU_ms": real_time,
-                "RAM": peak_mb,
+                # "CPU_ms": real_time,
+                # "RAM": peak_mb,
             }
 
             self.send_msg(topic="AB_model_data", message=model_data)

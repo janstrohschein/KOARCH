@@ -5,9 +5,6 @@
     {"name": "algorithm", "type": ["string"]},
     {"name": "repetition", "type": ["int"]},
     {"name": "budget", "type": ["int"]},
-    {"name": "model", "type": ["bytes"]},
-    {"name": "CPU_ms", "type": ["float"]},
-    {"name": "RAM", "type": ["float"]}
-
+    {"name": "model", "type": ["bytes"]}
     ]
     }
