@@ -40,9 +40,9 @@ Deploy the experiment onto the cluster:
 - `kubectl apply -f kubernetes_deployment.yml`
 
 Available endpoints:
-- `localhost/cognition/docs`
-- `localhost/knowledge_api/docs`
-- `localhost/topic_data/docs`
+- `localhost:8080/cognition/docs`
+- `localhost:8080/knowledge_api/docs`
+- `localhost:8080/topic_data/docs`
 
 
 #TODO Describe experiment
