@@ -285,6 +285,11 @@ class CognitionPC(KafkaPC):
             new_simulation = True
             self.selection_phase += 1
             print("Setting new_simulation=True")
+            # add the baseline to the df
+            job_info = {"selection_phase": self.selection_phase,
+                        "algorithm": "baseline"}
+            job_series = pd.Series(job_info)
+            self.df_sim = self.df_sim.append(job_series, ignore_index=True)
 
             if self.k_api.has_capacity():
                 # get feasible pipelines based on user input
@@ -332,8 +337,6 @@ class CognitionPC(KafkaPC):
             {"name": "budget", "type": ["int"]},
             {"name": "x", "type": ["float"]},
             {"name": "y", "type": ["float"]},
-            {"name": "CPU_ms", "type": ["float"]},
-            {"name": "RAM", "type": ["float"]}
             ]
         """
         try:
