@@ -136,7 +136,7 @@ try:
                 generateTestFunctions = robjects.r["generateTestFunctions"]
 
                 df = new_window.to_df()
-                
+
                 print(df)
 
                 testInstance = generateTestFunctions(df, N_INSTANCES)
@@ -144,8 +144,6 @@ try:
                 # selection_phase = selection_phase + 1
                 repetition = 1
                 # TODO Resources for Baseline necessary? Set to 0?
-                CPU_ms = 0.1
-                RAM = 0.05
                 samples = np.random.uniform(low=X_MIN, high=X_MAX, size=BUDGET)
                 y = testInstance(samples)
                 best_y = min(y)
@@ -172,8 +170,6 @@ try:
                     "budget": BUDGET,
                     "x": best_x,
                     "y": best_y,
-                    "CPU_ms": CPU_ms,
-                    "RAM": RAM,
                 }
                 print("Sending Baseline to Cognition")
                 new_pc.send_msg(
