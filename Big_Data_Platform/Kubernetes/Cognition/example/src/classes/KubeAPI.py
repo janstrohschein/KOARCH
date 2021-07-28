@@ -204,11 +204,16 @@ class KubeAPI:
         Returns:
             [int]: Percentage value
         """
+        if n1 == 0 or n2 == 0:
+            return 0
+
         result = 0
         try:
             result = int(n1 / n2 * 100)
         except ZeroDivisionError as e:
             print(f"Could not divide by 0. Error: {repr(e)}")
+        except Exception as e:
+            print(f"Error: {repr(e)}")
 
         return result
 

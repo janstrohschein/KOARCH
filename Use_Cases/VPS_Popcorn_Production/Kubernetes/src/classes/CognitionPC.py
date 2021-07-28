@@ -234,7 +234,7 @@ class CognitionPC(KafkaPC):
             f"Sent application results to Adaption: x={new_appl_result['x']}")
 
         # defining a params dict for the parameters to be sent to the API
-        params = {"x": new_appl_result["new_x"],
+        params = {"x": new_appl_result["x"],
                   "algorithm": new_appl_result["algorithm"]}
 
         # sending put request and saving the response as response object
@@ -308,7 +308,9 @@ class CognitionPC(KafkaPC):
 
                     # add the algorithm to the df
                     job_info = {"selection_phase": self.selection_phase,
-                                "algorithm": job.name}
+                                "algorithm": job.name,
+                                "CPU_ms": 0,
+                                "RAM": 0}
                     job_series = pd.Series(job_info)
                     self.df_sim = self.df_sim.append(
                         job_series, ignore_index=True)

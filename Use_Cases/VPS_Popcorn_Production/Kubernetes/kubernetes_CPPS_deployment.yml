@@ -91,7 +91,7 @@ spec:
       serviceAccountName: cognition
       containers:
         - name: 1-p-cluster-monitoring
-          image: koarch/vps_1_p_cluster_monitoring:0.16-amd64
+          image: koarch/vps_1_p_cluster_monitoring:0.17-amd64
           env:
             - name: config_path
               value: "/etc/config/"
@@ -219,7 +219,7 @@ spec:
     spec:
       containers:
         - name: 3-pc-cognition
-          image: koarch/vps_3_pc_evaluation:0.397-amd64
+          image: koarch/vps_3_pc_evaluation:0.399-amd64
           env:
             - name: config_path
               value: "/etc/config/"
