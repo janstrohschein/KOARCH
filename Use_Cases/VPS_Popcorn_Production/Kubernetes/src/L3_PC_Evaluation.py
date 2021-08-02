@@ -62,7 +62,7 @@ try:
                 print(f"Error retrieving topic: {repr(e)}")
             try:
                 new_message = new_cog.decode_msg(msg)
-                print(f"Received on topic '{msg.topic()}': {new_message}")
+                # print(f"Received on topic '{msg.topic()}': {new_message}")
             except Exception as e:
                 print(
                     f"Error decoding msg: {msg.topic()}, message: {new_message}")
