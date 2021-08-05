@@ -39,9 +39,17 @@ Create a Service Account with the necessary rights for the Cognition:
 Deploy the experiment onto the cluster:
 - `kubectl apply -f kubernetes_deployment.yml`
 
+## Simulation
 
+<img src="./docs/vps_simulation.png" width="1000px">
 
+## Production
 
+<img src="./docs/vps_production.png" width="1000px">
+
+## Overview
+
+<img src="./docs/vps_complete.png" width="1000px">
 ## Access to additional information
 While the experiment is running, the user can retrieve additional information through various APIs:
 
@@ -101,27 +109,6 @@ The described workflow is also shown in the figure below:
 
 <img src="./docs/vps_use_case_workflow.jpg" width="800px">
 
-## Access to additional information
-While the experiment is running, the user can retrieve additional information through various APIs:
-
-+ Production Parameter API\
-The CPPS Controller stores the most recent values for all production parameters.
-To access the HMI please visit: `127.0.0.1:8000/docs`
-
-+ Reporting API\
-The reporting module collects data from several topics and forwards the messages to the HMI module.
-There the user can retrieve all information or a filtered subset based on the topic as JSON or CSV.
-To access the HMI please visit: `127.0.0.1:8001/docs`
-
-+ Knowledge API\
-The knowledge module provides the use case information as well as the algorithm knowledge.
-To access the HMI please visit: `127.0.0.2:8002/docs`
-
-## Stop the Experiment
-Please press `Ctrl + C` in each terminal, to stop the experiment as well as the Kafka broker.
-Execute both commands to remove the containers:\
-`docker-compose down`\
-`docker-compose -f docker-compose_kafka.yml down`
 
 -->
 # Experiment results
@@ -145,14 +132,3 @@ The job is meant for one-off execution of a task, e.g., a part of a data process
 An overview of the complete process to dynamically create a data processing pipeline is depicted in the figure below. The cognitive component decides which algorithms should be tested on the current use case based on information about available cluster resources from the monitoring module and the knowledge on available algorithms and their properties. The cognition then declares which jobs need to run to form one or more data processing pipelines. The controller subsequently pulls the container images for the given jobs from the container registry and instantiates them.
 
 <img src="./docs/cognition_creates_pipeline.jpg" width="600px">
-
-<!---
-A lot of things happened in the background to make this work:
-+ Docker-compose builds the Containers from the Dockerfiles in `src`.
-+ The Dockerfiles specify the base image, install the requirements found in `./src/configurations/`, copy the sources into the container and set the program to execute when the container starts.
-+ The Docker-compose files also specify the path to the configuration file and the relevant sections for each container.
-This sets the environment for the container, e.g. the URL for the Kafka broker, the incoming / outgoing topics for our modules and also the serialization schema.
-+ Avro serializes the messages according to schemas defined in `./src/schema/`.
-Messages that do not comply to the specified schema raise an error and can´t be send.
-+ The reporting module and the HMI can be configured via `./src/configurations/config.yml`. The reporting module specifies all the API endpoints it wants to use under `API_OUT`. The HMI module defines to read the configuration section of the reporting module in the `docker-compose.yml` and creates the necessary endpoints. This allows to dynamically collect and combine data from several modules in one API.
--->
