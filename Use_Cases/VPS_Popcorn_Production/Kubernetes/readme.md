@@ -40,16 +40,43 @@ Deploy the experiment onto the cluster:
 - `kubectl apply -f kubernetes_deployment.yml`
 
 ## Simulation
+The Big Data Platform (BDP) uses process data from the CPPS to generate test functions.
+Several algorithms will evaluate those test functions and try to find an optimal solution.
+The most promising algorithm gets selected and is used to optimize the next n production cycles.
+
+The simulation phase consists of the following steps:
++ The phase starts in the Cognition (L3) module, which creates the initial design.
+The initial design consists of 5 points, equally distributed over the search space for x.
+The Cognition publishes those as starting points to the Analytics Bus, where the Adaption (L4) listens.
++ The Adaption sends those new parameters to the Protocol Translation (L0) , where they are transferred to the CPPS via OPC UA for the upcoming production cycle.
++ Sensors in the CPPS collect process information, which the Protocol Translation retrieves via a subscription to the OPC UA server.
++ The Feature Extraction (L0) recognizes when a production cycle ends and condenses the sensor information into seperate production cycles. The Monitoring (L1) module forwards the data to the Cognition.
++ The Cognition initiates a new simulation run when the production with parameters from the initial design concludes. It uses the knowledgebase to generate feasible pipelines and instantiates promising algorithms as Kubernetes jobs on the BDP. The insights from the production process are transferred to the Simulation (L3) module, which generates test functions for the feasible algorithms.
++ Currently CAAI implements several model-based algorithms, e.g., Random Forest and Kriging, which use the Model Learning (L1) module to train a model and the Model Application and Optimization (L2) module to search for an optimal solution on the model. Additionally, CAAI also implements different optimizers that work without a model, e.g., Differential Evolution and Dual Annealing, which are instantiated via the Optimize (L2) module.
++ The algorithms optimize the test functions and send the results to the Cognition (L3) for comparison and evaluation.
++ During the optimization the Cluster monitoring (L1) collects information about the resource consumption for each algorithm from the Kubernetes API.
++ The Cognition (L3) selects the most promising algorithm and creates a Kubernetes deployment for this algorithm. The algorithm will be used to optimize the next production cycles.
 
 <img src="./docs/vps_simulation.png" width="1000px">
 
 ## Production
+The production phase uses the selected algorithm to optimize the production parameters.
+The additional process data from each production cycle can be used to further refine the optimization.
+However, the Cognition will decide when another simulation run is required, either after a set number of production cycles or if the performance decreases below a certain threshold.
+
+The production phase consists of the following steps:
++ The Protocol Translation (L0) retrieves process information via OPC UA from the CPPS.
++ The Feature Extraction (L0) detects seperate production cycles and sends the condensed information to the feature topic.
++ The selected algorithm, either instantiated as a deployment of the Model Learning (L1) or Optimizer (L2) module, uses those features to optimize the production parameters. The Optimizer (L2) module will generate several points that should be tested during production before a new prediction is made, thus it sends information on two different topics to the Cognition (L3).
++ The Cognition evaluates the new production parameters and sends these to the Adaption (L4). The Cognition also initiates a new simulation run after a set number of production cycles or if the performance degrades.
++ The Adaption sends the new production parameters to the Protocol Translation (L0), where those new values are transferred via OPC UA to the CPPS.
 
 <img src="./docs/vps_production.png" width="1000px">
 
 ## Overview
-
+The following diagram shows all the modules, that are used for simulation and production with the associated Kafka topics.
 <img src="./docs/vps_complete.png" width="1000px">
+
 ## Access to additional information
 While the experiment is running, the user can retrieve additional information through various APIs:
 
@@ -78,39 +105,6 @@ Remove the ConfigMap `vps-use-case`:
 - `kubectl delete configmap vps-use-case`
 
 
-
-
-#TODO Describe experiment
-<!---
-Open another terminal to start the experiment:\
-`docker-compose up`
-
-## Start-up
-+ You can see the creation of several containers, one for each module of our CAAI pipeline.
-+ The start-up sequence starts in the third module, where the Cognition creates the initial design.
-The initial design consists of 5 points, equally distributed over the search space for x.
-The Cognition publishes those as starting points to the Analytics Bus, where the Adaption (4) listens.
-+ The Adaption sends those new parameters to the CPPS Controller (0), where they are retrieved from the CPPS (0) before continuous operation starts.
-
-## Continuous operation
-+ The CPPS Module (0) builds a model of the production process with data from experiments on the real CPPS during start-up.
-This model is used to evaluate the incoming points for x and derive the corresponding y-value.
-The CPPS (0) sends both points to the Data Bus.
-+ As we use message-based communication, we can subscribe any number of modules to a topic and each will receive the data.
-In this use case the Monitoring (1) and two Model Learning (1) modules listen to new data from the CPPS (0).
-The Monitoring (1) module transfers the CPPS data from the Data Bus to the Analytics Bus, so the Cognition (3) can evaluate the process data.
-The Model Learning (1) modules, implementing Kriging and Random Forest algorithms, use leave-one-out cross-validation to calculate RMSE, MAE and R<sup>2</sup> and send those metrics as well as the trained model to the Analytics Bus.
-+ The Model Application + Optimization (2) module receives both models and uses differential evolution to search for an improved solution.
-The best predicted y and the corresponding x for each algorithm is published to the Analytics Bus.
-+ The Cognition (3) is able to evaluate the suggested new values.
-Once the Cognition decided a new value to try in production, it is send to the Adaption (4), which instructs the CPPS controller and concludes the iteration.
-
-The described workflow is also shown in the figure below:
-
-<img src="./docs/vps_use_case_workflow.jpg" width="800px">
-
-
--->
 # Experiment results
 The detailed results for the experiment can be found [here](experiments/readme.md).
 
