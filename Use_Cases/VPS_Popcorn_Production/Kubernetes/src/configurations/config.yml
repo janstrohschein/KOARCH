@@ -24,6 +24,8 @@ Objective_Function:
     AB_application_results: ./schema/application_result.avsc
     AB_simulation_results: ./schema/simulation_result.avsc
     DB_features: ./schema/CPPSFeatures.avsc
+    AB_cluster_monitoring: ./schema/cluster_monitoring.avsc
+    AB_model_data: ./schema/model.avsc
 
 0_pc_cpps:
   OUT_TOPIC:

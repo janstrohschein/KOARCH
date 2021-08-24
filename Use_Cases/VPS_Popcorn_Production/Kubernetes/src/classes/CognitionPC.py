@@ -58,7 +58,7 @@ class CognitionPC(KafkaPC):
         self.production_parameters_url = API_URL + ENDPOINT
         self.nr_of_iterations = 0
         self.selection_phase = 0
-        self.theta = 25
+        self.theta = 2
         self.zeta = 1
         self.best_algorithm = "baseline"
         self.k_api = KubeAPI()
@@ -280,7 +280,7 @@ class CognitionPC(KafkaPC):
 
         # \If{(nrIterations $\%\, \theta = 0 \vee \zeta = 1$)}
         new_simulation = False
-        if self.nr_of_iterations % self.theta == 0 or self.zeta == 1:
+        if (self.nr_of_iterations % self.theta == 0 and self.nr_of_iterations > 5) or self.zeta == 1:
             self.zeta = 0
             new_simulation = True
             self.selection_phase += 1
