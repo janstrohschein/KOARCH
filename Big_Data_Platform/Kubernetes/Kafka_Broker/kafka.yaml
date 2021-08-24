@@ -140,7 +140,7 @@ spec:
       # The partition assignor class for the metric samplers
       metric.sampler.partition.assignor.class=com.linkedin.kafka.cruisecontrol.monitor.sampling.DefaultMetricSamplerPartitionAssignor
       # The metric sampling interval in milliseconds
-      metric.sampling.interval.ms=55000
+      metric.sampling.interval.ms=100000
       # The partition metrics window size in milliseconds
       partition.metrics.window.ms=300000
       # The number of partition metric windows to keep in memory
@@ -217,7 +217,7 @@ spec:
       # The metric anomaly finder class
       metric.anomaly.finder.class=com.linkedin.kafka.cruisecontrol.detector.KafkaMetricAnomalyFinder
       # The anomaly detection interval
-      anomaly.detection.interval.ms=10000
+      anomaly.detection.interval.ms=100000
       # The goal violation to detect.
       anomaly.detection.goals=com.linkedin.kafka.cruisecontrol.analyzer.goals.ReplicaCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.DiskCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkInboundCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkOutboundCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.CpuCapacityGoal
       # The interested metrics for metric anomaly analyzer.
