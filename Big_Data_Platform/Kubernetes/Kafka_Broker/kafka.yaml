@@ -140,7 +140,7 @@ spec:
       # The partition assignor class for the metric samplers
       metric.sampler.partition.assignor.class=com.linkedin.kafka.cruisecontrol.monitor.sampling.DefaultMetricSamplerPartitionAssignor
       # The metric sampling interval in milliseconds
-      metric.sampling.interval.ms=100000
+      metric.sampling.interval.ms=55000
       # The partition metrics window size in milliseconds
       partition.metrics.window.ms=300000
       # The number of partition metric windows to keep in memory
@@ -210,6 +210,10 @@ spec:
       num.concurrent.partition.movements.per.broker=10
       # The interval between two execution progress checks.
       execution.progress.check.interval.ms=10000
+      #
+      # ===========================
+      cruise.control.metrics.reporter.metrics.reporting.interval.ms=55000
+      #
       # Configurations for anomaly detector
       # =======================================
       # The goal violation notifier class
@@ -217,7 +221,7 @@ spec:
       # The metric anomaly finder class
       metric.anomaly.finder.class=com.linkedin.kafka.cruisecontrol.detector.KafkaMetricAnomalyFinder
       # The anomaly detection interval
-      anomaly.detection.interval.ms=100000
+      anomaly.detection.interval.ms=55000
       # The goal violation to detect.
       anomaly.detection.goals=com.linkedin.kafka.cruisecontrol.analyzer.goals.ReplicaCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.DiskCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkInboundCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkOutboundCapacityGoal,com.linkedin.kafka.cruisecontrol.analyzer.goals.CpuCapacityGoal
       # The interested metrics for metric anomaly analyzer.
@@ -293,6 +297,12 @@ spec:
         "brokerCapacities":[
           {
             "brokerId": "-1",
+        "capacity": {
+          "DISK": "100000",
+          "CPU": "100",
+          "NW_IN": "10000",
+          "NW_OUT": "10000"
+            }
           }
         ]
       }

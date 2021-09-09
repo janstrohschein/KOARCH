@@ -5,3 +5,5 @@
     AB_simulation_results: ./schema/simulation_result.avsc
     DB_features: ./schema/CPPSFeatures.avsc
     AB_model_data: ./schema/model.avsc
+    AB_simulation_model: ./schema/simulation_model.avsc
+    AB_simulation_model_data: ./schema/simulation_model.avsc

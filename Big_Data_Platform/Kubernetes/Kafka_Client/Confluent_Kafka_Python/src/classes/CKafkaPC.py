@@ -128,6 +128,8 @@ class KafkaPC:
 
     def create_topics_on_broker(self, partitions=1, replication=1):
 
+        print(f"Topics in config: " + str(self.out_topic))
+
         if self.out_topic is not None:
             a = AdminClient(
                 {"bootstrap.servers": self.config["KAFKA_BROKER_URL"]})
@@ -137,7 +139,7 @@ class KafkaPC:
             md = a.list_topics(timeout=10)
             broker_set = set(md.topics.values())
             diff_set = topic_set.difference(broker_set)
-            # print(f"Topics not yet available on Broker: {diff_set}")
+            print(f"Topics not yet available on Broker: {diff_set}")
             new_topics = [
                 NewTopic(
                     topic, num_partitions=partitions, replication_factor=replication
@@ -156,7 +158,7 @@ class KafkaPC:
                     f.result()  # The result itself is None
                     print(f"Topic {topic} created on Broker")
                 except Exception as e:
-                    # print(f"Failed to create topic {topic} on Broker: {repr(e)}")
+                    print(f"Failed to create topic {topic} on Broker: {repr(e)}")
                     pass
 
     def get_out_schema(self):
