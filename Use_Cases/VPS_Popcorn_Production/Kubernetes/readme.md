@@ -96,10 +96,10 @@ To access the HMI please visit: \
 ## Stop the experiment
 
 Remove the deployment from the cluster:
-- `kubectl apply -f kubernetes_deployment.yml`
+- `kubectl delete -f kubernetes_deployment.yml`
 
 Remove the Cognition Service Account:
-+ `kubectl apply -f cognition_preparation_custom_service_account.yaml`
++ `kubectl delete -f cognition_preparation_custom_service_account.yaml`
 
 Remove the ConfigMap `vps-use-case`:
 - `kubectl delete configmap vps-use-case`
