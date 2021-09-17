@@ -7,7 +7,7 @@ Initial_Design:
   N_INITIAL_DESIGN: 5
   MAX_PRODUCTION_CYCLES: 50
   X_MIN: 4000.0
-  X_MAX: 10100.0
+  X_MAX: 7500.0
 
 Objective_Function:
   data_path: ./data/vpsFeatures.csv
