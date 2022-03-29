@@ -58,7 +58,7 @@ while current_data_point < MAX_PRODUCTION_CYCLES:
     new_data_point = {
         "cycle": current_data_point,
         "timestamp": 12345,
-        "x": {"x": new_x},
+        "x": {"conveyorRuntime": new_x},
         "y_values": {"y": new_y},
         "y_agg": new_y,
         "y_values_norm": {"y": new_y},

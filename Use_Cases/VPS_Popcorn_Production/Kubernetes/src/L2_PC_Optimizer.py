@@ -69,7 +69,8 @@ class Optimizer(KafkaPC):
 
         print(f"sending from apply_to_cpps() with x={x[0]}")
         self.send_msg(topic="AB_apply_on_cpps", message=apply_on_cpps_dict)
-
+        
+        
         try:
             while True:
                 msg = new_pc.consumer.poll(0.1)
@@ -82,14 +83,21 @@ class Optimizer(KafkaPC):
 
                 else:
                     print(f"Arrived on topic: {msg.topic()} ")
-                    if msg.topic() == "AB_raw_data":
+                    if msg.topic() == "DB_features":                            #FIX: FALSCHER TOPIC?!?
+                    #if msg.topic() == "AB_test_function":
+                        print("msg:" + str(msg))
                         new_msg = self.decode_msg(msg)
+                        print("decoded:" + str(new_msg))
                         # get y from returning message
-                        return new_msg["y"]
+                        return new_msg["y_agg_norm"]
+
+                    elif msg.topic() == "AB_test_function":
+                        new_pc.func_dict[msg.topic()](msg)
+
 
         except KeyboardInterrupt:
             pass
-
+        
     def process_test_function(self, msg):
         print("Process test instance from Simulation on AB_test_function")
         print("Optimizer: " + OPTIMIZER_NAME)
@@ -156,7 +164,7 @@ class Optimizer(KafkaPC):
         print("Process production data from Monitoring on DB_features")
         id = new_production_data["cycle"]
         self.last_raw_id = id
-        self.raw_data_dict[id] = {
+        self.raw_data_dict[id] = { #FIX: Ueberbleibsel? keine weitere Verwendung
             "id": id,
             "phase": "observation",
             "algorithm": OPTIMIZER_NAME,

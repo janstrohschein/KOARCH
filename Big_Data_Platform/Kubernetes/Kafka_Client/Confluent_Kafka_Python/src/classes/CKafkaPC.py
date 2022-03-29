@@ -238,6 +238,7 @@ class KafkaPC:
 
     def create_deserializer(self):
         self.deserializer = {}
+        print("in Deserializer: " + str(self.in_topic))
         if self.in_topic is not None:
             for topic in self.in_topic:
                 if self.in_schema[topic] is None:

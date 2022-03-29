@@ -58,8 +58,8 @@ class CognitionPC(KafkaPC):
         self.production_parameters_url = API_URL + ENDPOINT
         self.nr_of_iterations = 0
         self.selection_phase = 0
-        self.theta = 2
-        self.zeta = 1
+        self.theta = 10 #2 #25 #Anzahl der Durchgänge vor neuevaluierung
+        self.zeta = 1 # ? Weis der Geier was das tut...
         self.best_algorithm = "baseline"
         self.k_api = KubeAPI()
         self.k_api.init_kube_connection()
@@ -360,17 +360,17 @@ class CognitionPC(KafkaPC):
 
             # append to df_sim
             in_df = self.df_sim[con_phase & con_al].index.tolist()
+            print(">>> in_df: " + str(in_df))
             if len(in_df) == 0:
                 self.df_sim = self.df_sim.append(
                     new_sim_results, ignore_index=True)
             else:
                 # repetition, budget, x, y
-                self.df_sim.iloc[in_df[0]
-                                 ]['repetition'] = new_sim_results['repetition']
-                self.df_sim.iloc[in_df[0]
-                                 ]['budget'] = new_sim_results['budget']
-                self.df_sim.iloc[in_df[0]]['x'] = new_sim_results['x']
-                self.df_sim.iloc[in_df[0]]['y'] = new_sim_results['y']
+                self.df_sim.loc[in_df[0], 'repetition'] = new_sim_results['repetition']
+                self.df_sim.loc[in_df[0], 'budget'] = new_sim_results['budget']
+                self.df_sim.loc[in_df[0], 'x'] = new_sim_results['x']
+                self.df_sim.loc[in_df[0], 'y'] = new_sim_results['y']
+                print(">>> df part: " + str(self.df_sim.iloc[in_df[0]]))
 
             print(self.df_sim)
 

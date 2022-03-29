@@ -7,29 +7,37 @@ library(SPOT)
 # d has the form: id, x, y
 generateTestFunctions <- function(d, n) {
   print("R: generate Test Functions call")
+  print("d orig: ")
+  print(d)
 
   S <- list()
+  print("R: list done")
 
   # remove duplicate x values 
   d <- d[!duplicated(d[, "x"]), ] 
+  print("R: rm dupli")
 
   minData <- 5
-  if(nrow(d) > minData)
+  if(nrow(d) > (minData + 3))
     # take first #minData data points and 3 random additional points
     d <- d[c(1:(minData + 3)), ]
     #d <- d[c(1:minData, sort(sample((minData+1):nrow(d), 3))), ]
 
   x <- cbind(d$x) # cbind(unique(d$x))
   y <- cbind(d$y) # cbind(unique(d$y))
+  print("R: c bind done")
 
-#  print(x)
-#  print(y)
+  print(x)
+  print(y)
 
   ## nr of functions to generate
   nrTestFunctions <- n
+  print("R: specify kriging model")
 
   ## specify Kriging model configuration for COBBS
   mc <- list(useLambda=FALSE, thetaLower=1e-6, thetaUpper=1e12)
+
+  print("R: kriginf done")
 
   ## and some configuration details for the simulation
   cntrl <- list(modelControl = mc,
@@ -40,12 +48,17 @@ generateTestFunctions <- function(d, n) {
                 #method="decompose",xsim=matrix(c(runif(200,-32,32)),,1),
                 conditionalSimulation = FALSE)
 
+  print("d: -->")
+  print(d)
+  print("R: objFun <- funVPS")
   # groundtruth function to compare simulations with (visually)
   objFun <- funVPS(d)
 
+  print("R: cobbsResult")
   # generate model and functions
   cobbsResult <- generateCOBBS(x, y, cntrl)
 
+  print("R: cobbsResult Simu")
   # shuffle simulation functions
   cobbsResult$simulation <- sample(cobbsResult$simulation, length(cobbsResult$simulation), replace=FALSE)
 
@@ -70,6 +83,9 @@ generateTestFunctions <- function(d, n) {
 #'
 ###################################################################################
 funVPS <- function(data) {
+  print("in funVPS...")
+  print(data$x)
+  print(data$y)
   # model y ~ x
   kriging <- buildKriging(as.matrix(data$x), as.matrix(data$y), control = list(useLambda=TRUE, reinterpolate=TRUE))
   tmp <- function(x) {

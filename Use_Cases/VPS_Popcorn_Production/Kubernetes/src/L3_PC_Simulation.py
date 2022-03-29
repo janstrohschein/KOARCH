@@ -79,7 +79,7 @@ generate_new = False
 r = robjects.r
 
 # redirect r output to local buffer
-new_pc.capture_r_console_output()
+# new_pc.capture_r_console_output()
 
 # source R file of test functions generator implementation
 source_simulation_r = prefix + "L3_PC_Simulation.R"
@@ -114,7 +114,8 @@ try:
                 ]
                 }
             """
-            new_data = new_pc.decode_msg(msg)
+            new_data = new_pc.decode_msg(msg) 
+            print("new_data: " + str(new_data)) #DEBUG
             new_data_point = new_window.Data_Point(
                 new_data["id"], new_data["x"], new_data["y"]
             )
@@ -137,7 +138,7 @@ try:
 
                 df = new_window.to_df()
 
-                print(df)
+                print("Dataframe:\n" + str(df))
 
                 testInstance = generateTestFunctions(df, N_INSTANCES)
                 # compute baseline performance results and send to cognition

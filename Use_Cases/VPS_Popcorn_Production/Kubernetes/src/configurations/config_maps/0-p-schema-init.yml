@@ -7,3 +7,4 @@
     AB_model_data: ./schema/model.avsc
     AB_simulation_model: ./schema/simulation_model.avsc
     AB_simulation_model_data: ./schema/simulation_model.avsc
+    AB_cluster_monitoring: ./schema/cluster_monitoring.avsc

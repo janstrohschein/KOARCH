@@ -92,8 +92,10 @@ Optimization:
             Prefer usage: true
             Avoid usage: false
           container:
-            Image: koarch/vps_2_pc_optimizer_differential_evolution
-            Version: 0.14-amd64
+            #Image: koarch/vps_2_pc_optimizer_differential_evolution
+            #Version: 0.14-amd64
+            Image: iasresearch/koarch
+            Version: vps_2_pc_optimizer_differential_evolution_0.15-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"
@@ -135,8 +137,10 @@ Optimization:
             Prefer usage: true
             Avoid usage: false
           container:
-            Image: koarch/vps_2_pc_optimizer_dual_annealing
-            Version: 0.14-amd64
+            # Image: koarch/vps_2_pc_optimizer_dual_annealing
+            # Version: 0.14-amd64
+            Image: iasresearch/koarch
+            Version: vps_2_pc_optimizer_dual_annealing_0.18-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"
@@ -163,8 +167,10 @@ Optimization:
             Prefer usage: true
             Avoid usage: false
           container:
-            Image: koarch/vps_2_pc_optimizer_lbfgsb
-            Version: 0.14-amd64
+            #Image: koarch/vps_2_pc_optimizer_lbfgsb
+            #Version: 0.14-amd64
+            Image: iasresearch/koarch
+            Version: vps_2_pc_optimizer_lbfgsb_0.16-amd64
             Config_Maps:
               - name: "vps-use-case"
                 key: "general.yml"

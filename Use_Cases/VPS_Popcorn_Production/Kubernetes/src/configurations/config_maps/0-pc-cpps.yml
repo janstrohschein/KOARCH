@@ -1,4 +1,5 @@
 0_pc_cpps:
   OUT_TOPIC:
-    DB_raw_data: ./schema/data.avsc
-  API_URL: http://api-cpps-controller-service:80
+    #DB_raw_data: ./schema/data.avsc #auskommentiert weil Simulation
+    DB_features: ./schema/CPPSFeatures.avsc
+  API_URL: http://api-cognition-service:80 #http://api-cpps-controller-service:80

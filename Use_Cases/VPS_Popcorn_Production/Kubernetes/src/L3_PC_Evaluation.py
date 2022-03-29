@@ -62,13 +62,15 @@ try:
                 print(f"Error retrieving topic: {repr(e)}")
             try:
                 new_message = new_cog.decode_msg(msg)
-                # print(f"Received on topic '{msg.topic()}': {new_message}")
+                print(f"Received on topic '{msg.topic()}': {new_message}")
             except Exception as e:
                 print(
                     f"Error decoding msg: {msg.topic()}, message: {new_message}")
                 print(f"Error: {repr(e)}")
             try:
+                print("Processing in 'CognitionPC'...")
                 new_cog.func_dict[msg.topic()](msg)
+                print("---> MSG processed in 'CognitionPC'!\n")
             except Exception as e:
                 print(
                     f"Error accessing the function for topic {msg.topic()}: {repr(e)}")
